@@ -3,6 +3,7 @@
         <TargetFrameworks>netcoreapp2.0;net461</TargetFrameworks>
     </PropertyGroup>
     <ItemGroup>
+      <ProjectReference Include="..\..\src\AspNetCore.Hosting\Rocket.Surgery.AspNetCore.Hosting.csproj" />
       <ProjectReference Include="..\..\src\Hosting\Rocket.Surgery.Extensions.Hosting.csproj" />
     </ItemGroup>
     <ItemGroup Condition="'$(TargetFramework)'=='netstandard1.3' or '$(TargetFramework)'=='net451'">
