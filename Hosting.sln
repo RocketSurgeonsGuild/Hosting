@@ -39,8 +39,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rocket.Surgery.Extensions.H
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rocket.Surgery.Extensions.Hosting.Tests", "test\Hosting.Tests\Rocket.Surgery.Extensions.Hosting.Tests.csproj", "{D731027D-E348-4001-8E67-7F86AD504C02}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rocket.Surgery.AspNet.Hosting", "src\AspNet.Hosting\Rocket.Surgery.AspNet.Hosting.csproj", "{664F1046-E738-43E7-A4CA-2EEB8CA447A1}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,18 +85,6 @@ Global
 		{D731027D-E348-4001-8E67-7F86AD504C02}.Release|x64.Build.0 = Release|Any CPU
 		{D731027D-E348-4001-8E67-7F86AD504C02}.Release|x86.ActiveCfg = Release|Any CPU
 		{D731027D-E348-4001-8E67-7F86AD504C02}.Release|x86.Build.0 = Release|Any CPU
-		{664F1046-E738-43E7-A4CA-2EEB8CA447A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{664F1046-E738-43E7-A4CA-2EEB8CA447A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{664F1046-E738-43E7-A4CA-2EEB8CA447A1}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{664F1046-E738-43E7-A4CA-2EEB8CA447A1}.Debug|x64.Build.0 = Debug|Any CPU
-		{664F1046-E738-43E7-A4CA-2EEB8CA447A1}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{664F1046-E738-43E7-A4CA-2EEB8CA447A1}.Debug|x86.Build.0 = Debug|Any CPU
-		{664F1046-E738-43E7-A4CA-2EEB8CA447A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{664F1046-E738-43E7-A4CA-2EEB8CA447A1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{664F1046-E738-43E7-A4CA-2EEB8CA447A1}.Release|x64.ActiveCfg = Release|Any CPU
-		{664F1046-E738-43E7-A4CA-2EEB8CA447A1}.Release|x64.Build.0 = Release|Any CPU
-		{664F1046-E738-43E7-A4CA-2EEB8CA447A1}.Release|x86.ActiveCfg = Release|Any CPU
-		{664F1046-E738-43E7-A4CA-2EEB8CA447A1}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -107,7 +93,6 @@ Global
 		{AD06E4D2-ECC0-4E3B-B266-82E2D7FB5A33} = {52F62811-7776-42E4-921F-E1F9202F8074}
 		{14691714-25C5-4FE3-B5E7-FD9519BB91AD} = {52F62811-7776-42E4-921F-E1F9202F8074}
 		{D731027D-E348-4001-8E67-7F86AD504C02} = {F2329C11-7A3F-4D18-A665-6FA91A922DBF}
-		{664F1046-E738-43E7-A4CA-2EEB8CA447A1} = {52F62811-7776-42E4-921F-E1F9202F8074}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7EF3BE50-98BC-4A67-A514-EF6078B1DA37}
