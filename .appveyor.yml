@@ -1,0 +1,42 @@
+image: Visual Studio 2017
+init:
+  - git config --global core.autocrlf input
+build_script:
+  - ps: .\build.ps1
+test: off
+after_build:
+  - "SET PATH=C:\\Python34;C:\\Python34\\Scripts;%PATH%"
+  - pip install codecov
+  - codecov -f "./artifacts/report/coverage/index.xml"
+artifacts:
+  - path: ./artifacts/nuget/*.nupkg
+cache:
+  - tools -> build.cake, tools/packages.config
+nuget:
+  project_feed: true
+deploy:
+  - provider: NuGet
+    server: https://www.myget.org/F/rocket-surgeons-guild/api/v2/package
+    api_key:
+      secure: eoBrSWDtOXSxyUOoCSTyQCeDkvU18W67pE3w26viEUBRi1K4Tru0cTjUtDUB7l9V
+    skip_symbols: false
+    symbol_server: https://www.myget.org/F/rocket-surgeons-guild/symbols/api/v2/package
+    artifact: /.*\.nupkg/
+    on:
+      branch: master
+  - provider: NuGet
+    server: https://www.myget.org/F/rocket-surgeons-guild/api/v2/package
+    api_key:
+      secure: eoBrSWDtOXSxyUOoCSTyQCeDkvU18W67pE3w26viEUBRi1K4Tru0cTjUtDUB7l9V
+    skip_symbols: false
+    symbol_server: https://www.myget.org/F/rocket-surgeons-guild/symbols/api/v2/package
+    artifact: /.*\.nupkg/
+    on:
+      appveyor_repo_tag: true
+  - provider: NuGet
+    api_key:
+      secure: 0v8N4paitMtyZbuSL1LwNREpUVIrpoVTGHD1lUmSm3Rb5UBIuYpjoMSFy14JrTPl
+    skip_symbols: true
+    artifact: /.*\.nupkg/
+    on:
+      appveyor_repo_tag: true

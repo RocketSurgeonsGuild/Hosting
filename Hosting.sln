@@ -1,0 +1,115 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2006
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".config", ".config", "{1E56F8EA-0A93-4EA5-9EC6-400B24CAC531}"
+	ProjectSection(SolutionItems) = preProject
+		.appveyor.yml = .appveyor.yml
+		.editorconfig = .editorconfig
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		.gitmodules = .gitmodules
+		cake.config = cake.config
+		GitVersion.yml = GitVersion.yml
+		global.json = global.json
+		NuGet.config = NuGet.config
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{2D7895AC-3F01-45F6-9F26-85F09B6F7E62}"
+	ProjectSection(SolutionItems) = preProject
+		build.ps1 = build.ps1
+		cakefile.cake = cakefile.cake
+		Common.Build.props = Common.Build.props
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{52F62811-7776-42E4-921F-E1F9202F8074}"
+	ProjectSection(SolutionItems) = preProject
+		src\Directory.Build.props = src\Directory.Build.props
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{F2329C11-7A3F-4D18-A665-6FA91A922DBF}"
+	ProjectSection(SolutionItems) = preProject
+		test\Directory.Build.props = test\Directory.Build.props
+		test\Directory.Build.targets = test\Directory.Build.targets
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rocket.Surgery.Extensions.Hosting", "src\Hosting\Rocket.Surgery.Extensions.Hosting.csproj", "{AD06E4D2-ECC0-4E3B-B266-82E2D7FB5A33}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rocket.Surgery.Extensions.Hosting.Abstractions", "src\Hosting.Abstractions\Rocket.Surgery.Extensions.Hosting.Abstractions.csproj", "{14691714-25C5-4FE3-B5E7-FD9519BB91AD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rocket.Surgery.Extensions.Hosting.Tests", "test\Hosting.Tests\Rocket.Surgery.Extensions.Hosting.Tests.csproj", "{D731027D-E348-4001-8E67-7F86AD504C02}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rocket.Surgery.AspNet.Hosting", "src\AspNet.Hosting\Rocket.Surgery.AspNet.Hosting.csproj", "{664F1046-E738-43E7-A4CA-2EEB8CA447A1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AD06E4D2-ECC0-4E3B-B266-82E2D7FB5A33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD06E4D2-ECC0-4E3B-B266-82E2D7FB5A33}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD06E4D2-ECC0-4E3B-B266-82E2D7FB5A33}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{AD06E4D2-ECC0-4E3B-B266-82E2D7FB5A33}.Debug|x64.Build.0 = Debug|Any CPU
+		{AD06E4D2-ECC0-4E3B-B266-82E2D7FB5A33}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AD06E4D2-ECC0-4E3B-B266-82E2D7FB5A33}.Debug|x86.Build.0 = Debug|Any CPU
+		{AD06E4D2-ECC0-4E3B-B266-82E2D7FB5A33}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD06E4D2-ECC0-4E3B-B266-82E2D7FB5A33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD06E4D2-ECC0-4E3B-B266-82E2D7FB5A33}.Release|x64.ActiveCfg = Release|Any CPU
+		{AD06E4D2-ECC0-4E3B-B266-82E2D7FB5A33}.Release|x64.Build.0 = Release|Any CPU
+		{AD06E4D2-ECC0-4E3B-B266-82E2D7FB5A33}.Release|x86.ActiveCfg = Release|Any CPU
+		{AD06E4D2-ECC0-4E3B-B266-82E2D7FB5A33}.Release|x86.Build.0 = Release|Any CPU
+		{14691714-25C5-4FE3-B5E7-FD9519BB91AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14691714-25C5-4FE3-B5E7-FD9519BB91AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14691714-25C5-4FE3-B5E7-FD9519BB91AD}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{14691714-25C5-4FE3-B5E7-FD9519BB91AD}.Debug|x64.Build.0 = Debug|Any CPU
+		{14691714-25C5-4FE3-B5E7-FD9519BB91AD}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{14691714-25C5-4FE3-B5E7-FD9519BB91AD}.Debug|x86.Build.0 = Debug|Any CPU
+		{14691714-25C5-4FE3-B5E7-FD9519BB91AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14691714-25C5-4FE3-B5E7-FD9519BB91AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14691714-25C5-4FE3-B5E7-FD9519BB91AD}.Release|x64.ActiveCfg = Release|Any CPU
+		{14691714-25C5-4FE3-B5E7-FD9519BB91AD}.Release|x64.Build.0 = Release|Any CPU
+		{14691714-25C5-4FE3-B5E7-FD9519BB91AD}.Release|x86.ActiveCfg = Release|Any CPU
+		{14691714-25C5-4FE3-B5E7-FD9519BB91AD}.Release|x86.Build.0 = Release|Any CPU
+		{D731027D-E348-4001-8E67-7F86AD504C02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D731027D-E348-4001-8E67-7F86AD504C02}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D731027D-E348-4001-8E67-7F86AD504C02}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D731027D-E348-4001-8E67-7F86AD504C02}.Debug|x64.Build.0 = Debug|Any CPU
+		{D731027D-E348-4001-8E67-7F86AD504C02}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D731027D-E348-4001-8E67-7F86AD504C02}.Debug|x86.Build.0 = Debug|Any CPU
+		{D731027D-E348-4001-8E67-7F86AD504C02}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D731027D-E348-4001-8E67-7F86AD504C02}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D731027D-E348-4001-8E67-7F86AD504C02}.Release|x64.ActiveCfg = Release|Any CPU
+		{D731027D-E348-4001-8E67-7F86AD504C02}.Release|x64.Build.0 = Release|Any CPU
+		{D731027D-E348-4001-8E67-7F86AD504C02}.Release|x86.ActiveCfg = Release|Any CPU
+		{D731027D-E348-4001-8E67-7F86AD504C02}.Release|x86.Build.0 = Release|Any CPU
+		{664F1046-E738-43E7-A4CA-2EEB8CA447A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{664F1046-E738-43E7-A4CA-2EEB8CA447A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{664F1046-E738-43E7-A4CA-2EEB8CA447A1}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{664F1046-E738-43E7-A4CA-2EEB8CA447A1}.Debug|x64.Build.0 = Debug|Any CPU
+		{664F1046-E738-43E7-A4CA-2EEB8CA447A1}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{664F1046-E738-43E7-A4CA-2EEB8CA447A1}.Debug|x86.Build.0 = Debug|Any CPU
+		{664F1046-E738-43E7-A4CA-2EEB8CA447A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{664F1046-E738-43E7-A4CA-2EEB8CA447A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{664F1046-E738-43E7-A4CA-2EEB8CA447A1}.Release|x64.ActiveCfg = Release|Any CPU
+		{664F1046-E738-43E7-A4CA-2EEB8CA447A1}.Release|x64.Build.0 = Release|Any CPU
+		{664F1046-E738-43E7-A4CA-2EEB8CA447A1}.Release|x86.ActiveCfg = Release|Any CPU
+		{664F1046-E738-43E7-A4CA-2EEB8CA447A1}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{AD06E4D2-ECC0-4E3B-B266-82E2D7FB5A33} = {52F62811-7776-42E4-921F-E1F9202F8074}
+		{14691714-25C5-4FE3-B5E7-FD9519BB91AD} = {52F62811-7776-42E4-921F-E1F9202F8074}
+		{D731027D-E348-4001-8E67-7F86AD504C02} = {F2329C11-7A3F-4D18-A665-6FA91A922DBF}
+		{664F1046-E738-43E7-A4CA-2EEB8CA447A1} = {52F62811-7776-42E4-921F-E1F9202F8074}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7EF3BE50-98BC-4A67-A514-EF6078B1DA37}
+	EndGlobalSection
+EndGlobal

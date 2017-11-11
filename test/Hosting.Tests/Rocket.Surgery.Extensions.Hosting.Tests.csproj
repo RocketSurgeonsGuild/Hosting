@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFrameworks>netcoreapp2.0;net461</TargetFrameworks>
+    </PropertyGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\Hosting\Rocket.Surgery.Extensions.Hosting.csproj" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(TargetFramework)'=='netstandard1.3' or '$(TargetFramework)'=='net451'">
+        <PackageReference Include="System.ValueTuple" Version="4.3.0" />
+    </ItemGroup>
+</Project>
