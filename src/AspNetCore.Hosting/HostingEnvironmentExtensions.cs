@@ -1,11 +1,14 @@
-﻿// ReSharper disable once CheckNamespace
-namespace Rocket.Surgery.Extensions.Hosting
+﻿using IRsgHostingEnvironment = Rocket.Surgery.Hosting.IHostingEnvironment;
+using RsgHostingEnvironment = Rocket.Surgery.Hosting.HostingEnvironment;
+
+// ReSharper disable once CheckNamespace
+namespace Microsoft.AspNetCore.Hosting
 {
     public static class HostingEnvironmentExtensions
     {
-        public static IHostingEnvironment ToRocketSurgeryHostingEnvironment(this Microsoft.AspNetCore.Hosting.IHostingEnvironment environment)
+        public static IRsgHostingEnvironment ToRocketSurgeryHostingEnvironment(this IHostingEnvironment environment)
         {
-            return new HostingEnvironment(
+            return new RsgHostingEnvironment(
                 environment.EnvironmentName,
                 environment.ApplicationName,
                 environment.WebRootPath,

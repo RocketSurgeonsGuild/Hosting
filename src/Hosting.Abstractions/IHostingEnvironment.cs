@@ -1,4 +1,4 @@
-﻿namespace Rocket.Surgery.Extensions.Hosting
+﻿namespace Rocket.Surgery.Hosting
 {
     public interface IHostingEnvironment
     {

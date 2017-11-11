@@ -33,11 +33,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{F2329C11-7
 		test\Directory.Build.targets = test\Directory.Build.targets
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rocket.Surgery.Extensions.Hosting", "src\Hosting\Rocket.Surgery.Extensions.Hosting.csproj", "{AD06E4D2-ECC0-4E3B-B266-82E2D7FB5A33}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rocket.Surgery.Hosting", "src\Hosting\Rocket.Surgery.Hosting.csproj", "{AD06E4D2-ECC0-4E3B-B266-82E2D7FB5A33}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rocket.Surgery.Extensions.Hosting.Abstractions", "src\Hosting.Abstractions\Rocket.Surgery.Extensions.Hosting.Abstractions.csproj", "{14691714-25C5-4FE3-B5E7-FD9519BB91AD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rocket.Surgery.Hosting.Abstractions", "src\Hosting.Abstractions\Rocket.Surgery.Hosting.Abstractions.csproj", "{14691714-25C5-4FE3-B5E7-FD9519BB91AD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rocket.Surgery.Extensions.Hosting.Tests", "test\Hosting.Tests\Rocket.Surgery.Extensions.Hosting.Tests.csproj", "{D731027D-E348-4001-8E67-7F86AD504C02}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rocket.Surgery.Hosting.Tests", "test\Hosting.Tests\Rocket.Surgery.Hosting.Tests.csproj", "{D731027D-E348-4001-8E67-7F86AD504C02}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rocket.Surgery.AspNetCore.Hosting", "src\AspNetCore.Hosting\Rocket.Surgery.AspNetCore.Hosting.csproj", "{A4E83233-F058-4E10-8C89-446B5DF849F5}"
 EndProject

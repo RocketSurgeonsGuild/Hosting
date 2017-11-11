@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using FakeItEasy;
+﻿using FakeItEasy;
 using FluentAssertions;
+using Microsoft.AspNetCore.Hosting;
 using Xunit;
 
-namespace Rocket.Surgery.Extensions.Hosting.Tests
+namespace Rocket.Surgery.Hosting.Tests
 {
     public class SimpleTest
     {
