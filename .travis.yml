@@ -2,7 +2,7 @@ language: csharp
 sudo: required
 dist: trusty
 mono: latest
-dotnet: 2.0.0
+# dotnet: 2.0.3
 os:
 - linux
 git:
@@ -13,6 +13,13 @@ cache:
   - "$HOME/.nuget/packages"
 before_cache:
 - rm -f tools/packages.config
+before_script:
+- curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg
+- sudo mv microsoft.gpg /etc/apt/trusted.gpg.d/microsoft.gpg
+- sudo sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-ubuntu-trusty-prod trusty main" > /etc/apt/sources.list.d/dotnetdev.list'
+- sudo apt-get update
+- sudo apt-get install dotnet-dev-1.1.5
+- sudo apt-get install dotnet-sdk-2.0.3
 script:
 - git fetch --unshallow
 - git fetch origin '+refs/heads/*:refs/heads/*'
@@ -21,4 +28,4 @@ script:
 - "./build.sh --verbosity Diagnostic"
 notifications:
   slack:
-    secure: f458lN0Ovi7S+rhSvhkwPWdvWFPpngsyYFlIDEOFtR1SvpWQqTw+g3JdT8PRgXiEJddwW9bLIsSFkkn8+MsRP0n0hDMhEYRJ/1QSQVqGhpkdzekQfmEvqeYr6upe9IUbUq8BDrUN9qUTn30TWWwtmNN4wuGtgArxzadt5HeGeVXMxqTeQVZJQqFuOWLn+q79+zLx4MDuMrECMdqZ4Iz/ScF6+WCcS5EDHRn5vecBhA2Xcdl/Yg+8BC/IFJfgcHktKYVKIfNVdy0MMw/cdCPs5+ECQtSzGTNvPqkAsSeThN0GwLRTqUu+JH8IcO8QPMqJy13dF4cJct5rkE+LbuqjajUcqSkhDB1vCaqLwQjPy2LW3IQnhCmk82N8f74XiWRStm7YJmpMhXCk3dHIED2xH3YvFi0KqTcYMMcMLEolHkohJITG+/Vtcua6K649Nu4uS92VTO9D+AnqXH18APf1X5Ay6wHThsT26kzQOLL+L7ssC7FJh3vJusgW4pMGxT9HGiOe4NlLW/UyqwJUA7MjzooQs3e/NNZw5R4/mhgxY7Gc1mL3VnxN8WvE+an0lDYkaieetCXOIaJBpbbWZXCVkB7OohACTXizhmIACPZTFJ9GmpT7dQK6hMmOKdq9te7TePKGuQDVyMknuaDRc2iYIEjmlB70sDcdiMx6pYHrLGk=
+    secure: Lb7ODb6GkZTwpVi3RMLsGX5Z97/C/BkBHsYZTgax5vbEsOwCm5EfEd2UICd/UrnstieIVEEO0CJsRRZgkGS4EcqNV6bVyjimnit1bFkhi0WXRg6lcPuFPr+QK34SFBmGOjIZH9zMGc8CgzgYsSMUDRotoTeXwbjRZtH5govTtSdca0OuIDlRvhrL4Lscl1N0npoAhpdIcRs1lm4SDHmN+mxb7td23jBp5gU5xJDesllZu4fwEF6IiFJoFg8k2hFxN73IhU0yVErJMXgaIQpGwp+DtOe1C7d0bySLuwfeiO6Ka5/t4RmT6XlPws073dl/oCl7skcD0vEP05CwlePuwH4hRCulK4duwOTYabhUg/hbI48Issr3WwIV2OjWI3MZ7t0Vj5GOc2rZqQaM7Yr8WgBz0lVQe/9jN3k3N+ZUa4YCsDPipMidvAKQ/vIwwBfg71lMn8fz2F/6hCrwfGWxi68+H1VBtrSmkhVsGVvVo/SQ9v1TwoGBHZpH+C/g0XBTgmjYeqtfCFYjPNMer18TSZz04jTX7b0HC3HQSmR+JG1o4dFKZ/g70Z64QmT/SOkWsnsatY0ca1thtXhq9lbZOUV5Uj6eQYg2qcPIm/adjF1CXr1s33DpzRKDU+BuJ5iNytOLwj8fwpo2BiFjkmntTjEdLVu8/SMawm7IOBzTj1k=
