@@ -11,11 +11,7 @@ namespace Microsoft.AspNetCore.Hosting
     {
         public static IRsgHostingEnvironment ToRocketSurgeryHostingEnvironment(this IHostingEnvironment environment)
         {
-            return new RsgHostingEnvironment(
-                environment.EnvironmentName,
-                environment.ApplicationName,
-                environment.WebRootPath,
-                environment.ContentRootPath);
+            return new ImplictHostingEnvironment(environment);
         }
 
         /// <summary>
