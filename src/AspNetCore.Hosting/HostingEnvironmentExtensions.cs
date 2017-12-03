@@ -1,5 +1,4 @@
 ﻿using System;
-using Microsoft.AspNetCore.Hosting.Internal;
 using Rocket.Surgery.AspNetCore.Hosting;
 using IRsgHostingEnvironment = Rocket.Surgery.Hosting.IHostingEnvironment;
 using RsgHostingEnvironment = Rocket.Surgery.Hosting.HostingEnvironment;
