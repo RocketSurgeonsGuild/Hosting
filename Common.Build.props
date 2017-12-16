@@ -6,7 +6,7 @@
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
     <PropertyGroup>
-        <RSG_Build_Version>1.2.1</RSG_Build_Version>
+        <RSG_Build_Version>1.2.2</RSG_Build_Version>
         <SourceLink_Version>2.6.0</SourceLink_Version>
         <Microsoft_NET_Test_Sdk_Version>15.5.0</Microsoft_NET_Test_Sdk_Version>
         <xunit_Version>2.3.1</xunit_Version>
