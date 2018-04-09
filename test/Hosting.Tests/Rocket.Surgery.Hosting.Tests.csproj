@@ -6,7 +6,4 @@
       <ProjectReference Include="..\..\src\AspNetCore.Hosting\Rocket.Surgery.AspNetCore.Hosting.csproj" />
       <ProjectReference Include="..\..\src\Hosting\Rocket.Surgery.Hosting.csproj" />
     </ItemGroup>
-    <ItemGroup Condition="'$(TargetFramework)'=='netstandard1.3' or '$(TargetFramework)'=='net451'">
-        <PackageReference Include="System.ValueTuple" Version="4.3.0" />
-    </ItemGroup>
 </Project>
