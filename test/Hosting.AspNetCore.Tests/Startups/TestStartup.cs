@@ -8,7 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Rocket.Surgery.AspNetCore.Hosting;
 using Rocket.Surgery.Extensions.DependencyInjection;
 
-namespace Rocket.Surgery.Hosting.AspNetCore.Tests
+namespace Rocket.Surgery.Hosting.AspNetCore.Tests.Startups
 {
     class TestStartup : RocketStartup
     {

@@ -19,6 +19,7 @@ using Rocket.Surgery.Extensions.CommandLine;
 using Rocket.Surgery.Extensions.Configuration;
 using Rocket.Surgery.Extensions.DependencyInjection;
 using Rocket.Surgery.Extensions.Testing;
+using Rocket.Surgery.Hosting.AspNetCore.Tests.Startups;
 using Xunit;
 using Xunit.Abstractions;
 

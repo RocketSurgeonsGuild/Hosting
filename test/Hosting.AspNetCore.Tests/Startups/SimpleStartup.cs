@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Rocket.Surgery.Hosting.AspNetCore.Tests
+namespace Rocket.Surgery.Hosting.AspNetCore.Tests.Startups
 {
     class SimpleStartup
     {

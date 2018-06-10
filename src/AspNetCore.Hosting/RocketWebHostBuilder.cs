@@ -18,7 +18,6 @@ using Rocket.Surgery.Conventions.Reflection;
 using Rocket.Surgery.Conventions.Scanners;
 using Rocket.Surgery.Extensions.Configuration;
 using Rocket.Surgery.Extensions.DependencyInjection;
-using Rocket.Surgery.Hosting;
 using ConfigurationBuilder = Rocket.Surgery.Extensions.Configuration.ConfigurationBuilder;
 using IHostingEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
 using IWebHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
@@ -84,8 +83,6 @@ namespace Rocket.Surgery.AspNetCore.Hosting
                 services.AddSingleton(AssemblyCandidateFinder);
                 services.AddSingleton<IRocketWebHostBuilder>(this);
                 services.AddSingleton<IWebHostBuilder>(this);
-                services.AddSingleton<IRocketHostBuilder>(this);
-                services.AddSingleton<IHostBuilder>(this);
             });
 
             _webHostBuilder.ConfigureAppConfiguration((context, configurationBuilder) =>

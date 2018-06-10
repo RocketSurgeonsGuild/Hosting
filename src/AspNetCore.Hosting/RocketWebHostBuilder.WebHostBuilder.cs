@@ -10,7 +10,6 @@ using Microsoft.Extensions.Hosting;
 using Rocket.Surgery.Conventions;
 using Rocket.Surgery.Extensions.Configuration;
 using Rocket.Surgery.Extensions.DependencyInjection;
-using Rocket.Surgery.Hosting;
 using IWebHostBuilder = Microsoft.AspNetCore.Hosting.IWebHostBuilder;
 using IWebHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 using WebHostBuilderContext = Microsoft.AspNetCore.Hosting.WebHostBuilderContext;

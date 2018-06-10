@@ -1,13 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
     </PropertyGroup>
     <ItemGroup>
-        <ProjectReference Include="..\Hosting.Abstractions\Rocket.Surgery.Hosting.Abstractions.csproj" />
-    </ItemGroup>
-    <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="$(Microsoft_AspNetCore_Hosting_Version)" />
         <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="$(Microsoft_AspNetCore_Http_Version)" />
+        <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="$(System_Diagnostics_DiagnosticSource_Version)" />
         <PackageReference Include="Rocket.Surgery.Builders.Abstractions" Version="$(RSG_Builders_Version)" />
         <PackageReference Include="Rocket.Surgery.Conventions.Abstractions" Version="$(RSG_Conventions_Version)" />
         <PackageReference Include="Rocket.Surgery.Extensions.CommandLine.Abstractions" Version="$(RSG_CommandLine_Version)" />

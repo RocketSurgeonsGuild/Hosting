@@ -9,7 +9,6 @@ using Microsoft.Extensions.Logging;
 using Rocket.Surgery.Conventions;
 using Rocket.Surgery.Conventions.Reflection;
 using Rocket.Surgery.Conventions.Scanners;
-using Rocket.Surgery.Hosting;
 
 namespace Rocket.Surgery.AspNetCore.Hosting
 {
@@ -61,8 +60,6 @@ namespace Rocket.Surgery.AspNetCore.Hosting
         IRocketWebHostBuilder UseServicesBuilderFactory(ServicesBuilderDelegate configureDelegate);
 
         IWebHostBuilder AsWebHostBuilder();
-        IRocketHostBuilder AsRocketHostBuilder();
-        IHostBuilder AsHostBuilder();
 
         IConventionScanner Scanner { get; }
         IAssemblyCandidateFinder AssemblyCandidateFinder { get; }

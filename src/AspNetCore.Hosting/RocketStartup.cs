@@ -11,7 +11,6 @@ using Microsoft.Extensions.Logging;
 using Rocket.Surgery.Conventions;
 using Rocket.Surgery.Conventions.Reflection;
 using Rocket.Surgery.Conventions.Scanners;
-using Rocket.Surgery.Hosting;
 using Rocket.Surgery.Reflection.Extensions;
 using IHostingEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
 
@@ -48,9 +47,7 @@ namespace Rocket.Surgery.AspNetCore.Hosting
             foreach (var d in services
                 .Where(x =>
                     x.ServiceType == typeof(IRocketWebHostBuilder) ||
-                    x.ServiceType == typeof(IWebHostBuilder) ||
-                    x.ServiceType == typeof(IRocketHostBuilder) ||
-                    x.ServiceType == typeof(IHostBuilder))
+                    x.ServiceType == typeof(IWebHostBuilder))
                 .ToArray())
             {
                 services.Remove(d);
