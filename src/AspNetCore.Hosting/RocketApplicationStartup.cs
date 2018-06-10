@@ -1,0 +1,107 @@
+using System;
+using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Rocket.Surgery.Conventions;
+using Rocket.Surgery.Hosting;
+using Rocket.Surgery.Reflection.Extensions;
+using IHostingEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
+
+namespace Rocket.Surgery.AspNetCore.Hosting
+{
+    public abstract class RocketApplicationStartup : IStartup
+    {
+        protected DiagnosticLogger Logger { get; }
+        protected DiagnosticSource DiagnosticSource { get; }
+
+        protected RocketApplicationStartup(
+            IConfiguration configuration,
+            IHostingEnvironment environment,
+            DiagnosticSource diagnosticSource)
+        {
+            Environment = environment;
+            Configuration = configuration;
+            DiagnosticSource = diagnosticSource;
+            Logger = new DiagnosticLogger(DiagnosticSource);
+        }
+
+        public IHostingEnvironment Environment { get; }
+        public IConfiguration Configuration { get; }
+
+        public IServiceProvider ApplicationServices { get; private set; }
+        public IServiceProvider SystemServices { get; private set; }
+
+        protected abstract void ComposeServices(
+            IServiceCollection services,
+            out IServiceProvider systemServiceProvider,
+            out IServiceProvider applicationServiceProvider);
+
+        public IServiceProvider ConfigureServices(IServiceCollection services)
+        {
+            foreach (var d in services
+                .Where(x =>
+                    x.ServiceType == typeof(IRocketWebHostBuilder) ||
+                    x.ServiceType == typeof(IWebHostBuilder) ||
+                    x.ServiceType == typeof(IRocketHostBuilder) ||
+                    x.ServiceType == typeof(IHostBuilder))
+                .ToArray())
+            {
+                services.Remove(d);
+            }
+
+            ComposeServices(services, out var systemServiceProvider, out var applicationServiceProvider);
+
+            ApplicationServices = applicationServiceProvider;
+            SystemServices = systemServiceProvider;
+
+            return applicationServiceProvider;
+        }
+
+        public void Configure(IApplicationBuilder app)
+        {
+            using (Logger.TimeTrace("{Step}", nameof(Configure)))
+            {
+                var builder = new RocketApplicationBuilder(app, Configuration);
+
+                if (GetType().GetMethod("ComposeSystem", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic) != null)
+                {
+                    Action<object, IServiceProvider, RocketSystemBuilder> systemAction;
+                    using (Logger.TimeTrace("Configuring ComposeSystem Method"))
+                    {
+                        systemAction = InjectableMethodBuilder.Create(GetType(), "ComposeSystem")
+                            .WithParameter<RocketSystemBuilder>()
+                            .Compile();
+                    }
+
+                    using (Logger.TimeTrace("Invoking ComposeSystem Method"))
+                    {
+                        builder.Map("/system", a =>
+                        {
+                            var system = new RocketSystemBuilder(builder, a);
+                            systemAction(this, SystemServices, system);
+                        });
+                    }
+                }
+
+                Action<object, IServiceProvider, RocketApplicationBuilder> action;
+                using (Logger.TimeTrace("Configuring Compose Method"))
+                {
+                    action = InjectableMethodBuilder.Create(GetType(), "Compose")
+                        .WithParameter<RocketApplicationBuilder>()
+                        .Compile();
+                }
+
+                using (Logger.TimeDebug("Invoking Compose Method"))
+                {
+                    action(this, ApplicationServices, builder);
+                }
+            }
+        }
+    }
+}

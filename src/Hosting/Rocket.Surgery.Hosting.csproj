@@ -1,15 +1,23 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFrameworks>netstandard1.3;net451;netstandard2.0;net461</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
     </PropertyGroup>
     <ItemGroup>
         <ProjectReference Include="..\Hosting.Abstractions\Rocket.Surgery.Hosting.Abstractions.csproj" />
     </ItemGroup>
-	<ItemGroup>
-	</ItemGroup>
-    <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0' or '$(TargetFramework)'=='net461'">
-    </ItemGroup>
-    <ItemGroup Condition="'$(TargetFramework)'=='netstandard1.3' or '$(TargetFramework)'=='net451'">
-        <PackageReference Include="System.ValueTuple" Version="4.3.0" />
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="$(Microsoft_Extensions_Hosting_Version)" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="$(Microsoft_Extensions_Configuration_Version)" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="$(Microsoft_Extensions_Configuration_Version)" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="$(Microsoft_Extensions_Configuration_Version)" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="$(Microsoft_Extensions_Configuration_Version)" />
+        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="$(Microsoft_Extensions_Options_Version)" />
+        <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="$(System_Diagnostics_DiagnosticSource_Version)" />
+        <PackageReference Include="Rocket.Surgery.Builders" Version="$(RSG_Builders_Version)" />
+        <PackageReference Include="Rocket.Surgery.Conventions" Version="$(RSG_Conventions_Version)" />
+        <PackageReference Include="Rocket.Surgery.Extensions" Version="$(RSG_Extensions_Version)" />
+        <PackageReference Include="Rocket.Surgery.Extensions.CommandLine" Version="$(RSG_CommandLine_Version)" />
+        <PackageReference Include="Rocket.Surgery.Extensions.Configuration" Version="$(RSG_Configuration_Version)" />
+        <PackageReference Include="Rocket.Surgery.Extensions.DependencyInjection" Version="$(RSG_DependencyInjection_Version)" />
     </ItemGroup>
 </Project>

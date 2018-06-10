@@ -3,7 +3,6 @@
         <TargetFrameworks>netcoreapp2.0;net461</TargetFrameworks>
     </PropertyGroup>
     <ItemGroup>
-      <ProjectReference Include="..\..\src\AspNetCore.Hosting\Rocket.Surgery.AspNetCore.Hosting.csproj" />
-      <ProjectReference Include="..\..\src\Hosting\Rocket.Surgery.Hosting.csproj" />
+        <ProjectReference Include="..\..\src\Hosting\Rocket.Surgery.Hosting.csproj" />
     </ItemGroup>
 </Project>
