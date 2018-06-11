@@ -2,10 +2,15 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting.Internal;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Rocket.Surgery.Conventions;
@@ -52,6 +57,8 @@ namespace Rocket.Surgery.AspNetCore.Hosting
                 services.Remove(d);
             }
 
+            services.RemoveAll(typeof(AutoRequestServicesStartupFilter));
+
             ComposeServices(services, out var systemServiceProvider, out var applicationServiceProvider);
 
             ApplicationServices = applicationServiceProvider;
@@ -64,7 +71,7 @@ namespace Rocket.Surgery.AspNetCore.Hosting
         {
             using (Logger.TimeTrace("{Step}", nameof(Configure)))
             {
-                var builder = new RocketApplicationBuilder(app, Configuration);
+                var application = new RocketApplicationBuilder(app, Configuration);
 
                 if (GetType().GetMethod("ComposeSystem", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic) != null)
                 {
@@ -78,9 +85,11 @@ namespace Rocket.Surgery.AspNetCore.Hosting
 
                     using (Logger.TimeTrace("Invoking ComposeSystem Method"))
                     {
-                        builder.Map("/system", a =>
+                        application.Map("/system", a =>
                         {
-                            var system = new RocketSystemBuilder(builder, a);
+                            var system = new RocketSystemBuilder(a, Configuration);
+                            system.UseMiddleware<RequestServicesContainerMiddleware>(
+                                SystemServices.GetRequiredService<IServiceScopeFactory>());
                             systemAction(this, SystemServices, system);
                         });
                     }
@@ -96,9 +105,20 @@ namespace Rocket.Surgery.AspNetCore.Hosting
 
                 using (Logger.TimeDebug("Invoking Compose Method"))
                 {
-                    action(this, ApplicationServices, builder);
+                    application.UseMiddleware<RequestServicesContainerMiddleware>(
+                        ApplicationServices.GetRequiredService<IServiceScopeFactory>());
+                    action(this, ApplicationServices, application);
                 }
             }
+        }
+
+        public Action<IApplicationBuilder> App(Action<RocketApplicationBuilder> applicationBuilderAction)
+        {
+            return (app) =>
+            {
+                var ab = new RocketApplicationBuilder(app, Configuration);
+                applicationBuilderAction(ab);
+            };
         }
     }
 }

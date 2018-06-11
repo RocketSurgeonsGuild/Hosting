@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder.Internal;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Configuration;
@@ -9,11 +10,11 @@ namespace Rocket.Surgery.AspNetCore.Hosting
 {
     public class RocketApplicationBuilder : IRocketApplicationBuilder
     {
-        private readonly IApplicationBuilder _app;
+        private readonly IApplicationBuilder _applicationBuilder;
 
-        public RocketApplicationBuilder(IApplicationBuilder app, IConfiguration configuration)
+        public RocketApplicationBuilder(IApplicationBuilder applicationBuilder, IConfiguration configuration)
         {
-            _app = app ?? throw new ArgumentNullException(nameof(app));
+            _applicationBuilder = applicationBuilder;
             Configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }
 
@@ -21,27 +22,27 @@ namespace Rocket.Surgery.AspNetCore.Hosting
 
         public IApplicationBuilder Use(Func<RequestDelegate, RequestDelegate> middleware)
         {
-            return _app.Use(middleware);
+            return _applicationBuilder.Use(middleware);
         }
 
-        IApplicationBuilder IApplicationBuilder.New()
+        public IApplicationBuilder New()
         {
-            return _app.New();
+            return _applicationBuilder.New();
         }
 
-        RequestDelegate IApplicationBuilder.Build()
+        public RequestDelegate Build()
         {
-            return _app.Build();
+            return _applicationBuilder.Build();
         }
 
         public IServiceProvider ApplicationServices
         {
-            get => _app.ApplicationServices;
-            set => _app.ApplicationServices = value;
+            get => _applicationBuilder.ApplicationServices;
+            set => _applicationBuilder.ApplicationServices = value;
         }
 
-        public IFeatureCollection ServerFeatures => _app.ServerFeatures;
+        public IFeatureCollection ServerFeatures => _applicationBuilder.ServerFeatures;
 
-        public IDictionary<string, object> Properties => _app.Properties;
+        public IDictionary<string, object> Properties => _applicationBuilder.Properties;
     }
 }

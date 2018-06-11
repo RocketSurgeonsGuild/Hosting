@@ -4,8 +4,10 @@ using System.Diagnostics;
 using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Rocket.Surgery.Conventions;
@@ -75,6 +77,15 @@ namespace Rocket.Surgery.AspNetCore.Hosting
                     action(this, ApplicationServices, builder);
                 }
             }
+        }
+
+        public Action<IApplicationBuilder> App(Action<RocketApplicationBuilder> applicationBuilderAction)
+        {
+            return (app) =>
+            {
+                var ab = new RocketApplicationBuilder(app, Configuration);
+                applicationBuilderAction(ab);
+            };
         }
     }
 }

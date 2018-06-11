@@ -1,21 +1,48 @@
+using System;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder.Internal;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Extensions.Configuration;
 
 namespace Rocket.Surgery.AspNetCore.Hosting
 {
-    public class RocketSystemBuilder : RocketApplicationBuilder<IRocketApplicationBuilder>
+    public class RocketSystemBuilder : IRocketSystemBuilder
     {
-        public RocketSystemBuilder(IRocketApplicationBuilder parent, IApplicationBuilder fork)
-            : this(parent, parent, fork)
+        private readonly IApplicationBuilder _applicationBuilder;
+
+        public RocketSystemBuilder(IApplicationBuilder applicationBuilder, IConfiguration configuration)
         {
+            _applicationBuilder = applicationBuilder;
+            Configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }
 
-        public RocketSystemBuilder(IRocketApplicationBuilder parent, IRocketApplicationBuilder root, IApplicationBuilder fork)
-            : base(parent, new RocketApplicationBuilder(fork, parent.Configuration))
+        public IConfiguration Configuration { get; }
+
+        public IApplicationBuilder Use(Func<RequestDelegate, RequestDelegate> middleware)
         {
-            // TODO: Fork the container here as well
-            Root = root;
+            return _applicationBuilder.Use(middleware);
         }
 
-        public IRocketApplicationBuilder Root { get; }
+        public IApplicationBuilder New()
+        {
+            return _applicationBuilder.New();
+        }
+
+        public RequestDelegate Build()
+        {
+            return _applicationBuilder.Build();
+        }
+
+        public IServiceProvider ApplicationServices
+        {
+            get => _applicationBuilder.ApplicationServices;
+            set => _applicationBuilder.ApplicationServices = value;
+        }
+
+        public IFeatureCollection ServerFeatures => _applicationBuilder.ServerFeatures;
+
+        public IDictionary<string, object> Properties => _applicationBuilder.Properties;
     }
 }

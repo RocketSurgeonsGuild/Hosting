@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace Rocket.Surgery.AspNetCore.Hosting
 {
-    public interface IRocketApplicationBuilder : IApplicationBuilder
+    public interface IRocketSystemBuilder : IApplicationBuilder
     {
         IConfiguration Configuration { get; }
     }
