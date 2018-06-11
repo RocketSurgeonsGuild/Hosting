@@ -55,7 +55,10 @@ namespace Rocket.Surgery.AspNetCore.Hosting
                 services.Remove(d);
             }
 
-            return ApplicationServices = ComposeServices(services);
+            using (Logger.TimeTrace("{Step}", nameof(ConfigureServices)))
+            {
+                return ApplicationServices = ComposeServices(services);
+            }
         }
 
         public void Configure(IApplicationBuilder app)
