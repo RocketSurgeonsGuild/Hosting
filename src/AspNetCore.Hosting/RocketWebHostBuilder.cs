@@ -19,6 +19,7 @@ using Rocket.Surgery.Conventions.Reflection;
 using Rocket.Surgery.Conventions.Scanners;
 using Rocket.Surgery.Extensions.Configuration;
 using Rocket.Surgery.Extensions.DependencyInjection;
+using Rocket.Surgery.Hosting;
 using ConfigurationBuilder = Rocket.Surgery.Extensions.Configuration.ConfigurationBuilder;
 using IHostingEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
 using IWebHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
@@ -31,7 +32,6 @@ namespace Rocket.Surgery.AspNetCore.Hosting
     {
         private readonly IWebHostBuilder _webHostBuilder;
         private readonly WebHostBuilderContext _context;
-        private ServicesBuilderDelegate _servicesBuilderDelegate;
 
         private readonly FieldInfo _contextProperty = typeof(WebHostBuilder)
             .GetField("_context", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -49,8 +49,6 @@ namespace Rocket.Surgery.AspNetCore.Hosting
             AssemblyCandidateFinder = assemblyCandidateFinder;
             AssemblyProvider = assemblyProvider;
             DiagnosticSource = diagnosticSource;
-            _servicesBuilderDelegate = (conventionScanner, provider, finder, services, configuration, environment, logger1, properties) =>
-                new ServicesBuilder(Scanner, AssemblyProvider, AssemblyCandidateFinder, services, configuration, environment, diagnosticSource, Properties);
         }
 
         public IConventionScanner Scanner { get; }
@@ -62,28 +60,12 @@ namespace Rocket.Surgery.AspNetCore.Hosting
         {
             _webHostBuilder.ConfigureServices((context, services) =>
             {
-                services.AddSingleton<IServiceProviderFactory<IServiceCollection>>(
-                    new RocketServiceProviderFactory(collection =>
-                    _servicesBuilderDelegate(
-                        Scanner,
-                        AssemblyProvider,
-                        AssemblyCandidateFinder,
-                        collection,
-                        context.Configuration,
-                        (IHostingEnvironment)context.HostingEnvironment,
-                        DiagnosticSource,
-                        Properties
-                    )
-                ));
-            });
-
-            _webHostBuilder.ConfigureServices((context, services) =>
-            {
                 services.AddSingleton(Scanner);
                 services.AddSingleton(AssemblyProvider);
                 services.AddSingleton(AssemblyCandidateFinder);
-                services.AddSingleton<IRocketWebHostBuilder>(this);
-                services.AddSingleton<IWebHostBuilder>(this);
+                services.AddSingleton(Properties);
+                services.AddSingleton<IRocketServiceComposer, RocketServiceComposer>();
+                services.AddSingleton<IRocketApplicationServiceComposer, RocketApplicationServiceComposer>();
             });
 
             _webHostBuilder.ConfigureAppConfiguration((context, configurationBuilder) =>
@@ -99,50 +81,6 @@ namespace Rocket.Surgery.AspNetCore.Hosting
             });
 
             return _webHostBuilder.Build();
-        }
-
-        private IHost BuildHost()
-        {
-            IConfiguration appConfiguration = null;
-            IHostingEnvironment hostingEnvironment = null;
-            var hostBuilder = new HostBuilder();
-            hostBuilder.ConfigureServices((context, services) =>
-            {
-                appConfiguration = context.Configuration;
-                hostingEnvironment = context.HostingEnvironment;
-                services.AddSingleton(Scanner);
-                services.AddSingleton(AssemblyProvider);
-                services.AddSingleton(AssemblyCandidateFinder);
-            });
-
-            hostBuilder.UseServiceProviderFactory(
-                new RocketServiceProviderFactory(collection =>
-                    _servicesBuilderDelegate(
-                        Scanner,
-                        AssemblyProvider,
-                        AssemblyCandidateFinder,
-                        collection,
-                        appConfiguration,
-                        hostingEnvironment,
-                        DiagnosticSource,
-                        Properties
-                    )
-                )
-            );
-
-            hostBuilder.ConfigureAppConfiguration((context, configurationBuilder) =>
-            {
-                var cb = new ConfigurationBuilder(
-                    Scanner,
-                    context.HostingEnvironment,
-                    context.Configuration,
-                    configurationBuilder,
-                    DiagnosticSource,
-                    Properties);
-                cb.Build();
-            });
-
-            return hostBuilder.Build();
         }
     }
 }

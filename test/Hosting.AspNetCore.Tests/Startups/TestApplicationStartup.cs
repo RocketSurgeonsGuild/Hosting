@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -12,32 +13,13 @@ namespace Rocket.Surgery.Hosting.AspNetCore.Tests.Startups
 {
     class TestApplicationStartup : RocketApplicationStartup
     {
-        private readonly IRocketWebHostBuilder _builder;
-
         public TestApplicationStartup(
+            IRocketApplicationServiceComposer serviceComposer,
             IConfiguration configuration, 
             IHostingEnvironment environment, 
             DiagnosticSource diagnosticSource,
-            IRocketWebHostBuilder builder) : base(configuration, environment, diagnosticSource)
+            IDictionary<object, object> properties) : base(serviceComposer, configuration, environment, diagnosticSource, properties)
         {
-            _builder = builder;
-        }
-
-        protected override void ComposeServices(IServiceCollection services, out IServiceProvider systemServiceProvider,
-            out IServiceProvider applicationServiceProvider)
-        {
-            var builder = new ApplicationServicesBuilder(
-                _builder.Scanner,
-                _builder.AssemblyProvider,
-                _builder.AssemblyCandidateFinder,
-                services,
-                Configuration,
-                Environment,
-                DiagnosticSource,
-                _builder.Properties
-            );
-
-            (systemServiceProvider, applicationServiceProvider) = builder.Build();
         }
 
         public void ComposeSystem(RocketSystemBuilder app)

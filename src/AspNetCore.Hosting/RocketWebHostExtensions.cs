@@ -91,7 +91,7 @@ namespace Rocket.Surgery.AspNetCore.Hosting
                 commandLineAction?.Invoke(clb);
                 var executor = clb.Build().Parse(args);
 
-                hostBuilder.ConfigureServices(collection =>
+                ((IWebHostBuilder)hostBuilder).ConfigureServices(collection =>
                 {
                     collection.AddSingleton(executor);
                     collection.AddSingleton(applicationState);

@@ -57,8 +57,6 @@ namespace Rocket.Surgery.AspNetCore.Hosting
         /// <returns>The <see cref="T:Microsoft.AspNetCore.Hosting.IWebHostBuilder" />.</returns>
         new IRocketWebHostBuilder UseSetting(string key, string value);
 
-        IRocketWebHostBuilder UseServicesBuilderFactory(ServicesBuilderDelegate configureDelegate);
-
         IWebHostBuilder AsWebHostBuilder();
 
         IConventionScanner Scanner { get; }

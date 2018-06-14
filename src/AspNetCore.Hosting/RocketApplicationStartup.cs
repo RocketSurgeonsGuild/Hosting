@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -14,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Rocket.Surgery.Conventions;
+using Rocket.Surgery.Hosting;
 using Rocket.Surgery.Reflection.Extensions;
 using IHostingEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
 
@@ -21,50 +23,47 @@ namespace Rocket.Surgery.AspNetCore.Hosting
 {
     public abstract class RocketApplicationStartup : IStartup
     {
-        protected DiagnosticLogger Logger { get; }
-        protected DiagnosticSource DiagnosticSource { get; }
+        private readonly IRocketApplicationServiceComposer _serviceComposer;
+        private readonly IDictionary<object, object> _properties;
+        private IServiceProvider _services;
 
         protected RocketApplicationStartup(
+            IRocketApplicationServiceComposer serviceComposer,
             IConfiguration configuration,
             IHostingEnvironment environment,
-            DiagnosticSource diagnosticSource)
+            DiagnosticSource diagnosticSource,
+            IDictionary<object, object> properties)
         {
+            _serviceComposer = serviceComposer;
+            _properties = properties;
             Environment = environment;
             Configuration = configuration;
             DiagnosticSource = diagnosticSource;
             Logger = new DiagnosticLogger(DiagnosticSource);
         }
 
-        public IHostingEnvironment Environment { get; }
-        public IConfiguration Configuration { get; }
+        protected IHostingEnvironment Environment { get; }
+        protected IConfiguration Configuration { get; }
+        protected DiagnosticLogger Logger { get; }
+        protected DiagnosticSource DiagnosticSource { get; }
 
-        public IServiceProvider ApplicationServices { get; private set; }
-        public IServiceProvider SystemServices { get; private set; }
+        protected IServiceProvider ApplicationServices { get; private set; }
+        protected IServiceProvider SystemServices { get; private set; }
 
-        protected abstract void ComposeServices(
-            IServiceCollection services,
-            out IServiceProvider systemServiceProvider,
-            out IServiceProvider applicationServiceProvider);
-
-        public IServiceProvider ConfigureServices(IServiceCollection services)
+        public virtual IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            foreach (var d in services
-                .Where(x =>
-                    x.ServiceType == typeof(IRocketWebHostBuilder) ||
-                    x.ServiceType == typeof(IWebHostBuilder))
-                .ToArray())
+            services.RemoveAll(typeof(IDictionary<object, object>));
+            using (Logger.TimeTrace("{Step}", nameof(ConfigureServices)))
             {
-                services.Remove(d);
+                services.RemoveAll(typeof(AutoRequestServicesStartupFilter));
+
+                _serviceComposer.ComposeServices(services, _properties, out var systemServiceProvider, out var applicationServiceProvider);
+
+                ApplicationServices = applicationServiceProvider;
+                SystemServices = systemServiceProvider;
+
+                return applicationServiceProvider;
             }
-
-            services.RemoveAll(typeof(AutoRequestServicesStartupFilter));
-
-            ComposeServices(services, out var systemServiceProvider, out var applicationServiceProvider);
-
-            ApplicationServices = applicationServiceProvider;
-            SystemServices = systemServiceProvider;
-
-            return applicationServiceProvider;
         }
 
         public void Configure(IApplicationBuilder app)

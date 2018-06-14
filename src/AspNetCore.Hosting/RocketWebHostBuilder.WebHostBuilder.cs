@@ -31,13 +31,13 @@ namespace Rocket.Surgery.AspNetCore.Hosting
         }
         IWebHostBuilder IWebHostBuilder.ConfigureServices(Action<IServiceCollection> configureServices)
         {
-            ((IRocketWebHostBuilder)this).ConfigureServices(configureServices);
+            _webHostBuilder.ConfigureServices(configureServices);
             return this;
         }
 
         IWebHostBuilder IWebHostBuilder.ConfigureServices(Action<WebHostBuilderContext, IServiceCollection> configureServices)
         {
-            ((IRocketWebHostBuilder)this).ConfigureServices(configureServices);
+            _webHostBuilder.ConfigureServices(configureServices);
             return this;
         }
 
@@ -102,12 +102,6 @@ namespace Rocket.Surgery.AspNetCore.Hosting
         IRocketWebHostBuilder IRocketWebHostBuilder.UseSetting(string key, string value)
         {
             _webHostBuilder.UseSetting(key, value);
-            return this;
-        }
-
-        IRocketWebHostBuilder IRocketWebHostBuilder.UseServicesBuilderFactory(ServicesBuilderDelegate configureDelegate)
-        {
-            _servicesBuilderDelegate = configureDelegate;
             return this;
         }
 
