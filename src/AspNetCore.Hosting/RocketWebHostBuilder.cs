@@ -49,6 +49,17 @@ namespace Rocket.Surgery.AspNetCore.Hosting
             AssemblyCandidateFinder = assemblyCandidateFinder;
             AssemblyProvider = assemblyProvider;
             DiagnosticSource = diagnosticSource;
+            _webHostBuilder.ConfigureServices(ConfigureDefaultServices);
+        }
+
+        private void ConfigureDefaultServices(WebHostBuilderContext context, IServiceCollection services)
+        {
+            services.AddSingleton(Scanner);
+            services.AddSingleton(AssemblyProvider);
+            services.AddSingleton(AssemblyCandidateFinder);
+            services.AddSingleton(Properties);
+            services.AddSingleton<IRocketServiceComposer, RocketServiceComposer>();
+            services.AddSingleton<IRocketApplicationServiceComposer, RocketApplicationServiceComposer>();
         }
 
         public IConventionScanner Scanner { get; }
@@ -58,16 +69,6 @@ namespace Rocket.Surgery.AspNetCore.Hosting
 
         public IWebHost Build()
         {
-            _webHostBuilder.ConfigureServices((context, services) =>
-            {
-                services.AddSingleton(Scanner);
-                services.AddSingleton(AssemblyProvider);
-                services.AddSingleton(AssemblyCandidateFinder);
-                services.AddSingleton(Properties);
-                services.AddSingleton<IRocketServiceComposer, RocketServiceComposer>();
-                services.AddSingleton<IRocketApplicationServiceComposer, RocketApplicationServiceComposer>();
-            });
-
             _webHostBuilder.ConfigureAppConfiguration((context, configurationBuilder) =>
             {
                 var cb = new ConfigurationBuilder(
