@@ -67,10 +67,7 @@ namespace Rocket.Surgery.AspNetCore.Hosting
                 throw new ArgumentNullException(nameof(configureServices));
             }
 
-            Scanner.AppendDelegate(new ServiceConventionDelegate(context =>
-            {
-                configureServices(context.Services);
-            }));
+            _webHostBuilder.ConfigureServices(configureServices);
             return this;
         }
 
@@ -81,10 +78,7 @@ namespace Rocket.Surgery.AspNetCore.Hosting
                 throw new ArgumentNullException(nameof(configureServices));
             }
 
-            Scanner.AppendDelegate(new ServiceConventionDelegate(context =>
-            {
-                configureServices(_context, context.Services);
-            }));
+            _webHostBuilder.ConfigureServices(configureServices);
             return this;
         }
 
