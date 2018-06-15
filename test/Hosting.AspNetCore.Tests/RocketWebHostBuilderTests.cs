@@ -44,7 +44,7 @@ namespace Rocket.Surgery.Hosting.AspNetCore.Tests
             builder.AppendDelegate(new Action(() => { }));
             builder.ConfigureServices((context, collection) => { });
             A.CallTo(() => AutoFake.Resolve<IConventionScanner>().PrependDelegate(A<Delegate>._)).MustHaveHappened(1, Times.Exactly);
-            A.CallTo(() => AutoFake.Resolve<IConventionScanner>().AppendDelegate(A<Delegate>._)).MustHaveHappened(2, Times.Exactly);
+            A.CallTo(() => AutoFake.Resolve<IConventionScanner>().AppendDelegate(A<Delegate>._)).MustHaveHappened(1, Times.Exactly);
         }
 
         [Fact]
