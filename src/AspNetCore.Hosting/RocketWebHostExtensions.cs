@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Rocket.Surgery.AspNetCore.Hosting.Cli;
 using Rocket.Surgery.Extensions.CommandLine;
 using IHostingEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
 
@@ -30,37 +31,20 @@ namespace Rocket.Surgery.AspNetCore.Hosting
             await host.WaitForShutdownAsync();
             return 0;
         }
-        public static async Task<int> RunCli(this IWebHostBuilder builder)
+        public static Task<int> RunCli(this IWebHostBuilder builder)
         {
-            await Task.Yield();
-            var host = builder.Build();
-            var executor = host.Services.GetRequiredService<ICommandLineExecutor>();
-            return executor.Execute(host.Services);
+            return builder.Build().RunCli();
         }
 
-        public static async Task<int> RunCliOrStart(this IWebHostBuilder builder)
+        public static Task<int> RunCliOrStart(this IWebHostBuilder builder)
         {
-            await Task.Yield();
-            var host = builder.Build();
-            var executor = host.Services.GetService<ICommandLineExecutor>();
-
-            if (executor != null && !executor.IsDefaultCommand)
-            {
-                return executor.Execute(host.Services);
-            }
-
-            await host.StartAsync();
-            await host.WaitForShutdownAsync();
-            return 0;
+            return builder.Build().RunCliOrStart();
         }
 
         public static async Task<int> RunCliOrStart(this IRocketWebHostBuilder builder, string[] args)
         {
             await Task.Yield();
-            builder
-                .UseCli(args, commandLineBuilder =>
-                {
-                });
+            builder.UseCli(args, commandLineBuilder =>{});
             var host = builder.Build();
             var executor = host.Services.GetService<ICommandLineExecutor>();
             if (executor != null && !executor.IsDefaultCommand)
@@ -87,7 +71,14 @@ namespace Rocket.Surgery.AspNetCore.Hosting
                     hostBuilder.DiagnosticSource,
                     hostBuilder.Properties
                 );
-                clb.OnParse(state => { applicationState = state; });
+                clb.OnParse(state =>
+                {
+                    applicationState = state;
+                    if (!state.IsDefaultCommand)
+                    {
+                        hostBuilder.UseServer(new CliServer());
+                    }
+                });
                 commandLineAction?.Invoke(clb);
                 var executor = clb.Build().Parse(args);
 

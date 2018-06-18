@@ -4,6 +4,7 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Rocket.Surgery.AspNetCore.Hosting;
+using Rocket.Surgery.AspNetCore.Hosting.Cli;
 using Rocket.Surgery.Conventions.Reflection;
 using Rocket.Surgery.Conventions.Scanners;
 using Rocket.Surgery.Extensions.Testing;
@@ -13,9 +14,9 @@ using Xunit.Abstractions;
 
 namespace Rocket.Surgery.Hosting.AspNetCore.Tests
 {
-    public class RocketWebHostStartupnTests : AutoTestBase
+    public class RocketWebHostStartupTests : AutoTestBase
     {
-        public RocketWebHostStartupnTests(ITestOutputHelper outputHelper) : base(outputHelper)
+        public RocketWebHostStartupTests(ITestOutputHelper outputHelper) : base(outputHelper)
         {
             AutoFake.Provide(WebHost.CreateDefaultBuilder());
             AutoFake.Provide<IConventionScanner>(new BasicConventionScanner());
