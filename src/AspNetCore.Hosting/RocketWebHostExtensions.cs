@@ -10,42 +10,75 @@ namespace Rocket.Surgery.AspNetCore.Hosting
 {
     public static class RocketWebHostExtensions
     {
-        public static async Task<int> RunCli(this IWebHost host)
+        public static Task<int> RunCli(this IWebHostBuilder builder)
+        {
+            return ((IRocketWebHostBuilder)builder).RunCli();
+        }
+
+        public static Task<int> RunCli(this IWebHostBuilder builder, string[] args)
+        {
+            return ((IRocketWebHostBuilder)builder).RunCli(args);
+        }
+        public static Task<int> RunCliOrStart(this IWebHostBuilder builder)
+        {
+            return ((IRocketWebHostBuilder)builder).RunCliOrStart();
+        }
+
+        public static Task<int> RunCliOrStart(this IWebHostBuilder builder, string[] args)
+        {
+            return ((IRocketWebHostBuilder)builder).RunCliOrStart(args);
+        }
+
+        public static Task<int> RunCli(this IRocketWebHostBuilder builder)
+        {
+            return builder.RunCli(Array.Empty<string>());
+        }
+
+        public async static Task<int> RunCli(this IRocketWebHostBuilder builder, string[] args)
         {
             await Task.Yield();
+
+            IWebHost host = null;
+            WebHostWrapper webHostWrapper = null;
+
+            builder.ConfigureServices(services =>
+                services.AddSingleton(_ => webHostWrapper));
+            builder.ConfigureServices(services =>
+                services.AddSingleton(_ => host));
+
+            host = builder.Build();
+            webHostWrapper = new WebHostWrapper(host);
+
+            builder.Properties[typeof(IWebHost)] = host;
+            builder.Properties[typeof(WebHostWrapper)] = webHostWrapper;
+
             var executor = host.Services.GetRequiredService<ICommandLineExecutor>();
             return executor.Execute(host.Services);
         }
 
-        public static async Task<int> RunCliOrStart(this IWebHost host)
+        public static Task<int> RunCliOrStart(this IRocketWebHostBuilder builder)
         {
-            await Task.Yield();
-            var executor = host.Services.GetService<ICommandLineExecutor>();
-
-            if (executor != null && !executor.IsDefaultCommand)
-            {
-                return executor.Execute(host.Services);
-            }
-
-            await host.StartAsync();
-            await host.WaitForShutdownAsync();
-            return 0;
-        }
-        public static Task<int> RunCli(this IWebHostBuilder builder)
-        {
-            return builder.Build().RunCli();
-        }
-
-        public static Task<int> RunCliOrStart(this IWebHostBuilder builder)
-        {
-            return builder.Build().RunCliOrStart();
+            return builder.RunCliOrStart(Array.Empty<string>());
         }
 
         public static async Task<int> RunCliOrStart(this IRocketWebHostBuilder builder, string[] args)
         {
             await Task.Yield();
-            builder.UseCli(args, commandLineBuilder =>{});
-            var host = builder.Build();
+
+            IWebHost host = null;
+            WebHostWrapper webHostWrapper = null;
+
+            builder.ConfigureServices(services =>
+                services.AddSingleton(_ => webHostWrapper));
+            builder.ConfigureServices(services =>
+                services.AddSingleton(_ => host));
+
+            host = builder.Build();
+            webHostWrapper = new WebHostWrapper(host);
+
+            builder.Properties[typeof(IWebHost)] = host;
+            builder.Properties[typeof(WebHostWrapper)] = webHostWrapper;
+
             var executor = host.Services.GetService<ICommandLineExecutor>();
             if (executor != null && !executor.IsDefaultCommand)
             {
