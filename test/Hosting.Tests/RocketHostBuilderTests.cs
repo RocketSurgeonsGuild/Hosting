@@ -71,7 +71,7 @@ namespace Rocket.Surgery.Hosting.Tests
         }
 
         [Fact]
-        public void Should_Run_Rocket_CommandLine()
+        public async Task Should_Run_Rocket_CommandLine()
         {
             AutoFake.Provide<IHostBuilder>(new HostBuilder());
             AutoFake.Provide<IConventionScanner>(new BasicConventionScanner());
@@ -83,9 +83,27 @@ namespace Rocket.Surgery.Hosting.Tests
             IRocketHostBuilder builder = AutoFake.Resolve<RocketHostBuilder>();
 
             var result = builder
-                .UseCommandLine(new string[] { }, x => x.OnRun(state => 1337));
+                .UseCli(new string[] { }, x => x.OnRun(state => 1337));
 
-            result.RunCommandLine().Should().Be(1337);
+            (await result.RunCli()).Should().Be(1337);
+        }
+
+        [Fact]
+        public async Task Should_Inject_WebHost_Into_Command()
+        {
+            AutoFake.Provide<IHostBuilder>(new HostBuilder());
+            AutoFake.Provide<IConventionScanner>(new BasicConventionScanner());
+            AutoFake.Provide<IAssemblyCandidateFinder>(
+                new DefaultAssemblyCandidateFinder(new[] { typeof(RocketHostBuilderTests).Assembly }));
+            AutoFake.Provide<IAssemblyProvider>(
+                new DefaultAssemblyProvider(new[] { typeof(RocketHostBuilderTests).Assembly }));
+
+            IRocketHostBuilder builder = AutoFake.Resolve<RocketHostBuilder>();
+            var result = builder
+                .UseCli(new[] { "myself" }, x => x.OnRun(state => 1337))
+                .AppendDelegate(new CommandLineConventionDelegate(context => context.AddCommand<MyCommand>("myself")));
+
+            (await result.RunCli()).Should().Be(1234);
         }
     }
 }

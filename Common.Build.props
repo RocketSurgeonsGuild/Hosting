@@ -9,7 +9,7 @@
         <RSG_Build_Version>2.1.0</RSG_Build_Version>
         <RSG_Builders_Version>3.0.0</RSG_Builders_Version>
         <RSG_Conventions_Version>0.12.2</RSG_Conventions_Version>
-        <RSG_CommandLine_Version>0.14.2</RSG_CommandLine_Version>
+        <RSG_CommandLine_Version>0.14.3</RSG_CommandLine_Version>
         <RSG_Configuration_Version>0.8.0</RSG_Configuration_Version>
         <RSG_DependencyInjection_Version>0.11.0</RSG_DependencyInjection_Version>
         <RSG_Extensions_Version>0.8.2</RSG_Extensions_Version>

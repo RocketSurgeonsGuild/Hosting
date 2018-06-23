@@ -14,8 +14,8 @@ namespace Rocket.Surgery.AspNetCore.Hosting.Cli
 
         public WebHostWrapper(IWebHost host)
         {
-            _server = host.Services.GetRequiredService<IServer>() as CliServer;
             _host = host ?? throw new ArgumentNullException(nameof(host));
+            _server = host.Services.GetRequiredService<IServer>() as CliServer ?? throw new ArgumentException("server");
         }
 
         public Uri BaseAddress => _server.BaseAddress;

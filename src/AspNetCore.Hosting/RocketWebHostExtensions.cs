@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Rocket.Surgery.AspNetCore.Hosting.Cli;
 using Rocket.Surgery.Extensions.CommandLine;
 using IHostingEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
@@ -32,6 +33,7 @@ namespace Rocket.Surgery.AspNetCore.Hosting
             builder.ConfigureServices(services =>
                 services.AddSingleton(_ => host));
 
+            builder.UseServer(new CliServer());
             host = builder.Build();
             webHostWrapper = new WebHostWrapper(host);
 
@@ -39,7 +41,21 @@ namespace Rocket.Surgery.AspNetCore.Hosting
             builder.Properties[typeof(WebHostWrapper)] = webHostWrapper;
 
             var executor = host.Services.GetRequiredService<ICommandLineExecutor>();
-            return executor.Execute(host.Services);
+            
+            var logger = host.Services.GetRequiredService<ILoggerFactory>().CreateLogger<IWebHost>();
+            try
+            {
+                await host.StartAsync();
+                var result = executor.Execute(host.Services);
+                await host.StopAsync();
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                logger.LogCritical(e, "Application Crashed");
+                return -1;
+            }
         }
 
         public static async Task<int> RunCliOrStart(this IRocketWebHostBuilder builder)
@@ -60,15 +76,26 @@ namespace Rocket.Surgery.AspNetCore.Hosting
             builder.Properties[typeof(IWebHost)] = host;
             builder.Properties[typeof(WebHostWrapper)] = webHostWrapper;
 
-            var executor = host.Services.GetService<ICommandLineExecutor>();
-            if (executor != null && !executor.IsDefaultCommand)
+            var logger = host.Services.GetRequiredService<ILoggerFactory>().CreateLogger<IWebHost>();
+            try
             {
-                return executor.Execute(host.Services);
+                var executor = host.Services.GetService<ICommandLineExecutor>();
+                if (executor != null && !executor.IsDefaultCommand)
+                {
+                    await host.StartAsync();
+                    var result = executor.Execute(host.Services);
+                    await host.StopAsync();
+                    return result;
+                }
+                await host.StartAsync();
+                await host.WaitForShutdownAsync();
+                return 0;
             }
-
-            await host.StartAsync();
-            await host.WaitForShutdownAsync();
-            return 0;
+            catch (Exception e)
+            {
+                logger.LogCritical(e, "Application Crashed");
+                return -1;
+            }
         }
 
         public static IRocketWebHostBuilder UseCli(this IRocketWebHostBuilder hostBuilder, string[] args, Action<ICommandLineBuilder> commandLineAction = null)
