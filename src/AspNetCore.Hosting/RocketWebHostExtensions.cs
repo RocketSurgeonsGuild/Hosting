@@ -63,18 +63,13 @@ namespace Rocket.Surgery.AspNetCore.Hosting
             await Task.Yield();
 
             IWebHost host = null;
-            WebHostWrapper webHostWrapper = null;
 
             builder.ConfigureServices(services =>
-                services.AddSingleton(_ => webHostWrapper));
+                services.AddSingleton(_ => new WebHostWrapper(host)));
             builder.ConfigureServices(services =>
                 services.AddSingleton(_ => host));
 
             host = builder.Build();
-            webHostWrapper = new WebHostWrapper(host);
-
-            builder.Properties[typeof(IWebHost)] = host;
-            builder.Properties[typeof(WebHostWrapper)] = webHostWrapper;
 
             var logger = host.Services.GetRequiredService<ILoggerFactory>().CreateLogger<IWebHost>();
             try
@@ -127,8 +122,6 @@ namespace Rocket.Surgery.AspNetCore.Hosting
                 {
                     collection.AddSingleton(executor);
                     collection.AddSingleton(applicationState);
-                    collection.AddSingleton(_ => hostBuilder.Properties[typeof(IWebHost)] as IWebHost);
-                    collection.AddSingleton(_ => hostBuilder.Properties[typeof(WebHostWrapper)] as WebHostWrapper);
                 });
             });
             return hostBuilder;
