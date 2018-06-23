@@ -15,26 +15,12 @@ namespace Rocket.Surgery.AspNetCore.Hosting
             return ((IRocketWebHostBuilder)builder).RunCli();
         }
 
-        public static Task<int> RunCli(this IWebHostBuilder builder, string[] args)
-        {
-            return ((IRocketWebHostBuilder)builder).RunCli(args);
-        }
         public static Task<int> RunCliOrStart(this IWebHostBuilder builder)
         {
             return ((IRocketWebHostBuilder)builder).RunCliOrStart();
         }
 
-        public static Task<int> RunCliOrStart(this IWebHostBuilder builder, string[] args)
-        {
-            return ((IRocketWebHostBuilder)builder).RunCliOrStart(args);
-        }
-
-        public static Task<int> RunCli(this IRocketWebHostBuilder builder)
-        {
-            return builder.RunCli(Array.Empty<string>());
-        }
-
-        public async static Task<int> RunCli(this IRocketWebHostBuilder builder, string[] args)
+        public async static Task<int> RunCli(this IRocketWebHostBuilder builder)
         {
             await Task.Yield();
 
@@ -56,12 +42,7 @@ namespace Rocket.Surgery.AspNetCore.Hosting
             return executor.Execute(host.Services);
         }
 
-        public static Task<int> RunCliOrStart(this IRocketWebHostBuilder builder)
-        {
-            return builder.RunCliOrStart(Array.Empty<string>());
-        }
-
-        public static async Task<int> RunCliOrStart(this IRocketWebHostBuilder builder, string[] args)
+        public static async Task<int> RunCliOrStart(this IRocketWebHostBuilder builder)
         {
             await Task.Yield();
 
@@ -119,6 +100,8 @@ namespace Rocket.Surgery.AspNetCore.Hosting
                 {
                     collection.AddSingleton(executor);
                     collection.AddSingleton(applicationState);
+                    collection.AddSingleton(_ => hostBuilder.Properties[typeof(IWebHost)] as IWebHost);
+                    collection.AddSingleton(_ => hostBuilder.Properties[typeof(WebHostWrapper)] as WebHostWrapper);
                 });
             });
             return hostBuilder;

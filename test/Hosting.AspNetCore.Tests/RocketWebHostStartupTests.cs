@@ -1,5 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using FluentAssertions;
+using McMaster.Extensions.CommandLineUtils;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
@@ -7,6 +9,7 @@ using Rocket.Surgery.AspNetCore.Hosting;
 using Rocket.Surgery.AspNetCore.Hosting.Cli;
 using Rocket.Surgery.Conventions.Reflection;
 using Rocket.Surgery.Conventions.Scanners;
+using Rocket.Surgery.Extensions.CommandLine;
 using Rocket.Surgery.Extensions.Testing;
 using Rocket.Surgery.Hosting.AspNetCore.Tests.Startups;
 using Xunit;
@@ -68,6 +71,35 @@ namespace Rocket.Surgery.Hosting.AspNetCore.Tests
                 var content = await response.Content.ReadAsStringAsync();
                 content.Should().Be("SimpleStartup -> Configure");
             }
+        }
+
+        [Fact]
+        public async Task Should_Inject_WebHost_Into_Command()
+        {
+            var result = Builder
+                .UseCli(new[] { "myself" }, x => x.OnRun(state => 1337))
+                .AppendDelegate(new CommandLineConventionDelegate(context => context.AddCommand<MyCommand>("myself")))
+                .UseStartup<SimpleStartup>();
+
+            (await result.RunCli()).Should().Be(1234);
+        }
+    }
+
+    [Command]
+    class MyCommand
+    {
+        private readonly IWebHost _webHost;
+        private readonly WebHostWrapper _webHostWrapper;
+
+        public MyCommand(IWebHost webHost, WebHostWrapper webHostWrapper)
+        {
+            _webHost = webHost ?? throw new ArgumentNullException(nameof(webHost));
+            _webHostWrapper = webHostWrapper ?? throw new ArgumentNullException(nameof(webHostWrapper));
+        }
+
+        public Task<int> OnExecuteAsync()
+        {
+            return Task.FromResult(1234);
         }
     }
 }

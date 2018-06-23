@@ -7,6 +7,7 @@ using Rocket.Surgery.AspNetCore.Hosting;
 using Rocket.Surgery.AspNetCore.Hosting.Cli;
 using Rocket.Surgery.Conventions.Reflection;
 using Rocket.Surgery.Conventions.Scanners;
+using Rocket.Surgery.Extensions.CommandLine;
 using Rocket.Surgery.Extensions.Testing;
 using Rocket.Surgery.Hosting.AspNetCore.Tests.Startups;
 using Xunit;
@@ -84,6 +85,17 @@ namespace Rocket.Surgery.Hosting.AspNetCore.Tests
                 var content = await response.Content.ReadAsStringAsync();
                 content.Should().Be("TestApplicationStartup -> ComposeSystem");
             }
+        }
+
+        [Fact]
+        public async Task Should_Inject_WebHost_Into_Command()
+        {
+            var result = Builder
+                .UseCli(new[] { "myself" }, x => x.OnRun(state => 1337))
+                .AppendDelegate(new CommandLineConventionDelegate(context => context.AddCommand<MyCommand>("myself")))
+                .UseStartup<SimpleStartup>();
+
+            (await result.RunCli()).Should().Be(1234);
         }
     }
 }
