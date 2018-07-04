@@ -3,14 +3,14 @@
         <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="$(Microsoft_AspNetCore_Hosting_Version)" />
-        <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="$(Microsoft_AspNetCore_Http_Version)" />
-        <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="$(System_Diagnostics_DiagnosticSource_Version)" />
-        <PackageReference Include="Rocket.Surgery.Builders.Abstractions" Version="$(RSG_Builders_Version)" />
-        <PackageReference Include="Rocket.Surgery.Conventions.Abstractions" Version="$(RSG_Conventions_Version)" />
-        <PackageReference Include="Rocket.Surgery.Extensions.CommandLine.Abstractions" Version="$(RSG_CommandLine_Version)" />
-        <PackageReference Include="Rocket.Surgery.Extensions.Configuration.Abstractions" Version="$(RSG_Configuration_Version)" />
-        <PackageReference Include="Rocket.Surgery.Extensions.DependencyInjection.Abstractions" Version="$(RSG_DependencyInjection_Version)" />
-        <PackageReference Include="Rocket.Surgery.Extensions.Logging.Abstractions" Version="$(RSG_Logging_Version)" />
+        <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" />
+        <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" />
+        <PackageReference Include="System.Diagnostics.DiagnosticSource" />
+        <PackageReference Include="Rocket.Surgery.Builders.Abstractions" />
+        <PackageReference Include="Rocket.Surgery.Conventions.Abstractions" />
+        <PackageReference Include="Rocket.Surgery.Extensions.CommandLine.Abstractions" />
+        <PackageReference Include="Rocket.Surgery.Extensions.Configuration.Abstractions" />
+        <PackageReference Include="Rocket.Surgery.Extensions.DependencyInjection.Abstractions" />
+        <PackageReference Include="Rocket.Surgery.Extensions.Logging.Abstractions" />
     </ItemGroup>
 </Project>

@@ -6,18 +6,18 @@
         <ProjectReference Include="..\Hosting.Abstractions\Rocket.Surgery.Hosting.Abstractions.csproj" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="$(Microsoft_Extensions_Hosting_Version)" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="$(Microsoft_Extensions_Configuration_Version)" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="$(Microsoft_Extensions_Configuration_Version)" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="$(Microsoft_Extensions_Configuration_Version)" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="$(Microsoft_Extensions_Configuration_Version)" />
-        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="$(Microsoft_Extensions_Options_Version)" />
-        <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="$(System_Diagnostics_DiagnosticSource_Version)" />
-        <PackageReference Include="Rocket.Surgery.Builders" Version="$(RSG_Builders_Version)" />
-        <PackageReference Include="Rocket.Surgery.Conventions" Version="$(RSG_Conventions_Version)" />
-        <PackageReference Include="Rocket.Surgery.Extensions" Version="$(RSG_Extensions_Version)" />
-        <PackageReference Include="Rocket.Surgery.Extensions.CommandLine" Version="$(RSG_CommandLine_Version)" />
-        <PackageReference Include="Rocket.Surgery.Extensions.Configuration" Version="$(RSG_Configuration_Version)" />
-        <PackageReference Include="Rocket.Surgery.Extensions.DependencyInjection" Version="$(RSG_DependencyInjection_Version)" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" />
+        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
+        <PackageReference Include="System.Diagnostics.DiagnosticSource" />
+        <PackageReference Include="Rocket.Surgery.Builders" />
+        <PackageReference Include="Rocket.Surgery.Conventions" />
+        <PackageReference Include="Rocket.Surgery.Extensions" />
+        <PackageReference Include="Rocket.Surgery.Extensions.CommandLine" />
+        <PackageReference Include="Rocket.Surgery.Extensions.Configuration" />
+        <PackageReference Include="Rocket.Surgery.Extensions.DependencyInjection" />
     </ItemGroup>
 </Project>

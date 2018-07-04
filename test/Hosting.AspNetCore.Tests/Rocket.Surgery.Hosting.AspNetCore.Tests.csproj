@@ -4,6 +4,6 @@
     </PropertyGroup>
     <ItemGroup>
         <ProjectReference Include="..\..\src\AspNetCore.Hosting\Rocket.Surgery.AspNetCore.Hosting.csproj" />
-        <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="$(Microsoft_AspNetCore_Version)" />
+        <PackageReference Include="Microsoft.AspNetCore.TestHost" />
     </ItemGroup>
 </Project>
