@@ -1,102 +1,75 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Rocket.Surgery.Extensions.CommandLine;
+using Rocket.Surgery.Extensions.Configuration;
+using Rocket.Surgery.Extensions.DependencyInjection;
+using Rocket.Surgery.Extensions.Logging;
 
 namespace Rocket.Surgery.Hosting
 {
     public static class RocketHostExtensions
     {
-        public static Task<int> RunCli(this IHostBuilder builder)
+        public static Task<int> GoAsync(this IHostBuilder builder)
         {
-            return ((IRocketHostBuilder)builder).RunCli();
+            return ((IRocketHostBuilder)builder).GoAsync(CancellationToken.None);
         }
 
-        public static Task<int> RunCliOrStart(this IHostBuilder builder)
+        public static Task<int> GoAsync(this IHostBuilder builder, CancellationToken cancellationToken)
         {
-            return ((IRocketHostBuilder)builder).RunCliOrStart();
+            return ((IRocketHostBuilder)builder).GoAsync(cancellationToken);
         }
 
-        public static async Task<int> RunCli(this IRocketHostBuilder hostBuilder)
+        public static int Go(this IHostBuilder builder)
+        {
+            return ((IRocketHostBuilder)builder).GoAsync(CancellationToken.None).GetAwaiter().GetResult();
+        }
+
+        public static async Task<int> GoAsync(this IRocketHostBuilder hostBuilder)
+        {
+            return hostBuilder.GoAsync(CancellationToken.None).GetAwaiter().GetResult();
+        }
+
+        public static async Task<int> GoAsync(this IRocketHostBuilder hostBuilder, CancellationToken cancellationToken)
         {
             await Task.Yield();
-
-            var host = hostBuilder.Build();
-
-            var logger = host.Services.GetRequiredService<ILoggerFactory>().CreateLogger<IHost>();
-            try
+            using (var host = hostBuilder.Build())
             {
-                await host.StartAsync();
-                var result = host.Services.GetRequiredService<ICommandLineExecutor>().Execute(host.Services);
-                await host.StopAsync();
-                return result;
-            }
-            catch (Exception e)
-            {
-                logger.LogCritical(e, "Application Crashed");
-                return -1;
+                var lifetime = host.Services.GetRequiredService<IHostLifetime>() as CliLifetime;
+                await host.RunAsync(cancellationToken);
+                return lifetime?.Result ?? 0;
             }
         }
 
-        public static async Task<int> RunCliOrStart(this IRocketHostBuilder hostBuilder)
+        public static T ContributeCommandLine<T>(this T builder, CommandLineConventionDelegate commandLineConventionDelegate)
+            where T : IRocketHostBuilder
         {
-            await Task.Yield();
-
-            var host = hostBuilder.Build();
-
-            var logger = host.Services.GetRequiredService<ILoggerFactory>().CreateLogger<IHost>();
-            try
-            {
-                var executor = host.Services.GetService<ICommandLineExecutor>();
-                if (executor != null && !executor.IsDefaultCommand)
-                {
-                    await host.StartAsync();
-                    var result = executor.Execute(host.Services);
-                    await host.StopAsync();
-                    return result;
-                }
-
-                await host.StartAsync();
-                await host.WaitForShutdownAsync();
-                return 0;
-            }
-            catch (Exception e)
-            {
-                logger.LogCritical(e, "Application Crashed");
-                return -1;
-            }
+            builder.AppendDelegate(commandLineConventionDelegate);
+            return builder;
         }
 
-        public static IRocketHostBuilder UseCli(this IRocketHostBuilder hostBuilder, string[] args, Action<ICommandLineBuilder> commandLineAction = null)
+        public static T ContributeConfiguration<T>(this T builder, ConfigurationConventionDelegate configurationConventionDelegate)
+            where T : IRocketHostBuilder
         {
-            ICommandLineExecutor executor = null;
-            IApplicationState applicationState = null;
+            builder.AppendDelegate(configurationConventionDelegate);
+            return builder;
+        }
 
-            hostBuilder.ConfigureAppConfiguration((context, services) =>
-            {
-                var clb = new CommandLineBuilder(
-                    hostBuilder.Scanner,
-                    hostBuilder.AssemblyProvider,
-                    hostBuilder.AssemblyCandidateFinder,
-                    context.Configuration,
-                    context.HostingEnvironment,
-                    hostBuilder.DiagnosticSource,
-                    hostBuilder.Properties
-                );
-                clb.OnParse(state => { applicationState = state; });
-                commandLineAction?.Invoke(clb);
-                executor = clb.Build().Parse(args);
-            });
+        public static T ContributeLogging<T>(this T builder, LoggingConventionDelegate loggingConventionDelegate)
+            where T : IRocketHostBuilder
+        {
+            builder.AppendDelegate(loggingConventionDelegate);
+            return builder;
+        }
 
-            hostBuilder.ConfigureServices((context, services) =>
-            {
-                services.AddSingleton(executor);
-                services.AddSingleton(applicationState);
-            });
-
-            return hostBuilder;
+        public static T ContributeServices<T>(this T builder, ServiceConventionDelegate serviceConventionDelegate)
+            where T : IRocketHostBuilder
+        {
+            builder.AppendDelegate(serviceConventionDelegate);
+            return builder;
         }
     }
 }

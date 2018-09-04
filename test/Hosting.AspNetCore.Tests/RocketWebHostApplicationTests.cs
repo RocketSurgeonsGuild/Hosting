@@ -24,42 +24,44 @@ namespace Rocket.Surgery.Hosting.AspNetCore.Tests
                 new DefaultAssemblyCandidateFinder(new[] { typeof(RocketWebHostBuilderTests).Assembly }));
             AutoFake.Provide<IAssemblyProvider>(
                 new DefaultAssemblyProvider(new[] { typeof(RocketWebHostBuilderTests).Assembly }));
-
-            Builder = AutoFake.Resolve<RocketWebHostBuilder>();
         }
-
-        public IRocketWebHostBuilder Builder { get; }
 
 
         [Fact]
         public async Task Should_Start_System_Based_Application()
         {
-            var result = Builder
-                .UseCli(new string[] { }, x => x.OnRun(state => 1337));
-            Builder.UseStartup<TestStartup>();
+            AutoFake.Provide(new string[0]);
+            IRocketWebHostBuilder builder = AutoFake.Resolve<RocketWebHostBuilder>();
+            var result = builder
+                .ContributeCommandLine(c => c.OnRun(state => 1337));
+            builder.UseStartup<TestStartup>();
 
-            (await result.RunCli()).Should().Be(1337);
+            (await result.GoAsync()).Should().Be(1337);
         }
 
         [Fact]
         public async Task Should_Run_Command_Given_Arguments1()
         {
-            var result = Builder
-                .AppendConvention(new CommandLineConvention())
-                .UseCli(new string[] { "dosomething" }, x => x.OnRun(state => 1337));
-            Builder.UseStartup<TestStartup>();
+            AutoFake.Provide(new string[] {"dosomething"});
+            IRocketWebHostBuilder builder = AutoFake.Resolve<RocketWebHostBuilder>();
+            var result = builder
+                .ContributeCommandLine(c => c.OnRun(state => 1337))
+                .AppendConvention(new CommandLineConvention());
+            builder.UseStartup<TestStartup>();
 
-            (await result.RunCli()).Should().Be(1001);
+            (await result.GoAsync()).Should().Be(1001);
         }
 
         [Fact]
         public async Task Should_Start_Application()
         {
-            var result = Builder
-                .UseCli(new string[] { }, x => x.OnRun(state => 1337));
-            Builder.UseStartup<TestStartup>();
+            AutoFake.Provide(new string[0]);
+            IRocketWebHostBuilder builder = AutoFake.Resolve<RocketWebHostBuilder>();
+            var result = builder
+                .ContributeCommandLine(c => c.OnRun(state => 1337));
+            builder.UseStartup<TestStartup>();
 
-            using (var server = new TestServer(Builder))
+            using (var server = new TestServer(builder))
             {
                 var response = await server.CreateRequest("/")
                     .GetAsync();

@@ -1,4 +1,5 @@
-﻿Microsoft Visual Studio Solution File, Format Version 12.00
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27004.2006
 MinimumVisualStudioVersion = 10.0.40219.1
@@ -20,6 +21,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{2D7895
 		build.ps1 = build.ps1
 		cakefile.cake = cakefile.cake
 		Common.Build.props = Common.Build.props
+		Common.Build.targets = Common.Build.targets
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{52F62811-7776-42E4-921F-E1F9202F8074}"
@@ -41,9 +43,19 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rocket.Surgery.Hosting.Test
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rocket.Surgery.AspNetCore.Hosting", "src\AspNetCore.Hosting\Rocket.Surgery.AspNetCore.Hosting.csproj", "{A4E83233-F058-4E10-8C89-446B5DF849F5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rocket.Surgery.AspNetCore.Hosting.Abstractions", "src\AspNetCore.Hosting.Abstractions\Rocket.Surgery.AspNetCore.Hosting.Abstractions.csproj", "{22148122-B53D-4655-9C96-D90ECE08EB74}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rocket.Surgery.AspNetCore.Hosting.Abstractions", "src\AspNetCore.Hosting.Abstractions\Rocket.Surgery.AspNetCore.Hosting.Abstractions.csproj", "{22148122-B53D-4655-9C96-D90ECE08EB74}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rocket.Surgery.Hosting.AspNetCore.Tests", "test\Hosting.AspNetCore.Tests\Rocket.Surgery.Hosting.AspNetCore.Tests.csproj", "{B35EB220-AE5F-45BF-A150-1851FA27EB00}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rocket.Surgery.Hosting.AspNetCore.Tests", "test\Hosting.AspNetCore.Tests\Rocket.Surgery.Hosting.AspNetCore.Tests.csproj", "{B35EB220-AE5F-45BF-A150-1851FA27EB00}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sample", "sample", "{00068E20-BE9D-4D58-A69C-C8B1E4447C99}"
+	ProjectSection(SolutionItems) = preProject
+		sample\Directory.Build.props = sample\Directory.Build.props
+		sample\Directory.Build.targets = sample\Directory.Build.targets
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extensions.Host", "sample\Extensions.Host\Extensions.Host.csproj", "{52981CFA-8A77-4AC7-A254-72668102A8F1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCore.Host", "sample\AspNetCore.Host\AspNetCore.Host.csproj", "{C9BD2104-F6C1-4716-AE07-D539BEDCE529}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -127,6 +139,30 @@ Global
 		{B35EB220-AE5F-45BF-A150-1851FA27EB00}.Release|x64.Build.0 = Release|Any CPU
 		{B35EB220-AE5F-45BF-A150-1851FA27EB00}.Release|x86.ActiveCfg = Release|Any CPU
 		{B35EB220-AE5F-45BF-A150-1851FA27EB00}.Release|x86.Build.0 = Release|Any CPU
+		{52981CFA-8A77-4AC7-A254-72668102A8F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52981CFA-8A77-4AC7-A254-72668102A8F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52981CFA-8A77-4AC7-A254-72668102A8F1}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{52981CFA-8A77-4AC7-A254-72668102A8F1}.Debug|x64.Build.0 = Debug|Any CPU
+		{52981CFA-8A77-4AC7-A254-72668102A8F1}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{52981CFA-8A77-4AC7-A254-72668102A8F1}.Debug|x86.Build.0 = Debug|Any CPU
+		{52981CFA-8A77-4AC7-A254-72668102A8F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52981CFA-8A77-4AC7-A254-72668102A8F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{52981CFA-8A77-4AC7-A254-72668102A8F1}.Release|x64.ActiveCfg = Release|Any CPU
+		{52981CFA-8A77-4AC7-A254-72668102A8F1}.Release|x64.Build.0 = Release|Any CPU
+		{52981CFA-8A77-4AC7-A254-72668102A8F1}.Release|x86.ActiveCfg = Release|Any CPU
+		{52981CFA-8A77-4AC7-A254-72668102A8F1}.Release|x86.Build.0 = Release|Any CPU
+		{C9BD2104-F6C1-4716-AE07-D539BEDCE529}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9BD2104-F6C1-4716-AE07-D539BEDCE529}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9BD2104-F6C1-4716-AE07-D539BEDCE529}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C9BD2104-F6C1-4716-AE07-D539BEDCE529}.Debug|x64.Build.0 = Debug|Any CPU
+		{C9BD2104-F6C1-4716-AE07-D539BEDCE529}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C9BD2104-F6C1-4716-AE07-D539BEDCE529}.Debug|x86.Build.0 = Debug|Any CPU
+		{C9BD2104-F6C1-4716-AE07-D539BEDCE529}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9BD2104-F6C1-4716-AE07-D539BEDCE529}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C9BD2104-F6C1-4716-AE07-D539BEDCE529}.Release|x64.ActiveCfg = Release|Any CPU
+		{C9BD2104-F6C1-4716-AE07-D539BEDCE529}.Release|x64.Build.0 = Release|Any CPU
+		{C9BD2104-F6C1-4716-AE07-D539BEDCE529}.Release|x86.ActiveCfg = Release|Any CPU
+		{C9BD2104-F6C1-4716-AE07-D539BEDCE529}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -138,6 +174,8 @@ Global
 		{A4E83233-F058-4E10-8C89-446B5DF849F5} = {52F62811-7776-42E4-921F-E1F9202F8074}
 		{22148122-B53D-4655-9C96-D90ECE08EB74} = {52F62811-7776-42E4-921F-E1F9202F8074}
 		{B35EB220-AE5F-45BF-A150-1851FA27EB00} = {F2329C11-7A3F-4D18-A665-6FA91A922DBF}
+		{52981CFA-8A77-4AC7-A254-72668102A8F1} = {00068E20-BE9D-4D58-A69C-C8B1E4447C99}
+		{C9BD2104-F6C1-4716-AE07-D539BEDCE529} = {00068E20-BE9D-4D58-A69C-C8B1E4447C99}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7EF3BE50-98BC-4A67-A514-EF6078B1DA37}

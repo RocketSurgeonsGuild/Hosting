@@ -15,6 +15,7 @@ namespace Rocket.Surgery.AspNetCore.Hosting
     {
         public static IRocketWebHostBuilder ForDependencyContext(
             DependencyContext dependencyContext,
+            string[] arguments = null,
             DiagnosticSource diagnosticSource = null)
         {
             diagnosticSource = diagnosticSource ?? new DiagnosticListener("Rocket.Surgery.Hosting");
@@ -27,11 +28,13 @@ namespace Rocket.Surgery.AspNetCore.Hosting
                 scanner,
                 assemblyCandidateFinder,
                 assemblyProvider,
-                diagnosticSource);
+                diagnosticSource,
+                arguments);
         }
 
         public static IRocketWebHostBuilder ForAppDomain(
             AppDomain appDomain,
+            string[] arguments = null,
             DiagnosticSource diagnosticSource = null)
         {
             diagnosticSource = diagnosticSource ?? new DiagnosticListener("Rocket.Surgery.Hosting");
@@ -45,12 +48,14 @@ namespace Rocket.Surgery.AspNetCore.Hosting
                 scanner,
                 assemblyCandidateFinder,
                 assemblyProvider,
-                diagnosticSource);
+                diagnosticSource,
+                arguments);
         }
 
 
         public static IRocketWebHostBuilder ForAssemblies(
             IEnumerable<Assembly> assemblies,
+            string[] arguments = null,
             DiagnosticSource diagnosticSource = null)
         {
             diagnosticSource = diagnosticSource ?? new DiagnosticListener("Rocket.Surgery.Hosting");
@@ -60,7 +65,13 @@ namespace Rocket.Surgery.AspNetCore.Hosting
             var assemblyCandidateFinder = new DefaultAssemblyCandidateFinder(enumerable, logger);
             var assemblyProvider = new DefaultAssemblyProvider(enumerable, logger);
             var scanner = new AggregateConventionScanner(assemblyCandidateFinder);
-            return new RocketWebHostBuilder(WebHost.CreateDefaultBuilder(), scanner, assemblyCandidateFinder, assemblyProvider, diagnosticSource);
+            return new RocketWebHostBuilder(
+                WebHost.CreateDefaultBuilder(),
+                scanner,
+                assemblyCandidateFinder,
+                assemblyProvider,
+                diagnosticSource,
+                arguments);
         }
     }
 }

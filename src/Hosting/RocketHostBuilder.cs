@@ -1,14 +1,19 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Hosting.Internal;
 using Microsoft.Extensions.Logging;
 using Rocket.Surgery.Builders;
 using Rocket.Surgery.Conventions;
 using Rocket.Surgery.Conventions.Reflection;
 using Rocket.Surgery.Conventions.Scanners;
+using Rocket.Surgery.Extensions.CommandLine;
 using Rocket.Surgery.Extensions.Configuration;
 using Rocket.Surgery.Extensions.DependencyInjection;
 using ConfigurationBuilder = Rocket.Surgery.Extensions.Configuration.ConfigurationBuilder;
@@ -19,7 +24,9 @@ namespace Rocket.Surgery.Hosting
 {
     public class RocketHostBuilder : Builder, IRocketHostBuilder
     {
+        private readonly List<Action<IMsftConfigurationBuilder>> _configureHostConfigActions = new List<Action<IMsftConfigurationBuilder>>();
         private readonly IHostBuilder _hostBuilder;
+        private readonly string[] _arguments;
         private ServicesBuilderDelegate _servicesBuilderDelegate;
 
         public RocketHostBuilder(
@@ -27,7 +34,8 @@ namespace Rocket.Surgery.Hosting
             IConventionScanner scanner,
             IAssemblyCandidateFinder assemblyCandidateFinder,
             IAssemblyProvider assemblyProvider,
-            DiagnosticSource diagnosticSource)
+            DiagnosticSource diagnosticSource,
+            string[] arguments = null)
             : base(hostBuilder.Properties)
         {
             _hostBuilder = hostBuilder;
@@ -35,28 +43,82 @@ namespace Rocket.Surgery.Hosting
             AssemblyCandidateFinder = assemblyCandidateFinder;
             AssemblyProvider = assemblyProvider;
             DiagnosticSource = diagnosticSource;
+            _arguments = arguments;
             _servicesBuilderDelegate = (conventionScanner, provider, finder, services, configuration, environment, logger1, properties) =>
                 new ServicesBuilder(Scanner, AssemblyProvider, AssemblyCandidateFinder, services, configuration, environment, diagnosticSource, Properties);
+
+            _hostBuilder.ConfigureServices(ConfigureDefaultServices);
+            _hostBuilder.ConfigureAppConfiguration(DefaultApplicationConfiguration);
+            ((IRocketHostBuilder)this).PrependConvention(new StandardConfigurationConvention());
+            UseCli = _arguments != null;
+        }
+
+        private void DefaultApplicationConfiguration(HostBuilderContext context, IMsftConfigurationBuilder configurationBuilder)
+        {
+            // remove standard configurations
+            configurationBuilder.Sources.Clear();
+            var cb = new ConfigurationBuilder(
+                Scanner,
+                (IHostingEnvironment)context.HostingEnvironment,
+                context.Configuration,
+                configurationBuilder,
+                DiagnosticSource,
+                Properties);
+            cb.Build();
+        }
+
+        private void ConfigureDefaultServices(HostBuilderContext context, IServiceCollection services)
+        {
+            services.AddSingleton(Scanner);
+            services.AddSingleton(AssemblyProvider);
+            services.AddSingleton(AssemblyCandidateFinder);
         }
 
         public IConventionScanner Scanner { get; }
         public IAssemblyCandidateFinder AssemblyCandidateFinder { get; }
         public IAssemblyProvider AssemblyProvider { get; }
         public DiagnosticSource DiagnosticSource { get; }
+        public bool UseCli { get; set; }
 
         public IHost Build()
         {
+            if (UseCli)
+            {
+                var clb = new CommandLineBuilder(
+                    Scanner,
+                    AssemblyProvider,
+                    AssemblyCandidateFinder,
+                    DiagnosticSource,
+                    Properties
+                );
+                clb.OnParse(state =>
+                {
+                    this.ConfigureServices(services =>
+                    {
+                        services.AddSingleton(state);
+                    });
+
+                    this.Properties[typeof(IApplicationState)] = state;
+                    ((IRocketHostBuilder)this).AppendConvention(new FinalConfigurationConvention(state.RemainingArguments));
+                });
+                var executor = clb.Build().Parse(_arguments ?? Array.Empty<string>());
+                this.ConfigureServices(services =>
+                {
+                    services.AddSingleton(executor);
+                    services.AddSingleton<IHostLifetime, CliLifetime>();
+                });
+            }
+            else
+            {
+                ((IRocketHostBuilder)this).AppendConvention(new FinalConfigurationConvention());
+            }
+
             IConfiguration appConfiguration = null;
             IHostingEnvironment hostingEnvironment = null;
             _hostBuilder.ConfigureServices((context, services) =>
             {
                 appConfiguration = context.Configuration;
                 hostingEnvironment = context.HostingEnvironment;
-                services.AddSingleton(Scanner);
-                services.AddSingleton(AssemblyProvider);
-                services.AddSingleton(AssemblyCandidateFinder);
-                services.AddSingleton<IRocketHostBuilder>(this);
-                services.AddSingleton<IHostBuilder>(this);
             });
 
             _hostBuilder.UseServiceProviderFactory(
@@ -89,7 +151,7 @@ namespace Rocket.Surgery.Hosting
             return _hostBuilder.Build();
         }
 
-        IRocketHostBuilder IRocketHostBuilder.ConfigureAppConfiguration(Action<HostBuilderContext, IMsftConfigurationBuilder> configureDelegate)
+        public IRocketHostBuilder ConfigureAppConfiguration(Action<HostBuilderContext, IMsftConfigurationBuilder> configureDelegate)
         {
             if (configureDelegate == null)
             {
@@ -107,13 +169,13 @@ namespace Rocket.Surgery.Hosting
             return this;
         }
 
-        IRocketHostBuilder IRocketHostBuilder.ConfigureHostConfiguration(Action<IMsftConfigurationBuilder> configureDelegate)
+        public IRocketHostBuilder ConfigureHostConfiguration(Action<IMsftConfigurationBuilder> configureDelegate)
         {
             _hostBuilder.ConfigureHostConfiguration(configureDelegate);
             return this;
         }
 
-        IRocketHostBuilder IRocketHostBuilder.ConfigureServices(Action<HostBuilderContext, IServiceCollection> configureDelegate)
+        public IRocketHostBuilder ConfigureServices(Action<HostBuilderContext, IServiceCollection> configureDelegate)
         {
             if (configureDelegate == null)
             {
@@ -131,55 +193,55 @@ namespace Rocket.Surgery.Hosting
             return this;
         }
 
-        IRocketHostBuilder IRocketHostBuilder.ConfigureContainer<TContainerBuilder>(Action<HostBuilderContext, TContainerBuilder> configureDelegate)
+        public IRocketHostBuilder ConfigureContainer<TContainerBuilder>(Action<HostBuilderContext, TContainerBuilder> configureDelegate)
         {
             _hostBuilder.ConfigureContainer(configureDelegate);
             return this;
         }
 
-        IRocketHostBuilder IRocketHostBuilder.UseServicesBuilderFactory(ServicesBuilderDelegate configureDelegate)
+        public IRocketHostBuilder UseServicesBuilderFactory(ServicesBuilderDelegate configureDelegate)
         {
             _servicesBuilderDelegate = configureDelegate;
             return this;
         }
 
-        IRocketHostBuilder IRocketSurgeryHostBuilder<IRocketHostBuilder>.AppendConvention(IConvention convention)
+        public IRocketHostBuilder AppendConvention(IConvention convention)
         {
             Scanner.AppendConvention(convention ?? throw new ArgumentNullException(nameof(convention)));
             return this;
         }
 
-        IRocketHostBuilder IRocketSurgeryHostBuilder<IRocketHostBuilder>.AppendDelegate(Delegate @delegate)
+        public IRocketHostBuilder AppendDelegate(Delegate @delegate)
         {
             Scanner.AppendDelegate(@delegate ?? throw new ArgumentNullException(nameof(@delegate)));
             return this;
         }
 
-        IRocketHostBuilder IRocketSurgeryHostBuilder<IRocketHostBuilder>.ExceptConvention(Type type)
+        public IRocketHostBuilder ExceptConvention(Type type)
         {
             Scanner.ExceptConvention(type ?? throw new ArgumentNullException(nameof(type)));
             return this;
         }
 
-        IRocketHostBuilder IRocketSurgeryHostBuilder<IRocketHostBuilder>.ExceptConvention(Assembly assembly)
+        public IRocketHostBuilder ExceptConvention(Assembly assembly)
         {
             Scanner.ExceptConvention(assembly ?? throw new ArgumentNullException(nameof(assembly)));
             return this;
         }
 
-        IRocketHostBuilder IRocketSurgeryHostBuilder<IRocketHostBuilder>.PrependConvention(IConvention convention)
+        public IRocketHostBuilder PrependConvention(IConvention convention)
         {
             Scanner.PrependConvention(convention ?? throw new ArgumentNullException(nameof(convention)));
             return this;
         }
 
-        IRocketHostBuilder IRocketSurgeryHostBuilder<IRocketHostBuilder>.PrependDelegate(Delegate @delegate)
+        public IRocketHostBuilder PrependDelegate(Delegate @delegate)
         {
             Scanner.PrependDelegate(@delegate ?? throw new ArgumentNullException(nameof(@delegate)));
             return this;
         }
 
-        IHostBuilder IRocketHostBuilder.AsHostBuilder() => this;
+        public IHostBuilder AsHostBuilder() => this;
 
         IHostBuilder IHostBuilder.ConfigureHostConfiguration(Action<IMsftConfigurationBuilder> configureDelegate)
         {

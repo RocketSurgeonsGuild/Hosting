@@ -17,6 +17,7 @@ namespace Rocket.Surgery.Hosting
     {
         public static IRocketHostBuilder ForDependencyContext(
             DependencyContext dependencyContext,
+            string[] arguments = null,
             DiagnosticSource diagnosticSource = null)
         {
             diagnosticSource = diagnosticSource ?? new DiagnosticListener("Rocket.Surgery.Hosting");
@@ -25,11 +26,12 @@ namespace Rocket.Surgery.Hosting
             var assemblyCandidateFinder = new DependencyContextAssemblyCandidateFinder(dependencyContext, logger);
             var assemblyProvider = new DependencyContextAssemblyProvider(dependencyContext, logger);
             var scanner = new AggregateConventionScanner(assemblyCandidateFinder);
-            return new RocketHostBuilder(new HostBuilder(), scanner, assemblyCandidateFinder, assemblyProvider, diagnosticSource);
+            return new RocketHostBuilder(new HostBuilder(), scanner, assemblyCandidateFinder, assemblyProvider, diagnosticSource, arguments);
         }
 
         public static IRocketHostBuilder ForAppDomain(
             AppDomain appDomain,
+            string[] arguments = null,
             DiagnosticSource diagnosticSource = null)
         {
             diagnosticSource = diagnosticSource ?? new DiagnosticListener("Rocket.Surgery.Hosting");
@@ -38,12 +40,13 @@ namespace Rocket.Surgery.Hosting
             var assemblyCandidateFinder = new AppDomainAssemblyCandidateFinder(appDomain, logger);
             var assemblyProvider = new AppDomainAssemblyProvider(appDomain, logger);
             var scanner = new AggregateConventionScanner(assemblyCandidateFinder);
-            return new RocketHostBuilder(new HostBuilder(), scanner, assemblyCandidateFinder, assemblyProvider, diagnosticSource);
+            return new RocketHostBuilder(new HostBuilder(), scanner, assemblyCandidateFinder, assemblyProvider, diagnosticSource, arguments);
         }
 
 
         public static IRocketHostBuilder ForAssemblies(
             IEnumerable<Assembly> assemblies,
+            string[] arguments = null,
             DiagnosticSource diagnosticSource = null)
         {
             diagnosticSource = diagnosticSource ?? new DiagnosticListener("Rocket.Surgery.Hosting");
@@ -53,7 +56,7 @@ namespace Rocket.Surgery.Hosting
             var assemblyCandidateFinder = new DefaultAssemblyCandidateFinder(enumerable, logger);
             var assemblyProvider = new DefaultAssemblyProvider(enumerable, logger);
             var scanner = new AggregateConventionScanner(assemblyCandidateFinder);
-            return new RocketHostBuilder(new HostBuilder(), scanner, assemblyCandidateFinder, assemblyProvider, diagnosticSource);
+            return new RocketHostBuilder(new HostBuilder(), scanner, assemblyCandidateFinder, assemblyProvider, diagnosticSource, arguments);
         }
     }
 }

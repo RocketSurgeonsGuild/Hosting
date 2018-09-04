@@ -1,130 +1,124 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Rocket.Surgery.AspNetCore.Hosting.Cli;
 using Rocket.Surgery.Extensions.CommandLine;
+using Rocket.Surgery.Extensions.Configuration;
+using Rocket.Surgery.Extensions.DependencyInjection;
+using Rocket.Surgery.Extensions.Logging;
 using IHostingEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
 
 namespace Rocket.Surgery.AspNetCore.Hosting
 {
     public static class RocketWebHostExtensions
     {
-        public static Task<int> RunCli(this IWebHostBuilder builder)
+        public static Task<int> GoAsync(this IWebHostBuilder builder)
         {
-            return ((IRocketWebHostBuilder)builder).RunCli();
+            return ((IRocketWebHostBuilder)builder).GoAsync(CancellationToken.None);
         }
 
-        public static Task<int> RunCliOrStart(this IWebHostBuilder builder)
+        public static Task<int> GoAsync(this IWebHostBuilder builder, CancellationToken cancellationToken)
         {
-            return ((IRocketWebHostBuilder)builder).RunCliOrStart();
+            return ((IRocketWebHostBuilder)builder).GoAsync(cancellationToken);
         }
 
-        public async static Task<int> RunCli(this IRocketWebHostBuilder builder)
+        public static int Go(this IWebHostBuilder builder)
         {
-            await Task.Yield();
-
-            IWebHost host = null;
-            WebHostWrapper webHostWrapper = null;
-
-            builder.ConfigureServices(services =>
-                services.AddSingleton(_ => webHostWrapper));
-            builder.ConfigureServices(services =>
-                services.AddSingleton(_ => host));
-
-            builder.UseServer(new CliServer());
-            host = builder.Build();
-            webHostWrapper = new WebHostWrapper(host);
-
-            builder.Properties[typeof(IWebHost)] = host;
-            builder.Properties[typeof(WebHostWrapper)] = webHostWrapper;
-
-            var executor = host.Services.GetRequiredService<ICommandLineExecutor>();
-            
-            var logger = host.Services.GetRequiredService<ILoggerFactory>().CreateLogger<IWebHost>();
-            try
-            {
-                await host.StartAsync();
-                var result = executor.Execute(host.Services);
-                await host.StopAsync();
-
-                return result;
-            }
-            catch (Exception e)
-            {
-                logger.LogCritical(e, "Application Crashed");
-                return -1;
-            }
+            return ((IRocketWebHostBuilder)builder).GoAsync(CancellationToken.None).GetAwaiter().GetResult();
         }
 
-        public static async Task<int> RunCliOrStart(this IRocketWebHostBuilder builder)
+        public static Task<int> GoAsync(this IRocketWebHostBuilder builder)
+        {
+            return builder.GoAsync(CancellationToken.None);
+        }
+
+        public static int Go(this IRocketWebHostBuilder builder)
+        {
+            return builder.GoAsync(CancellationToken.None).GetAwaiter().GetResult();
+        }
+
+        public static async Task<int> GoAsync(this IRocketWebHostBuilder hostBuilder, CancellationToken cancellationToken)
         {
             await Task.Yield();
 
             IWebHost host = null;
 
-            builder.ConfigureServices(services =>
+            hostBuilder.ConfigureServices(services =>
                 services.AddSingleton(_ => new WebHostWrapper(host)));
-            builder.ConfigureServices(services =>
+            hostBuilder.ConfigureServices(services =>
                 services.AddSingleton(_ => host));
 
-            host = builder.Build();
-
-            var logger = host.Services.GetRequiredService<ILoggerFactory>().CreateLogger<IWebHost>();
-            try
+            using (host = hostBuilder.Build())
             {
-                var executor = host.Services.GetService<ICommandLineExecutor>();
-                if (executor != null && !executor.IsDefaultCommand)
+                var logger = host.Services.GetRequiredService<ILoggerFactory>().CreateLogger<IWebHost>();
+                try
                 {
-                    await host.StartAsync();
-                    var result = executor.Execute(host.Services);
-                    await host.StopAsync();
-                    return result;
+                    var executor = host.Services.GetService<ICommandLineExecutor>();
+                    if (executor != null)
+                    {
+                        if (executor.Application.IsShowingInformation)
+                        {
+                            return 0;
+                        }
+
+                        if (!executor.IsDefaultCommand)
+                        {
+                            await host.StartAsync(cancellationToken);
+                            var result = executor.Execute(host.Services);
+                            await host.StopAsync(cancellationToken);
+                            return result;
+                        }
+                    }
+
+                    var r = executor.Execute(host.Services);
+                    if (r == int.MinValue)
+                    {
+                        await host.RunAsync(cancellationToken);
+                    }
+                    else
+                    {
+                        return r;
+                    }
+                    return 0;
                 }
-                await host.StartAsync();
-                await host.WaitForShutdownAsync();
-                return 0;
-            }
-            catch (Exception e)
-            {
-                logger.LogCritical(e, "Application Crashed");
-                return -1;
+                catch (Exception e)
+                {
+                    logger.LogCritical(e, "Application Crashed");
+                    return -1;
+                }
             }
         }
 
-        public static IRocketWebHostBuilder UseCli(this IRocketWebHostBuilder hostBuilder, string[] args, Action<ICommandLineBuilder> commandLineAction = null)
+        public static T ContributeCommandLine<T>(this T builder, CommandLineConventionDelegate commandLineConventionDelegate)
+            where T : IRocketWebHostBuilder
         {
-            hostBuilder.ConfigureAppConfiguration((context, services) =>
-            {
-                IApplicationState applicationState = null;
-                var clb = new CommandLineBuilder(
-                    hostBuilder.Scanner,
-                    hostBuilder.AssemblyProvider,
-                    hostBuilder.AssemblyCandidateFinder,
-                    context.Configuration,
-                    (IHostingEnvironment)context.HostingEnvironment,
-                    hostBuilder.DiagnosticSource,
-                    hostBuilder.Properties
-                );
-                clb.OnParse(state =>
-                {
-                    applicationState = state;
-                    if (!state.IsDefaultCommand)
-                    {
-                        hostBuilder.UseServer(new CliServer());
-                    }
-                });
-                commandLineAction?.Invoke(clb);
-                var executor = clb.Build().Parse(args);
+            builder.AppendDelegate(commandLineConventionDelegate);
+            return builder;
+        }
 
-                ((IWebHostBuilder)hostBuilder).ConfigureServices(collection =>
-                {
-                    collection.AddSingleton(executor);
-                    collection.AddSingleton(applicationState);
-                });
-            });
-            return hostBuilder;
+        public static T ContributeConfiguration<T>(this T builder, ConfigurationConventionDelegate configurationConventionDelegate)
+            where T : IRocketWebHostBuilder
+        {
+            builder.AppendDelegate(configurationConventionDelegate);
+            return builder;
+        }
+
+        public static T ContributeLogging<T>(this T builder, LoggingConventionDelegate loggingConventionDelegate)
+            where T : IRocketWebHostBuilder
+        {
+            builder.AppendDelegate(loggingConventionDelegate);
+            return builder;
+        }
+
+        public static T ContributeServices<T>(this T builder, ServiceConventionDelegate serviceConventionDelegate)
+            where T : IRocketWebHostBuilder
+        {
+            builder.AppendDelegate(serviceConventionDelegate);
+            return builder;
         }
     }
 }

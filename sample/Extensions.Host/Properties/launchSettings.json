@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Extensions.Host": {
+      "commandName": "Project",
+      "commandLineArgs": "--help"
+    }
+  }
+}

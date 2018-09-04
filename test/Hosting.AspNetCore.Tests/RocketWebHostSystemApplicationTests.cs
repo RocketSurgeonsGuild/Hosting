@@ -1,14 +1,17 @@
-﻿using System.Threading.Tasks;
+﻿using System.Diagnostics;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Rocket.Surgery.AspNetCore.Hosting;
 using Rocket.Surgery.AspNetCore.Hosting.Cli;
+using Rocket.Surgery.Conventions;
 using Rocket.Surgery.Conventions.Reflection;
 using Rocket.Surgery.Conventions.Scanners;
 using Rocket.Surgery.Extensions.CommandLine;
 using Rocket.Surgery.Extensions.Testing;
+using Rocket.Surgery.Hosting.AspNetCore.Tests.Cli;
 using Rocket.Surgery.Hosting.AspNetCore.Tests.Startups;
 using Xunit;
 using Xunit.Abstractions;
@@ -20,47 +23,52 @@ namespace Rocket.Surgery.Hosting.AspNetCore.Tests
         public RocketWebHostSystemApplicationTests(ITestOutputHelper outputHelper) : base(outputHelper)
         {
             AutoFake.Provide(WebHost.CreateDefaultBuilder());
+            var source = new DiagnosticListener("Test");
+            source.SubscribeWithAdapter(new DiagnosticListenerLoggingAdapter(Logger));
+            AutoFake.Provide<DiagnosticSource>(source);
             AutoFake.Provide<IConventionScanner>(new BasicConventionScanner());
             AutoFake.Provide<IAssemblyCandidateFinder>(
                 new DefaultAssemblyCandidateFinder(new[] { typeof(RocketWebHostBuilderTests).Assembly }));
             AutoFake.Provide<IAssemblyProvider>(
                 new DefaultAssemblyProvider(new[] { typeof(RocketWebHostBuilderTests).Assembly }));
-
-            Builder = AutoFake.Resolve<RocketWebHostBuilder>();
         }
-
-        public IRocketWebHostBuilder Builder { get; }
 
 
         [Fact]
         public async Task Should_Start_System_Based_Application()
         {
-            var result = Builder
-                .UseCli(new string[] { }, x => x.OnRun(state => 1337));
-            Builder.UseStartup<TestApplicationStartup>();
+            AutoFake.Provide(new string[0]);
+            IRocketWebHostBuilder builder = AutoFake.Resolve<RocketWebHostBuilder>();
+            var result = builder
+                .ContributeCommandLine(c => c.OnRun(state => 1337));
+            builder.UseStartup<TestApplicationStartup>();
 
-            (await result.RunCli()).Should().Be(1337);
+            (await result.GoAsync()).Should().Be(1337);
         }
 
         [Fact]
         public async Task Should_Run_Command_Given_Arguments1()
         {
-            var result = Builder
+            AutoFake.Provide(new [] { "dosomething" });
+            IRocketWebHostBuilder builder = AutoFake.Resolve<RocketWebHostBuilder>();
+            var result = builder
                 .AppendConvention(new CommandLineConvention())
-                .UseCli(new string[] { "dosomething" }, x => x.OnRun(state => 1337));
-            Builder.UseStartup<TestApplicationStartup>();
+                .ContributeCommandLine(c => c.OnRun(state => 1337));
+            builder.UseStartup<TestApplicationStartup>();
 
-            (await result.RunCli()).Should().Be(1001);
+            (await result.GoAsync()).Should().Be(1001);
         }
 
         [Fact]
         public async Task Should_Start_Application()
         {
-            var result = Builder
-                .UseCli(new string[] { }, x => x.OnRun(state => 1337));
-            Builder.UseStartup<TestApplicationStartup>();
+            AutoFake.Provide(new string[0]);
+            IRocketWebHostBuilder builder = AutoFake.Resolve<RocketWebHostBuilder>();
+            var result = builder
+                .ContributeCommandLine(c => c.OnRun(state => 1337));
+            builder.UseStartup<TestApplicationStartup>();
 
-            using (var server = new TestServer(Builder))
+            using (var server = new TestServer(builder))
             {
                 var response = await server.CreateRequest("/")
                     .GetAsync();
@@ -73,11 +81,13 @@ namespace Rocket.Surgery.Hosting.AspNetCore.Tests
         [Fact]
         public async Task Should_Start_System()
         {
-            var result = Builder
-                .UseCli(new string[] { }, x => x.OnRun(state => 1337));
-            Builder.UseStartup<TestApplicationStartup>();
+            AutoFake.Provide(new string[0]);
+            IRocketWebHostBuilder builder = AutoFake.Resolve<RocketWebHostBuilder>();
+            var result = builder
+                .ContributeCommandLine(c => c.OnRun(state => 1337));
+            builder.UseStartup<TestApplicationStartup>();
 
-            using (var server = new TestServer(Builder))
+            using (var server = new TestServer(builder))
             {
                 var response = await server.CreateRequest("/system")
                     .GetAsync();
@@ -90,12 +100,14 @@ namespace Rocket.Surgery.Hosting.AspNetCore.Tests
         [Fact]
         public async Task Should_Inject_WebHost_Into_Command()
         {
-            var result = Builder
-                .UseCli(new[] { "myself" }, x => x.OnRun(state => 1337))
+            AutoFake.Provide(new[] { "myself" });
+            IRocketWebHostBuilder builder = AutoFake.Resolve<RocketWebHostBuilder>();
+            var result = builder
+                .ContributeCommandLine(c => c.OnRun(state => 1337))
                 .AppendDelegate(new CommandLineConventionDelegate(context => context.AddCommand<MyCommand>("myself")))
                 .UseStartup<SimpleStartup>();
 
-            (await result.RunCli()).Should().Be(1234);
+            (await builder.GoAsync()).Should().Be(1234);
         }
     }
 }

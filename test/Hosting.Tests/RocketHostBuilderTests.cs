@@ -23,6 +23,7 @@ namespace Rocket.Surgery.Hosting.Tests
         [Fact]
         public void Builder_Should_Be_Castable_ToHostBuilder()
         {
+            AutoFake.Provide(new string[0]);
             IRocketHostBuilder builder = AutoFake.Resolve<RocketHostBuilder>();
             builder.AsHostBuilder().Should().BeAssignableTo<IHostBuilder>();
         }
@@ -30,6 +31,7 @@ namespace Rocket.Surgery.Hosting.Tests
         [Fact]
         public void Should_Call_Through_To_Delegate_Methods()
         {
+            AutoFake.Provide(new string[0]);
             IRocketHostBuilder builder = AutoFake.Resolve<RocketHostBuilder>();
             builder.PrependDelegate(new Action(() => { }));
             builder.AppendDelegate(new Action(() => { }));
@@ -41,17 +43,19 @@ namespace Rocket.Surgery.Hosting.Tests
         [Fact]
         public void Should_Call_Through_To_Convention_Methods()
         {
+            AutoFake.Provide(new string[0]);
             IRocketHostBuilder builder = AutoFake.Resolve<RocketHostBuilder>();
             var convention = AutoFake.Resolve<IConvention>();
             builder.PrependConvention(convention);
             builder.AppendConvention(convention);
-            A.CallTo(() => AutoFake.Resolve<IConventionScanner>().PrependConvention(A<IConvention>._)).MustHaveHappened(1, Times.Exactly);
+            A.CallTo(() => AutoFake.Resolve<IConventionScanner>().PrependConvention(A<IConvention>._)).MustHaveHappened(2, Times.Exactly);
             A.CallTo(() => AutoFake.Resolve<IConventionScanner>().AppendConvention(A<IConvention>._)).MustHaveHappened(1, Times.Exactly);
         }
 
         [Fact]
         public void Should_Build_The_Host_Correctly()
         {
+            AutoFake.Provide(new string[0]);
             var serviceConventionFake = A.Fake<IServiceConvention>();
             var configurationConventionFake = A.Fake<IConfigurationConvention>();
             var commandLineConventionFake = A.Fake<ICommandLineConvention>();
@@ -73,37 +77,41 @@ namespace Rocket.Surgery.Hosting.Tests
         [Fact]
         public async Task Should_Run_Rocket_CommandLine()
         {
+            AutoFake.Provide(new string[0]);
             AutoFake.Provide<IHostBuilder>(new HostBuilder());
             AutoFake.Provide<IConventionScanner>(new BasicConventionScanner());
             AutoFake.Provide<IAssemblyCandidateFinder>(
                 new DefaultAssemblyCandidateFinder(new[] { typeof(RocketHostBuilderTests).Assembly }));
             AutoFake.Provide<IAssemblyProvider>(
                 new DefaultAssemblyProvider(new[] { typeof(RocketHostBuilderTests).Assembly }));
+            AutoFake.Provide(Array.Empty<string>());
 
             IRocketHostBuilder builder = AutoFake.Resolve<RocketHostBuilder>();
 
             var result = builder
-                .UseCli(new string[] { }, x => x.OnRun(state => 1337));
+                .ContributeCommandLine(c => c.OnRun(state => 1337));
 
-            (await result.RunCli()).Should().Be(1337);
+            (await result.GoAsync()).Should().Be(1337);
         }
 
         [Fact]
         public async Task Should_Inject_WebHost_Into_Command()
         {
+            AutoFake.Provide(new string[0]);
             AutoFake.Provide<IHostBuilder>(new HostBuilder());
             AutoFake.Provide<IConventionScanner>(new BasicConventionScanner());
             AutoFake.Provide<IAssemblyCandidateFinder>(
                 new DefaultAssemblyCandidateFinder(new[] { typeof(RocketHostBuilderTests).Assembly }));
             AutoFake.Provide<IAssemblyProvider>(
                 new DefaultAssemblyProvider(new[] { typeof(RocketHostBuilderTests).Assembly }));
+            AutoFake.Provide(new [] { "myself" });
 
             IRocketHostBuilder builder = AutoFake.Resolve<RocketHostBuilder>();
             var result = builder
-                .UseCli(new[] { "myself" }, x => x.OnRun(state => 1337))
+                .ContributeCommandLine(c => c.OnRun(state => 1337))
                 .AppendDelegate(new CommandLineConventionDelegate(context => context.AddCommand<MyCommand>("myself")));
 
-            (await result.RunCli()).Should().Be(1234);
+            (await result.GoAsync()).Should().Be(1234);
         }
     }
 }

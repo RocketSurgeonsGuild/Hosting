@@ -31,6 +31,7 @@ namespace Rocket.Surgery.Hosting.AspNetCore.Tests
         public void Builder_Should_Be_Castable_ToHostBuilder()
         {
             AutoFake.Provide(WebHost.CreateDefaultBuilder());
+            AutoFake.Provide(new string[0]);
             IRocketWebHostBuilder builder = AutoFake.Resolve<RocketWebHostBuilder>();
             builder.AsWebHostBuilder().Should().BeAssignableTo<IWebHostBuilder>();
         }
@@ -39,6 +40,7 @@ namespace Rocket.Surgery.Hosting.AspNetCore.Tests
         public void Should_Call_Through_To_Delegate_Methods()
         {
             AutoFake.Provide(WebHost.CreateDefaultBuilder());
+            AutoFake.Provide(new string[0]);
             IRocketWebHostBuilder builder = AutoFake.Resolve<RocketWebHostBuilder>();
             builder.PrependDelegate(new Action(() => { }));
             builder.AppendDelegate(new Action(() => { }));
@@ -51,11 +53,12 @@ namespace Rocket.Surgery.Hosting.AspNetCore.Tests
         public void Should_Call_Through_To_Convention_Methods()
         {
             AutoFake.Provide(WebHost.CreateDefaultBuilder());
+            AutoFake.Provide(new string[0]);
             IRocketWebHostBuilder builder = AutoFake.Resolve<RocketWebHostBuilder>();
             var convention = AutoFake.Resolve<IConvention>();
             builder.PrependConvention(convention);
             builder.AppendConvention(convention);
-            A.CallTo(() => AutoFake.Resolve<IConventionScanner>().PrependConvention(A<IConvention>._)).MustHaveHappened(1, Times.Exactly);
+            A.CallTo(() => AutoFake.Resolve<IConventionScanner>().PrependConvention(A<IConvention>._)).MustHaveHappened(2, Times.Exactly);
             A.CallTo(() => AutoFake.Resolve<IConventionScanner>().AppendConvention(A<IConvention>._)).MustHaveHappened(1, Times.Exactly);
         }
 
@@ -65,6 +68,7 @@ namespace Rocket.Surgery.Hosting.AspNetCore.Tests
             var serviceConventionFake = A.Fake<IServiceConvention>();
             var configurationConventionFake = A.Fake<IConfigurationConvention>();
             var commandLineConventionFake = A.Fake<ICommandLineConvention>();
+            AutoFake.Provide(new string[0]);
             AutoFake.Provide(WebHost.CreateDefaultBuilder());
             AutoFake.Provide<IConventionScanner>(new BasicConventionScanner(
                 serviceConventionFake, configurationConventionFake, commandLineConventionFake
@@ -84,6 +88,7 @@ namespace Rocket.Surgery.Hosting.AspNetCore.Tests
         public void Should_Run_Rocket_CommandLine()
         {
             AutoFake.Provide(WebHost.CreateDefaultBuilder());
+            AutoFake.Provide(new string[0]);
             AutoFake.Provide<IConventionScanner>(new BasicConventionScanner());
             AutoFake.Provide<IAssemblyCandidateFinder>(
                 new DefaultAssemblyCandidateFinder(new[] { typeof(RocketWebHostBuilderTests).Assembly }));
@@ -93,7 +98,7 @@ namespace Rocket.Surgery.Hosting.AspNetCore.Tests
             IRocketWebHostBuilder builder = AutoFake.Resolve<RocketWebHostBuilder>();
 
             var result = builder
-                .UseCli(new string[] { }, x => x.OnRun(state => 1337));
+                .ContributeCommandLine(c => c.OnRun(state => 1337));
             builder.UseStartup<TestStartup>();
 
             var host = result.Build();

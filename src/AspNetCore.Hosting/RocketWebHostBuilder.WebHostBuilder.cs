@@ -47,7 +47,7 @@ namespace Rocket.Surgery.AspNetCore.Hosting
             return this;
         }
 
-        IRocketWebHostBuilder IRocketWebHostBuilder.ConfigureAppConfiguration(Action<WebHostBuilderContext, IMsftConfigurationBuilder> configureDelegate)
+        public IRocketWebHostBuilder ConfigureAppConfiguration(Action<WebHostBuilderContext, IMsftConfigurationBuilder> configureDelegate)
         {
             if (configureDelegate == null)
             {
@@ -60,7 +60,7 @@ namespace Rocket.Surgery.AspNetCore.Hosting
             }));
             return this;
         }
-        IRocketWebHostBuilder IRocketWebHostBuilder.ConfigureServices(Action<IServiceCollection> configureServices)
+        public IRocketWebHostBuilder ConfigureServices(Action<IServiceCollection> configureServices)
         {
             if (configureServices == null)
             {
@@ -71,7 +71,7 @@ namespace Rocket.Surgery.AspNetCore.Hosting
             return this;
         }
 
-        IRocketWebHostBuilder IRocketWebHostBuilder.ConfigureServices(Action<WebHostBuilderContext, IServiceCollection> configureServices)
+        public IRocketWebHostBuilder ConfigureServices(Action<WebHostBuilderContext, IServiceCollection> configureServices)
         {
             if (configureServices == null)
             {
@@ -92,46 +92,46 @@ namespace Rocket.Surgery.AspNetCore.Hosting
             return ((IRocketWebHostBuilder)this).UseSetting(key, value);
         }
 
-        string IRocketWebHostBuilder.GetSetting(string key) => _webHostBuilder.GetSetting(key);
-        IRocketWebHostBuilder IRocketWebHostBuilder.UseSetting(string key, string value)
+        public string GetSetting(string key) => _webHostBuilder.GetSetting(key);
+        public IRocketWebHostBuilder UseSetting(string key, string value)
         {
             _webHostBuilder.UseSetting(key, value);
             return this;
         }
 
-        IWebHostBuilder IRocketWebHostBuilder.AsWebHostBuilder() => this;
+        public IWebHostBuilder AsWebHostBuilder() => this;
 
-        IRocketWebHostBuilder IRocketSurgeryHostBuilder<IRocketWebHostBuilder>.PrependDelegate(Delegate @delegate)
+        public IRocketWebHostBuilder PrependDelegate(Delegate @delegate)
         {
             Scanner.PrependDelegate(@delegate ?? throw new ArgumentNullException(nameof(@delegate)));
             return this;
         }
 
-        IRocketWebHostBuilder IRocketSurgeryHostBuilder<IRocketWebHostBuilder>.PrependConvention(IConvention convention)
+        public IRocketWebHostBuilder PrependConvention(IConvention convention)
         {
             Scanner.PrependConvention(convention ?? throw new ArgumentNullException(nameof(convention)));
             return this;
         }
 
-        IRocketWebHostBuilder IRocketSurgeryHostBuilder<IRocketWebHostBuilder>.AppendDelegate(Delegate @delegate)
+        public IRocketWebHostBuilder AppendDelegate(Delegate @delegate)
         {
             Scanner.AppendDelegate(@delegate ?? throw new ArgumentNullException(nameof(@delegate)));
             return this;
         }
 
-        IRocketWebHostBuilder IRocketSurgeryHostBuilder<IRocketWebHostBuilder>.AppendConvention(IConvention convention)
+        public IRocketWebHostBuilder AppendConvention(IConvention convention)
         {
             Scanner.AppendConvention(convention ?? throw new ArgumentNullException(nameof(convention)));
             return this;
         }
 
-        IRocketWebHostBuilder IRocketSurgeryHostBuilder<IRocketWebHostBuilder>.ExceptConvention(Type type)
+        public IRocketWebHostBuilder ExceptConvention(Type type)
         {
             Scanner.ExceptConvention(type ?? throw new ArgumentNullException(nameof(type)));
             return this;
         }
 
-        IRocketWebHostBuilder IRocketSurgeryHostBuilder<IRocketWebHostBuilder>.ExceptConvention(Assembly assembly)
+        public IRocketWebHostBuilder ExceptConvention(Assembly assembly)
         {
             Scanner.ExceptConvention(assembly ?? throw new ArgumentNullException(nameof(assembly)));
             return this;
