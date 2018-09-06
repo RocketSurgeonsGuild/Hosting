@@ -109,6 +109,7 @@ namespace Rocket.Surgery.AspNetCore.Hosting
                     {
                         services.AddSingleton(state);
                     });
+                    Properties[typeof(IApplicationState)] = state;
 
                     ((IRocketWebHostBuilder)this).AppendConvention(new FinalConfigurationConvention(state.RemainingArguments));
                 });
