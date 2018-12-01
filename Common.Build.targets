@@ -17,6 +17,7 @@
     <PackageReference Update="Microsoft.Extensions.Hosting" Version="2.1.1" />
     <PackageReference Update="Microsoft.Extensions.Hosting.Abstractions" Version="2.1.1" />
     <PackageReference Update="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.1.1" />
+    <PackageReference Update="NetEscapades.Configuration.Yaml" Version="1.5.0" />
     <PackageReference Update="Rocket.Surgery.Builders" Version="3.1.0" />
     <PackageReference Update="Rocket.Surgery.Builders.Abstractions" Version="3.1.0" />
     <PackageReference Update="Rocket.Surgery.Conventions" Version="0.13.2" />

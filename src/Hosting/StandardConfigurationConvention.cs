@@ -11,8 +11,12 @@ namespace Rocket.Surgery.Hosting
         {
             var env = context.Environment;
 
-            context.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
+            context
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddYamlFile("appsettings.yml", optional: true, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.yml", optional: true, reloadOnChange: true)
+                ;
 
             if (env.IsDevelopment())
             {
