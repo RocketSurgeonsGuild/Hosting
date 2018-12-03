@@ -14,8 +14,8 @@ namespace Rocket.Surgery.Hosting
             context
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddYamlFile("appsettings.yml", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.yml", optional: true, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{env.EnvironmentName.ToLower()}.json", optional: true, reloadOnChange: true)
+                .AddYamlFile($"appsettings.{env.EnvironmentName.ToLower()}.yml", optional: true, reloadOnChange: true)
                 ;
 
             if (env.IsDevelopment())
