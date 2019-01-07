@@ -3,11 +3,8 @@
     <PropertyGroup>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <IsPackable>true</IsPackable>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <RootNamespace>$(MSBuildProjectName.Replace('.Abstractions', ''))</RootNamespace>
     </PropertyGroup>
-    <ItemGroup>
-        <PackageReference Include="Rocket.Surgery.Build.Metadata" />
-        <PackageReference Include="SourceLink.Create.CommandLine" />
-		<PackageReference Include="SourceLink.Copy.PdbFiles" />
-    </ItemGroup>
 </Project>
