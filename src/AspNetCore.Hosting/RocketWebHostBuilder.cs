@@ -111,6 +111,7 @@ namespace Rocket.Surgery.AspNetCore.Hosting
                     });
                     Properties[typeof(IApplicationState)] = state;
 
+                    ((IRocketWebHostBuilder)this).AppendConvention(new CliConfigurationConvention());
                     ((IRocketWebHostBuilder)this).AppendConvention(new FinalConfigurationConvention(state.RemainingArguments));
                 });
                 var executor = clb.Build().Parse(_arguments ?? Array.Empty<string>());

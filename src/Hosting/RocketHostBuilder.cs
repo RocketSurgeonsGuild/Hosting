@@ -99,6 +99,7 @@ namespace Rocket.Surgery.Hosting
                     });
 
                     Properties[typeof(IApplicationState)] = state;
+                    ((IRocketHostBuilder)this).AppendConvention(new CliConfigurationConvention());
                     ((IRocketHostBuilder)this).AppendConvention(new FinalConfigurationConvention(state.RemainingArguments));
                 });
                 var executor = clb.Build().Parse(_arguments ?? Array.Empty<string>());
