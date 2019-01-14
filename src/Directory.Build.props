@@ -1,10 +1,11 @@
 <Project>
-    <Import Project="$([MSBuild]::GetPathOfFileAbove('Common.Build.props', '$(MSBuildThisFileDirectory)../'))" />
-    <PropertyGroup>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <IsPackable>true</IsPackable>
-        <PublishRepositoryUrl>true</PublishRepositoryUrl>
-        <EmbedUntrackedSources>true</EmbedUntrackedSources>
-        <RootNamespace>$(MSBuildProjectName.Replace('.Abstractions', ''))</RootNamespace>
-    </PropertyGroup>
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Common.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+  <PropertyGroup>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <IsPackable>true</IsPackable>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <RootNamespace>$(MSBuildProjectName.Replace('.Abstractions', ''))</RootNamespace>
+    <Include>[ReadySelect.*]*</Include>
+  </PropertyGroup>
 </Project>

@@ -50,10 +50,10 @@ namespace Rocket.Surgery.AspNetCore.Hosting
             }
         }
 
-        protected IHostingEnvironment Environment { get; }
-        protected IConfiguration Configuration { get; }
-        protected DiagnosticLogger Logger { get; }
-        protected DiagnosticSource DiagnosticSource { get; }
+        public IHostingEnvironment Environment { get; }
+        public IConfiguration Configuration { get; }
+        public DiagnosticLogger Logger { get; }
+        public DiagnosticSource DiagnosticSource { get; }
 
         public virtual IServiceProvider ConfigureServices(IServiceCollection services)
         {
