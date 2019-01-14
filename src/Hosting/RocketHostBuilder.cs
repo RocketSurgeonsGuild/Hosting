@@ -16,13 +16,14 @@ using Rocket.Surgery.Conventions.Scanners;
 using Rocket.Surgery.Extensions.CommandLine;
 using Rocket.Surgery.Extensions.Configuration;
 using Rocket.Surgery.Extensions.DependencyInjection;
+using Rocket.Surgery.Extensions.Logging;
 using ConfigurationBuilder = Rocket.Surgery.Extensions.Configuration.ConfigurationBuilder;
 using IMsftConfigurationBuilder = Microsoft.Extensions.Configuration.IConfigurationBuilder;
 using MsftConfigurationBuilder = Microsoft.Extensions.Configuration.ConfigurationBuilder;
 
 namespace Rocket.Surgery.Hosting
 {
-    public class RocketHostBuilder : Builder, IRocketHostBuilder
+    public class RocketHostBuilder : ConventionHostBuilder, IRocketHostBuilder
     {
         private readonly List<Action<IMsftConfigurationBuilder>> _configureHostConfigActions = new List<Action<IMsftConfigurationBuilder>>();
         private readonly IHostBuilder _hostBuilder;
@@ -36,13 +37,9 @@ namespace Rocket.Surgery.Hosting
             IAssemblyProvider assemblyProvider,
             DiagnosticSource diagnosticSource,
             string[] arguments = null)
-            : base(hostBuilder.Properties)
+            : base(scanner, assemblyCandidateFinder, assemblyProvider, diagnosticSource, hostBuilder.Properties)
         {
             _hostBuilder = hostBuilder;
-            Scanner = scanner;
-            AssemblyCandidateFinder = assemblyCandidateFinder;
-            AssemblyProvider = assemblyProvider;
-            DiagnosticSource = diagnosticSource;
             _arguments = arguments;
             _servicesBuilderDelegate = (conventionScanner, provider, finder, services, configuration, environment, logger1, properties) =>
                 new ServicesBuilder(Scanner, AssemblyProvider, AssemblyCandidateFinder, services, configuration, environment, diagnosticSource, Properties);
@@ -51,6 +48,15 @@ namespace Rocket.Surgery.Hosting
             _hostBuilder.ConfigureAppConfiguration(DefaultApplicationConfiguration);
             ((IRocketHostBuilder)this).PrependConvention(new StandardConfigurationConvention());
             UseCli = _arguments != null;
+
+            this.UseEmpoweredLogging(new EmpoweredLoggingOptions()
+            {
+                GetLogLevel = context =>
+                {
+                    var state = context.Get<IApplicationState>();
+                    return state?.GetLogLevel() ?? LogLevel.Information;
+                }
+            });
         }
 
         private void DefaultApplicationConfiguration(HostBuilderContext context, IMsftConfigurationBuilder configurationBuilder)
@@ -74,10 +80,6 @@ namespace Rocket.Surgery.Hosting
             services.AddSingleton(AssemblyCandidateFinder);
         }
 
-        public IConventionScanner Scanner { get; }
-        public IAssemblyCandidateFinder AssemblyCandidateFinder { get; }
-        public IAssemblyProvider AssemblyProvider { get; }
-        public DiagnosticSource DiagnosticSource { get; }
         public bool UseCli { get; set; }
 
         public IHost Build()
@@ -206,18 +208,6 @@ namespace Rocket.Surgery.Hosting
             return this;
         }
 
-        public IRocketHostBuilder AppendConvention(IConvention convention)
-        {
-            Scanner.AppendConvention(convention ?? throw new ArgumentNullException(nameof(convention)));
-            return this;
-        }
-
-        public IRocketHostBuilder AppendDelegate(Delegate @delegate)
-        {
-            Scanner.AppendDelegate(@delegate ?? throw new ArgumentNullException(nameof(@delegate)));
-            return this;
-        }
-
         public IRocketHostBuilder ExceptConvention(Type type)
         {
             Scanner.ExceptConvention(type ?? throw new ArgumentNullException(nameof(type)));
@@ -227,18 +217,6 @@ namespace Rocket.Surgery.Hosting
         public IRocketHostBuilder ExceptConvention(Assembly assembly)
         {
             Scanner.ExceptConvention(assembly ?? throw new ArgumentNullException(nameof(assembly)));
-            return this;
-        }
-
-        public IRocketHostBuilder PrependConvention(IConvention convention)
-        {
-            Scanner.PrependConvention(convention ?? throw new ArgumentNullException(nameof(convention)));
-            return this;
-        }
-
-        public IRocketHostBuilder PrependDelegate(Delegate @delegate)
-        {
-            Scanner.PrependDelegate(@delegate ?? throw new ArgumentNullException(nameof(@delegate)));
             return this;
         }
 

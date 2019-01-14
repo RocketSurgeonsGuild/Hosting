@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27004.2006
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28407.52
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".config", ".config", "{1E56F8EA-0A93-4EA5-9EC6-400B24CAC531}"
 	ProjectSection(SolutionItems) = preProject
@@ -56,6 +56,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extensions.Host", "sample\Extensions.Host\Extensions.Host.csproj", "{52981CFA-8A77-4AC7-A254-72668102A8F1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCore.Host", "sample\AspNetCore.Host\AspNetCore.Host.csproj", "{C9BD2104-F6C1-4716-AE07-D539BEDCE529}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rocket.Surgery.AspNetCore.Hosting.Autofac", "src\AspNetCore.Hosting.Autofac\Rocket.Surgery.AspNetCore.Hosting.Autofac.csproj", "{A4CC5303-CF2E-4E78-B14C-AE3DF0C20980}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rocket.Surgery.Hosting.Autofac", "src\Hosting.Autofac\Rocket.Surgery.Hosting.Autofac.csproj", "{3B75DF55-5FD2-40FE-8485-8C79C9C0E0E6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -163,6 +167,30 @@ Global
 		{C9BD2104-F6C1-4716-AE07-D539BEDCE529}.Release|x64.Build.0 = Release|Any CPU
 		{C9BD2104-F6C1-4716-AE07-D539BEDCE529}.Release|x86.ActiveCfg = Release|Any CPU
 		{C9BD2104-F6C1-4716-AE07-D539BEDCE529}.Release|x86.Build.0 = Release|Any CPU
+		{A4CC5303-CF2E-4E78-B14C-AE3DF0C20980}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4CC5303-CF2E-4E78-B14C-AE3DF0C20980}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4CC5303-CF2E-4E78-B14C-AE3DF0C20980}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A4CC5303-CF2E-4E78-B14C-AE3DF0C20980}.Debug|x64.Build.0 = Debug|Any CPU
+		{A4CC5303-CF2E-4E78-B14C-AE3DF0C20980}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A4CC5303-CF2E-4E78-B14C-AE3DF0C20980}.Debug|x86.Build.0 = Debug|Any CPU
+		{A4CC5303-CF2E-4E78-B14C-AE3DF0C20980}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4CC5303-CF2E-4E78-B14C-AE3DF0C20980}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4CC5303-CF2E-4E78-B14C-AE3DF0C20980}.Release|x64.ActiveCfg = Release|Any CPU
+		{A4CC5303-CF2E-4E78-B14C-AE3DF0C20980}.Release|x64.Build.0 = Release|Any CPU
+		{A4CC5303-CF2E-4E78-B14C-AE3DF0C20980}.Release|x86.ActiveCfg = Release|Any CPU
+		{A4CC5303-CF2E-4E78-B14C-AE3DF0C20980}.Release|x86.Build.0 = Release|Any CPU
+		{3B75DF55-5FD2-40FE-8485-8C79C9C0E0E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B75DF55-5FD2-40FE-8485-8C79C9C0E0E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B75DF55-5FD2-40FE-8485-8C79C9C0E0E6}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3B75DF55-5FD2-40FE-8485-8C79C9C0E0E6}.Debug|x64.Build.0 = Debug|Any CPU
+		{3B75DF55-5FD2-40FE-8485-8C79C9C0E0E6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3B75DF55-5FD2-40FE-8485-8C79C9C0E0E6}.Debug|x86.Build.0 = Debug|Any CPU
+		{3B75DF55-5FD2-40FE-8485-8C79C9C0E0E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B75DF55-5FD2-40FE-8485-8C79C9C0E0E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B75DF55-5FD2-40FE-8485-8C79C9C0E0E6}.Release|x64.ActiveCfg = Release|Any CPU
+		{3B75DF55-5FD2-40FE-8485-8C79C9C0E0E6}.Release|x64.Build.0 = Release|Any CPU
+		{3B75DF55-5FD2-40FE-8485-8C79C9C0E0E6}.Release|x86.ActiveCfg = Release|Any CPU
+		{3B75DF55-5FD2-40FE-8485-8C79C9C0E0E6}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -176,6 +204,8 @@ Global
 		{B35EB220-AE5F-45BF-A150-1851FA27EB00} = {F2329C11-7A3F-4D18-A665-6FA91A922DBF}
 		{52981CFA-8A77-4AC7-A254-72668102A8F1} = {00068E20-BE9D-4D58-A69C-C8B1E4447C99}
 		{C9BD2104-F6C1-4716-AE07-D539BEDCE529} = {00068E20-BE9D-4D58-A69C-C8B1E4447C99}
+		{A4CC5303-CF2E-4E78-B14C-AE3DF0C20980} = {52F62811-7776-42E4-921F-E1F9202F8074}
+		{3B75DF55-5FD2-40FE-8485-8C79C9C0E0E6} = {52F62811-7776-42E4-921F-E1F9202F8074}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7EF3BE50-98BC-4A67-A514-EF6078B1DA37}

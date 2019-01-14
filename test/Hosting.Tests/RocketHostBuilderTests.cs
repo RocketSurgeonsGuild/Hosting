@@ -49,7 +49,7 @@ namespace Rocket.Surgery.Hosting.Tests
             builder.PrependConvention(convention);
             builder.AppendConvention(convention);
             A.CallTo(() => AutoFake.Resolve<IConventionScanner>().PrependConvention(A<IConvention>._)).MustHaveHappened(2, Times.Exactly);
-            A.CallTo(() => AutoFake.Resolve<IConventionScanner>().AppendConvention(A<IConvention>._)).MustHaveHappened(1, Times.Exactly);
+            A.CallTo(() => AutoFake.Resolve<IConventionScanner>().AppendConvention(A<IConvention>._)).MustHaveHappened(2, Times.Exactly);
         }
 
         [Fact]
@@ -107,11 +107,11 @@ namespace Rocket.Surgery.Hosting.Tests
             AutoFake.Provide(new [] { "myself" });
 
             IRocketHostBuilder builder = AutoFake.Resolve<RocketHostBuilder>();
-            var result = builder
+            builder
                 .ContributeCommandLine(c => c.OnRun(state => 1337))
                 .AppendDelegate(new CommandLineConventionDelegate(context => context.AddCommand<MyCommand>("myself")));
 
-            (await result.GoAsync()).Should().Be(1234);
+            (await builder.GoAsync()).Should().Be(1234);
         }
     }
 }

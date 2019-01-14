@@ -19,7 +19,7 @@ using Rocket.Surgery.Extensions.CommandLine;
 using Rocket.Surgery.Extensions.Configuration;
 using Rocket.Surgery.Extensions.DependencyInjection;
 using Rocket.Surgery.Hosting;
-using IHostingEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
+using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace Extensions.Host
 {
@@ -42,7 +42,7 @@ namespace Extensions.Host
 
     public class Startup : RocketStartup
     {
-        public Startup(IRocketServiceComposer serviceComposer, IConfiguration configuration, IHostingEnvironment environment, DiagnosticSource diagnosticSource, IDictionary<object, object> properties) : base(serviceComposer, configuration, environment, diagnosticSource, properties)
+        public Startup(IConventionScanner scanner, IRocketServiceComposer serviceComposer, IConfiguration configuration, IHostingEnvironment environment, DiagnosticSource diagnosticSource, IDictionary<object, object> properties) : base(scanner, serviceComposer, configuration, environment, diagnosticSource, properties)
         {
         }
 

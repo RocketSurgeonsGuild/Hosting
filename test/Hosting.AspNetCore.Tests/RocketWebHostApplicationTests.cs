@@ -46,7 +46,7 @@ namespace Rocket.Surgery.Hosting.AspNetCore.Tests
             IRocketWebHostBuilder builder = AutoFake.Resolve<RocketWebHostBuilder>();
             var result = builder
                 .ContributeCommandLine(c => c.OnRun(state => 1337))
-                .AppendConvention(new CommandLineConvention());
+                .ContributeConvention(new CommandLineConvention());
             builder.UseStartup<TestStartup>();
 
             (await result.GoAsync()).Should().Be(1001);

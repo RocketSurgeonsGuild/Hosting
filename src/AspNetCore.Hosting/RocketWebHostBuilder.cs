@@ -24,10 +24,11 @@ using IHostingEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
 using IWebHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 using IMsftConfigurationBuilder = Microsoft.Extensions.Configuration.IConfigurationBuilder;
 using MsftConfigurationBuilder = Microsoft.Extensions.Configuration.ConfigurationBuilder;
+using Rocket.Surgery.Extensions.Logging;
 
 namespace Rocket.Surgery.AspNetCore.Hosting
 {
-    public partial class RocketWebHostBuilder : Builder, IRocketWebHostBuilder
+    public partial class RocketWebHostBuilder : ConventionHostBuilder, IRocketWebHostBuilder
     {
         private readonly IWebHostBuilder _webHostBuilder;
         private readonly WebHostBuilderContext _context;
@@ -42,20 +43,20 @@ namespace Rocket.Surgery.AspNetCore.Hosting
             IAssemblyCandidateFinder assemblyCandidateFinder,
             IAssemblyProvider assemblyProvider,
             DiagnosticSource diagnosticSource,
-            string[] arguments = null) : base(new Dictionary<object, object>())
+            string[] arguments = null) : base(scanner, assemblyCandidateFinder, assemblyProvider, diagnosticSource, new Dictionary<object, object>())
         {
             _webHostBuilder = webHostBuilder;
             _context = (WebHostBuilderContext)_contextProperty.GetValue(webHostBuilder);
-            Scanner = scanner;
-            AssemblyCandidateFinder = assemblyCandidateFinder;
-            AssemblyProvider = assemblyProvider;
-            DiagnosticSource = diagnosticSource;
             _arguments = arguments;
             _webHostBuilder.ConfigureServices(ConfigureDefaultServices);
 
             _webHostBuilder.ConfigureAppConfiguration(DefaultApplicationConfiguration);
-            ((IRocketWebHostBuilder)this).PrependConvention(new StandardConfigurationConvention());
+            PrependConvention(new StandardConfigurationConvention());
             UseCli = _arguments != null;
+
+            this.UseEmpoweredLogging(new EmpoweredLoggingOptions()
+            {
+            });
         }
 
         private void DefaultApplicationConfiguration(WebHostBuilderContext context, IMsftConfigurationBuilder configurationBuilder)
@@ -81,11 +82,7 @@ namespace Rocket.Surgery.AspNetCore.Hosting
             services.AddSingleton<IRocketServiceComposer, RocketServiceComposer>();
             services.AddSingleton<IRocketApplicationServiceComposer, RocketApplicationServiceComposer>();
         }
-
-        public IConventionScanner Scanner { get; }
-        public IAssemblyCandidateFinder AssemblyCandidateFinder { get; }
-        public IAssemblyProvider AssemblyProvider { get; }
-        public DiagnosticSource DiagnosticSource { get; }
+        
         public bool UseCli { get; set; }
 
         public IWebHost Build()
@@ -111,8 +108,8 @@ namespace Rocket.Surgery.AspNetCore.Hosting
                     });
                     Properties[typeof(IApplicationState)] = state;
 
-                    ((IRocketWebHostBuilder)this).AppendConvention(new CliConfigurationConvention());
-                    ((IRocketWebHostBuilder)this).AppendConvention(new FinalConfigurationConvention(state.RemainingArguments));
+                    AppendConvention(new CliConfigurationConvention());
+                    AppendConvention(new FinalConfigurationConvention(state.RemainingArguments));
                 });
                 var executor = clb.Build().Parse(_arguments ?? Array.Empty<string>());
                 _webHostBuilder.ConfigureServices(services =>
@@ -122,7 +119,7 @@ namespace Rocket.Surgery.AspNetCore.Hosting
             }
             else
             {
-                ((IRocketWebHostBuilder)this).AppendConvention(new FinalConfigurationConvention());
+                AppendConvention(new FinalConfigurationConvention());
             }
 
             return _webHostBuilder.Build();

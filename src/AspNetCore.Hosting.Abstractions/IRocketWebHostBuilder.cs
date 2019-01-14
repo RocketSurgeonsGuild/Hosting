@@ -17,7 +17,7 @@ namespace Rocket.Surgery.AspNetCore.Hosting
         /// <summary>
         /// Builds an <see cref="T:Microsoft.AspNetCore.Hosting.IWebHost" /> which hosts a web application.
         /// </summary>
-        IWebHost Build();
+        new IWebHost Build();
 
         /// <summary>
         /// Adds a delegate for configuring the <see cref="T:Microsoft.Extensions.Configuration.IConfigurationBuilder" /> that will construct an <see cref="T:Microsoft.Extensions.Configuration.IConfiguration" />.
@@ -58,10 +58,5 @@ namespace Rocket.Surgery.AspNetCore.Hosting
         new IRocketWebHostBuilder UseSetting(string key, string value);
 
         IWebHostBuilder AsWebHostBuilder();
-
-        IConventionScanner Scanner { get; }
-        IAssemblyCandidateFinder AssemblyCandidateFinder { get; }
-        IAssemblyProvider AssemblyProvider { get; }
-        DiagnosticSource DiagnosticSource { get; }
     }
 }

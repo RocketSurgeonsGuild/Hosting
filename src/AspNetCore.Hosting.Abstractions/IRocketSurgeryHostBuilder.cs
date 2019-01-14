@@ -5,32 +5,8 @@ using Rocket.Surgery.Conventions;
 
 namespace Rocket.Surgery.AspNetCore.Hosting
 {
-    public interface IRocketSurgeryHostBuilder<T> : IBuilder
+    public interface IRocketSurgeryHostBuilder<T> : IConventionHostBuilder
     {
-        /// <summary>
-        /// Add a delegate to the scanner, that runs before scanning.
-        /// </summary>
-        /// <param name="delegate">The delegate</param>
-        T PrependDelegate(Delegate @delegate);
-
-        /// <summary>
-        /// Adds a convention to the scanner, that runs before scanning.
-        /// </summary>
-        /// <param name="convention">The convention</param>
-        T PrependConvention(IConvention convention);
-
-        /// <summary>
-        /// Add a delegate to the scanner, that runs after scanning.
-        /// </summary>
-        /// <param name="delegate">The delegate</param>
-        T AppendDelegate(Delegate @delegate);
-
-        /// <summary>
-        /// Adds a convention to the scanner, that runs after scanning.
-        /// </summary>
-        /// <param name="convention">The convention</param>
-        T AppendConvention(IConvention convention);
-
         /// <summary>
         /// Exclude a convention by type.
         /// </summary>

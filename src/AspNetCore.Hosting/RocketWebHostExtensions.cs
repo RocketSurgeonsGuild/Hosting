@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Rocket.Surgery.AspNetCore.Hosting.Cli;
+using Rocket.Surgery.Conventions;
 using Rocket.Surgery.Extensions.CommandLine;
 using Rocket.Surgery.Extensions.Configuration;
 using Rocket.Surgery.Extensions.DependencyInjection;
@@ -91,6 +92,20 @@ namespace Rocket.Surgery.AspNetCore.Hosting
                     return -1;
                 }
             }
+        }
+
+        public static T ContributeDelegate<T>(this T builder, params Delegate[] @delegates)
+            where T : IRocketWebHostBuilder
+        {
+            builder.AppendDelegate(@delegates);
+            return builder;
+        }
+
+        public static T ContributeConvention<T>(this T builder, params IConvention[] conventions)
+            where T : IRocketWebHostBuilder
+        {
+            builder.AppendConvention(conventions);
+            return builder;
         }
 
         public static T ContributeCommandLine<T>(this T builder, CommandLineConventionDelegate commandLineConventionDelegate)

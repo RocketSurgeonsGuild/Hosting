@@ -20,7 +20,7 @@
         <PackageReference Include="Rocket.Surgery.Extensions.CommandLine" />
         <PackageReference Include="Rocket.Surgery.Extensions.Configuration" />
         <PackageReference Include="Rocket.Surgery.Extensions.DependencyInjection" />
-        <PackageReference Include="Rocket.Surgery.Extensions.Logging" />
+        <PackageReference Include="Rocket.Surgery.Extensions.Logging.Empowered" />
         <PackageReference Include="System.Diagnostics.DiagnosticSource" />
     </ItemGroup>
 </Project>

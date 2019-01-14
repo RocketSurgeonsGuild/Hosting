@@ -16,7 +16,7 @@ using Rocket.Surgery.Conventions.Scanners;
 using Rocket.Surgery.Extensions.DependencyInjection;
 using Rocket.Surgery.Hosting;
 using Rocket.Surgery.Reflection.Extensions;
-using IHostingEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
+using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace Rocket.Surgery.AspNetCore.Hosting
 {
@@ -31,6 +31,7 @@ namespace Rocket.Surgery.AspNetCore.Hosting
         private IServiceProvider _services;
 
         protected RocketStartup(
+            IConventionScanner scanner,
             IRocketServiceComposer serviceComposer,
             IConfiguration configuration,
             IHostingEnvironment environment,
@@ -43,6 +44,10 @@ namespace Rocket.Surgery.AspNetCore.Hosting
             Configuration = configuration;
             DiagnosticSource = diagnosticSource;
             Logger = new DiagnosticLogger(DiagnosticSource);
+            if (this is IConvention convention)
+            {
+                scanner.AppendConvention(convention);
+            }
         }
 
         protected IHostingEnvironment Environment { get; }

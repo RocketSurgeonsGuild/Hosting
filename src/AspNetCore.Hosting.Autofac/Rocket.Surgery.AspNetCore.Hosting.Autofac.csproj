@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\AspNetCore.Hosting\Rocket.Surgery.AspNetCore.Hosting.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Rocket.Surgery.Extensions.Autofac" />
+    </ItemGroup>
+</Project>

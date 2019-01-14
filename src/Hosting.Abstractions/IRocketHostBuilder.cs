@@ -57,10 +57,5 @@ namespace Rocket.Surgery.Hosting
         IRocketHostBuilder  UseServicesBuilderFactory(ServicesBuilderDelegate configureDelegate);
 
         IHostBuilder AsHostBuilder();
-
-        IConventionScanner Scanner { get; }
-        IAssemblyCandidateFinder AssemblyCandidateFinder { get; }
-        IAssemblyProvider AssemblyProvider { get; }
-        DiagnosticSource DiagnosticSource { get; }
     }
 }

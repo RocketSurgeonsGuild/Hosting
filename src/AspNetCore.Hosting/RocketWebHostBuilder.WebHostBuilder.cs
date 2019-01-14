@@ -101,30 +101,6 @@ namespace Rocket.Surgery.AspNetCore.Hosting
 
         public IWebHostBuilder AsWebHostBuilder() => this;
 
-        public IRocketWebHostBuilder PrependDelegate(Delegate @delegate)
-        {
-            Scanner.PrependDelegate(@delegate ?? throw new ArgumentNullException(nameof(@delegate)));
-            return this;
-        }
-
-        public IRocketWebHostBuilder PrependConvention(IConvention convention)
-        {
-            Scanner.PrependConvention(convention ?? throw new ArgumentNullException(nameof(convention)));
-            return this;
-        }
-
-        public IRocketWebHostBuilder AppendDelegate(Delegate @delegate)
-        {
-            Scanner.AppendDelegate(@delegate ?? throw new ArgumentNullException(nameof(@delegate)));
-            return this;
-        }
-
-        public IRocketWebHostBuilder AppendConvention(IConvention convention)
-        {
-            Scanner.AppendConvention(convention ?? throw new ArgumentNullException(nameof(convention)));
-            return this;
-        }
-
         public IRocketWebHostBuilder ExceptConvention(Type type)
         {
             Scanner.ExceptConvention(type ?? throw new ArgumentNullException(nameof(type)));

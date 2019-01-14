@@ -59,7 +59,7 @@ namespace Rocket.Surgery.Hosting.AspNetCore.Tests
             builder.PrependConvention(convention);
             builder.AppendConvention(convention);
             A.CallTo(() => AutoFake.Resolve<IConventionScanner>().PrependConvention(A<IConvention>._)).MustHaveHappened(2, Times.Exactly);
-            A.CallTo(() => AutoFake.Resolve<IConventionScanner>().AppendConvention(A<IConvention>._)).MustHaveHappened(1, Times.Exactly);
+            A.CallTo(() => AutoFake.Resolve<IConventionScanner>().AppendConvention(A<IConvention>._)).MustHaveHappened(2, Times.Exactly);
         }
 
         [Fact]

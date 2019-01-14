@@ -52,8 +52,8 @@ namespace Rocket.Surgery.Hosting.AspNetCore.Tests
             AutoFake.Provide(new [] { "dosomething" });
             IRocketWebHostBuilder builder = AutoFake.Resolve<RocketWebHostBuilder>();
             var result = builder
-                .AppendConvention(new CommandLineConvention())
-                .ContributeCommandLine(c => c.OnRun(state => 1337));
+                .ContributeCommandLine(c => c.OnRun(state => 1337))
+                .ContributeConvention(new CommandLineConvention());
             builder.UseStartup<TestApplicationStartup>();
 
             (await result.GoAsync()).Should().Be(1001);
@@ -104,7 +104,7 @@ namespace Rocket.Surgery.Hosting.AspNetCore.Tests
             IRocketWebHostBuilder builder = AutoFake.Resolve<RocketWebHostBuilder>();
             var result = builder
                 .ContributeCommandLine(c => c.OnRun(state => 1337))
-                .AppendDelegate(new CommandLineConventionDelegate(context => context.AddCommand<MyCommand>("myself")))
+                .ContributeDelegate(new CommandLineConventionDelegate(context => context.AddCommand<MyCommand>("myself")))
                 .UseStartup<SimpleStartup>();
 
             (await builder.GoAsync()).Should().Be(1234);
