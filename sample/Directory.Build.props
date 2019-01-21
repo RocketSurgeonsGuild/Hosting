@@ -1,7 +1,8 @@
 <Project>
     <Import Project="$([MSBuild]::GetPathOfFileAbove('Common.Build.props', '$(MSBuildThisFileDirectory)../'))" />
     <PropertyGroup>
-        <PreserveCompilationContext>true</PreserveCompilationContext>
+      <IsPackable>false</IsPackable>
+      <PreserveCompilationContext>true</PreserveCompilationContext>
         <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
         <Include>[Rocket.Surgery.*]*</Include>
     </PropertyGroup>
