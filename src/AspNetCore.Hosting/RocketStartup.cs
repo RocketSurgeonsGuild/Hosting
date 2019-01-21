@@ -2,96 +2,129 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder.Internal;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Internal;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Rocket.Surgery.Conventions;
-using Rocket.Surgery.Conventions.Reflection;
 using Rocket.Surgery.Conventions.Scanners;
-using Rocket.Surgery.Extensions.DependencyInjection;
-using Rocket.Surgery.Hosting;
 using Rocket.Surgery.Reflection.Extensions;
 using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace Rocket.Surgery.AspNetCore.Hosting
 {
-    // 1. Create factory
-    // 2. Create twp base classes (one for system / application, one for just application)
-    // 3. Add tests to validate 3 main scenarios.
-
     public abstract class RocketStartup : IStartup
     {
+        private readonly IRocketHostingContext _context;
         private readonly IRocketServiceComposer _serviceComposer;
-        private readonly IDictionary<object, object> _properties;
-        private IServiceProvider _services;
+        protected string SystemPath = "/system";
 
         protected RocketStartup(
-            IConventionScanner scanner,
+            IRocketHostingContext context,
             IRocketServiceComposer serviceComposer,
             IConfiguration configuration,
-            IHostingEnvironment environment,
-            DiagnosticSource diagnosticSource,
-            IDictionary<object, object> properties)
+            IHostingEnvironment environment)
         {
+            _context = context;
             _serviceComposer = serviceComposer;
-            _properties = properties;
             Environment = environment;
             Configuration = configuration;
-            DiagnosticSource = diagnosticSource;
-            Logger = new DiagnosticLogger(DiagnosticSource);
+            Logger = new DiagnosticLogger(context.DiagnosticSource);
             if (this is IConvention convention)
             {
-                scanner.AppendConvention(convention);
+                context.Scanner.AppendConvention(convention);
             }
         }
 
         public IHostingEnvironment Environment { get; }
         public IConfiguration Configuration { get; }
-        public DiagnosticLogger Logger { get; }
-        public DiagnosticSource DiagnosticSource { get; }
+        public ILogger Logger { get; }
+        public IServiceProvider ApplicationServices { get; private set; }
+        public IServiceProvider SystemServices { get; private set; }
 
         public virtual IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services.RemoveAll(typeof(IDictionary<object, object>));
             using (Logger.TimeTrace("{Step}", nameof(ConfigureServices)))
             {
-                return _services = _serviceComposer.ComposeServices(services, _properties);
+                services.RemoveAll(typeof(AutoRequestServicesStartupFilter));
+
+                _serviceComposer.ComposeServices(
+                    services,
+                    _context.Properties,
+                    out var systemServiceProvider,
+                    out var applicationServiceProvider);
+
+                ApplicationServices = applicationServiceProvider;
+                SystemServices = systemServiceProvider;
+
+                return applicationServiceProvider;
             }
         }
 
-        public void Configure(IApplicationBuilder app)
+        public virtual void Configure(IApplicationBuilder application)
         {
-            using (Logger.TimeTrace("{Step}", nameof(Configure)))
+            if (SystemServices != null)
             {
-                var builder = new RocketApplicationBuilder(app, Configuration);
+                using (Logger.TimeTrace("{Step}", nameof(Configure)))
+                {
+                    application.Map(SystemPath, a => ConfigureSystem(new ApplicationBuilder(SystemServices)));
+                }
+            }
 
-                Action<object, IServiceProvider, RocketApplicationBuilder> action;
+            if (GetType().GetMethod("Compose", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic) != null)
+            {
                 using (Logger.TimeTrace("Configuring Compose Method"))
                 {
-                    action = InjectableMethodBuilder.Create(GetType(), "Compose")
-                        .WithParameter<RocketApplicationBuilder>()
+                    var action = InjectableMethodBuilder.Create(GetType(), "Compose")
+                        .WithParameter<IApplicationBuilder>()
                         .Compile();
-                }
 
-                using (Logger.TimeDebug("Invoking Compose Method"))
-                {
-                    action(this, _services, builder);
+                    using (Logger.TimeDebug("Invoking Compose Method"))
+                    {
+                        application.UseMiddleware<RequestServicesContainerMiddleware>(
+                            ApplicationServices.GetRequiredService<IServiceScopeFactory>());
+                        action(this, ApplicationServices, application);
+                    }
                 }
+            }
+            else
+            {
+                Logger.LogTrace("Missing Compose method, you probably didn't meant to get here!");
             }
         }
 
-        public Action<IApplicationBuilder> App(Action<RocketApplicationBuilder> applicationBuilderAction)
+        public virtual void ConfigureSystem(IApplicationBuilder applicationBuilder)
         {
-            return (app) =>
+            if (GetType().GetMethod("ComposeSystem", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic) != null)
             {
-                var ab = new RocketApplicationBuilder(app, Configuration);
-                applicationBuilderAction(ab);
-            };
+                using (Logger.TimeTrace("Configuring ComposeSystem Method"))
+                {
+                    var systemAction = InjectableMethodBuilder.Create(GetType(), "ComposeSystem")
+                        .WithParameter<IApplicationBuilder>()
+                        .Compile();
+
+                    using (Logger.TimeTrace("Invoking ComposeSystem Method"))
+                    {
+                        applicationBuilder.UseMiddleware<RequestServicesContainerMiddleware>(
+                        SystemServices.GetRequiredService<IServiceScopeFactory>());
+                        systemAction(this, SystemServices, applicationBuilder);
+                    }
+                }
+            }
+            else
+            {
+                Logger.LogTrace("Missing ComposeSystem method, you might have meant to get here!");
+            }
         }
     }
 }

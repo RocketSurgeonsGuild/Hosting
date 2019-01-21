@@ -23,13 +23,6 @@ namespace Rocket.Surgery.Hosting
 
         public IServiceProvider CreateServiceProvider(IServicesBuilder containerBuilder)
         {
-            foreach (var d in containerBuilder.Services
-                .Where(x => x.ServiceType == typeof(IRocketHostBuilder) || x.ServiceType == typeof(IHostBuilder))
-                .ToArray())
-            {
-                containerBuilder.Services.Remove(d);
-            }
-
             return containerBuilder.Build();
         }
     }

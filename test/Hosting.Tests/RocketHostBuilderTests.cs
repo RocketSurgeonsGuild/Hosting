@@ -21,18 +21,12 @@ namespace Rocket.Surgery.Hosting.Tests
         public RocketHostBuilderTests(ITestOutputHelper outputHelper) : base(outputHelper) { }
 
         [Fact]
-        public void Builder_Should_Be_Castable_ToHostBuilder()
-        {
-            AutoFake.Provide(new string[0]);
-            IRocketHostBuilder builder = AutoFake.Resolve<RocketHostBuilder>();
-            builder.AsHostBuilder().Should().BeAssignableTo<IHostBuilder>();
-        }
-
-        [Fact]
         public void Should_Call_Through_To_Delegate_Methods()
         {
             AutoFake.Provide(new string[0]);
-            IRocketHostBuilder builder = AutoFake.Resolve<RocketHostBuilder>();
+            IRocketHostBuilder builder = RocketHost.CreateDefaultBuilder()
+                .UseConventional()
+                .UseConventionalScanner(AutoFake.Resolve<IConventionScanner>());
             builder.PrependDelegate(new Action(() => { }));
             builder.AppendDelegate(new Action(() => { }));
             builder.ConfigureServices((context, collection) => { });
@@ -44,7 +38,9 @@ namespace Rocket.Surgery.Hosting.Tests
         public void Should_Call_Through_To_Convention_Methods()
         {
             AutoFake.Provide(new string[0]);
-            IRocketHostBuilder builder = AutoFake.Resolve<RocketHostBuilder>();
+            IRocketHostBuilder builder = RocketHost.CreateDefaultBuilder()
+                .UseConventional()
+                .UseConventionalScanner(AutoFake.Resolve<IConventionScanner>());
             var convention = AutoFake.Resolve<IConvention>();
             builder.PrependConvention(convention);
             builder.AppendConvention(convention);

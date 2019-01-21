@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Rocket.Surgery.Conventions.Reflection;
 using Rocket.Surgery.Conventions.Scanners;
 using Rocket.Surgery.Extensions.DependencyInjection;
-using Rocket.Surgery.Hosting;
+using IHostingEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
 
 namespace Rocket.Surgery.AspNetCore.Hosting
 {
@@ -36,9 +36,11 @@ namespace Rocket.Surgery.AspNetCore.Hosting
             _diagnosticSource = diagnosticSource ?? throw new ArgumentNullException(nameof(diagnosticSource));
         }
 
-        public IServiceProvider ComposeServices(
-            IServiceCollection services, 
-            IDictionary<object, object> properties)
+        public void ComposeServices(
+            IServiceCollection services,
+            IDictionary<object, object> properties,
+            out IServiceProvider systemServiceProvider,
+            out IServiceProvider applicationServiceProvider)
         {
             var builder = new ServicesBuilder(
                 _scanner,
@@ -50,7 +52,10 @@ namespace Rocket.Surgery.AspNetCore.Hosting
                 _diagnosticSource,
                 properties);
 
-            return builder.Build();
+            var c = builder.Build();
+
+            systemServiceProvider = null;
+            applicationServiceProvider = c;
         }
     }
 }

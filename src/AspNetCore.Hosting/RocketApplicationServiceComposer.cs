@@ -7,11 +7,10 @@ using Microsoft.Extensions.Hosting;
 using Rocket.Surgery.Conventions.Reflection;
 using Rocket.Surgery.Conventions.Scanners;
 using Rocket.Surgery.Extensions.DependencyInjection;
-using Rocket.Surgery.Hosting;
 
 namespace Rocket.Surgery.AspNetCore.Hosting
 {
-    class RocketApplicationServiceComposer : IRocketApplicationServiceComposer
+    class RocketApplicationServiceComposer : IRocketServiceComposer
     {
         private readonly IConventionScanner _scanner;
         private readonly IAssemblyProvider _assemblyProvider;

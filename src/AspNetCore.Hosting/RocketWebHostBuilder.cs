@@ -1,128 +1,76 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Reflection;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Builder.Internal;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Hosting.Internal;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging;
-using Rocket.Surgery.AspNetCore.Hosting.Cli;
-using Rocket.Surgery.Builders;
 using Rocket.Surgery.Conventions;
 using Rocket.Surgery.Conventions.Reflection;
 using Rocket.Surgery.Conventions.Scanners;
-using Rocket.Surgery.Extensions.CommandLine;
-using Rocket.Surgery.Extensions.DependencyInjection;
-using Rocket.Surgery.Hosting;
-using ConfigurationBuilder = Rocket.Surgery.Extensions.Configuration.ConfigurationBuilder;
-using IHostingEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
-using IWebHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
-using IMsftConfigurationBuilder = Microsoft.Extensions.Configuration.IConfigurationBuilder;
-using MsftConfigurationBuilder = Microsoft.Extensions.Configuration.ConfigurationBuilder;
-using Rocket.Surgery.Extensions.Logging;
 
 namespace Rocket.Surgery.AspNetCore.Hosting
 {
-    public partial class RocketWebHostBuilder : ConventionHostBuilder, IRocketWebHostBuilder
+    class RocketWebHostBuilder : ConventionHostBuilder, IRocketWebHostBuilder
     {
-        private readonly IWebHostBuilder _webHostBuilder;
-        private readonly WebHostBuilderContext _context;
-        private readonly string[] _arguments;
-
-        private readonly FieldInfo _contextProperty = typeof(WebHostBuilder)
-            .GetField("_context", BindingFlags.NonPublic | BindingFlags.Instance);
-
         public RocketWebHostBuilder(
-            IWebHostBuilder webHostBuilder,
-            IConventionScanner scanner,
-            IAssemblyCandidateFinder assemblyCandidateFinder,
-            IAssemblyProvider assemblyProvider,
-            DiagnosticSource diagnosticSource,
-            string[] arguments = null) : base(scanner, assemblyCandidateFinder, assemblyProvider, diagnosticSource, new Dictionary<object, object>())
+            IWebHostBuilder builder, 
+            IConventionScanner scanner, 
+            IAssemblyCandidateFinder assemblyCandidateFinder, 
+            IAssemblyProvider assemblyProvider, 
+            DiagnosticSource diagnosticSource, 
+            IDictionary<object, object> properties) : base(scanner, assemblyCandidateFinder, assemblyProvider, diagnosticSource, properties)
         {
-            _webHostBuilder = webHostBuilder;
-            _context = (WebHostBuilderContext)_contextProperty.GetValue(webHostBuilder);
-            _arguments = arguments;
-            _webHostBuilder.ConfigureServices(ConfigureDefaultServices);
-
-            _webHostBuilder.ConfigureAppConfiguration(DefaultApplicationConfiguration);
-            PrependConvention(new StandardConfigurationConvention());
-            UseCli = _arguments != null;
-
-            this.UseEmpoweredLogging(new EmpoweredLoggingOptions()
-            {
-            });
+            Builder = builder;
+        }
+        internal RocketWebHostBuilder(
+            IWebHostBuilder builder, 
+            IConventionScanner scanner, 
+            IAssemblyCandidateFinder assemblyCandidateFinder, 
+            IAssemblyProvider assemblyProvider, 
+            DiagnosticSource diagnosticSource, 
+            IDictionary<object, object> properties, 
+            Func<RocketWebHostBuilder, IConfiguration, Microsoft.Extensions.Hosting.IHostingEnvironment, IRocketServiceComposer> applicationServicesComposeDelegate, 
+            Func<RocketWebHostBuilder, IConfiguration, Microsoft.Extensions.Hosting.IHostingEnvironment, IRocketServiceComposer> applicationAndSystemServicesComposeDelegate) : base(scanner, assemblyCandidateFinder, assemblyProvider, diagnosticSource, properties)
+        {
+            Builder = builder;
+            ApplicationServicesComposeDelegate = applicationServicesComposeDelegate;
+            ApplicationAndSystemServicesComposeDelegate = applicationAndSystemServicesComposeDelegate;
         }
 
-        private void DefaultApplicationConfiguration(WebHostBuilderContext context, IMsftConfigurationBuilder configurationBuilder)
+        public IWebHostBuilder Builder { get; }
+        public IWebHost Build() => Builder.Build();
+        public IWebHostBuilder ConfigureAppConfiguration(Action<WebHostBuilderContext, IConfigurationBuilder> configureDelegate) => Builder.ConfigureAppConfiguration(configureDelegate);
+        public IWebHostBuilder ConfigureServices(Action<IServiceCollection> configureServices) => Builder.ConfigureServices(configureServices);
+        public IWebHostBuilder ConfigureServices(Action<WebHostBuilderContext, IServiceCollection> configureServices) => Builder.ConfigureServices(configureServices);
+        public string GetSetting(string key) => Builder.GetSetting(key);
+        public IWebHostBuilder UseSetting(string key, string value) => Builder.UseSetting(key, value);
+
+        internal RocketWebHostBuilder With(IConventionScanner scanner)
         {
-            // remove standard configurations
-            configurationBuilder.Sources.Clear();
-            var cb = new ConfigurationBuilder(
-                Scanner,
-                (IHostingEnvironment)context.HostingEnvironment,
-                context.Configuration,
-                configurationBuilder,
-                DiagnosticSource,
-                Properties);
-            cb.Build();
+            return new RocketWebHostBuilder(Builder, scanner, AssemblyCandidateFinder, AssemblyProvider, DiagnosticSource, Properties, ApplicationServicesComposeDelegate, ApplicationAndSystemServicesComposeDelegate);
         }
 
-        private void ConfigureDefaultServices(WebHostBuilderContext context, IServiceCollection services)
+        internal RocketWebHostBuilder With(IAssemblyCandidateFinder assemblyCandidateFinder)
         {
-            services.AddSingleton(Scanner);
-            services.AddSingleton(AssemblyProvider);
-            services.AddSingleton(AssemblyCandidateFinder);
-            services.AddSingleton(Properties);
-            services.AddSingleton<IRocketServiceComposer, RocketServiceComposer>();
-            services.AddSingleton<IRocketApplicationServiceComposer, RocketApplicationServiceComposer>();
+            return new RocketWebHostBuilder(Builder, Scanner, assemblyCandidateFinder, AssemblyProvider, DiagnosticSource, Properties, ApplicationServicesComposeDelegate, ApplicationAndSystemServicesComposeDelegate);
         }
-        
-        public bool UseCli { get; set; }
 
-        public IWebHost Build()
+        internal RocketWebHostBuilder With(IAssemblyProvider assemblyProvider)
         {
-            if (UseCli)
-            {
-                var clb = new CommandLineBuilder(
-                    Scanner,
-                    AssemblyProvider,
-                    AssemblyCandidateFinder,
-                    DiagnosticSource,
-                    Properties
-                );
-                clb.OnParse(state =>
-                {
-                    if (!state.IsDefaultCommand)
-                    {
-                        this.UseServer(new CliServer());
-                    }
-                    _webHostBuilder.ConfigureServices(services =>
-                    {
-                        services.AddSingleton(state);
-                    });
-                    Properties[typeof(IApplicationState)] = state;
-
-                    AppendConvention(new CliConfigurationConvention());
-                    AppendConvention(new FinalConfigurationConvention(state.RemainingArguments));
-                });
-                var executor = clb.Build().Parse(_arguments ?? Array.Empty<string>());
-                _webHostBuilder.ConfigureServices(services =>
-                {
-                    services.AddSingleton(executor);
-                });
-            }
-            else
-            {
-                AppendConvention(new FinalConfigurationConvention());
-            }
-
-            return _webHostBuilder.Build();
+            return new RocketWebHostBuilder(Builder, Scanner, AssemblyCandidateFinder, assemblyProvider, DiagnosticSource, Properties, ApplicationServicesComposeDelegate, ApplicationAndSystemServicesComposeDelegate);
         }
+
+        internal RocketWebHostBuilder With(DiagnosticSource diagnosticSource)
+        {
+            return new RocketWebHostBuilder(Builder, Scanner, AssemblyCandidateFinder, AssemblyProvider, diagnosticSource, Properties, ApplicationServicesComposeDelegate, ApplicationAndSystemServicesComposeDelegate);
+        }
+
+        internal RocketWebHostBuilder With(IDictionary<object, object> properties)
+        {
+            return new RocketWebHostBuilder(Builder, Scanner, AssemblyCandidateFinder, AssemblyProvider, DiagnosticSource, properties, ApplicationServicesComposeDelegate, ApplicationAndSystemServicesComposeDelegate);
+        }
+
+        internal Func<RocketWebHostBuilder, IConfiguration, Microsoft.Extensions.Hosting.IHostingEnvironment, IRocketServiceComposer> ApplicationServicesComposeDelegate { get; set; }
+        internal Func<RocketWebHostBuilder, IConfiguration, Microsoft.Extensions.Hosting.IHostingEnvironment, IRocketServiceComposer> ApplicationAndSystemServicesComposeDelegate { get; set; }
     }
 }

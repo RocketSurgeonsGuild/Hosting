@@ -18,7 +18,6 @@ using Rocket.Surgery.Conventions.Scanners;
 using Rocket.Surgery.Extensions.CommandLine;
 using Rocket.Surgery.Extensions.Configuration;
 using Rocket.Surgery.Extensions.DependencyInjection;
-using Rocket.Surgery.Hosting;
 using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace Extensions.Host

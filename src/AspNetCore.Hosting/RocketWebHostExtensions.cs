@@ -1,139 +1,222 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Rocket.Surgery.AspNetCore.Hosting.Cli;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.DependencyModel;
+using Rocket.Surgery.AspNetCore.Hosting;
 using Rocket.Surgery.Conventions;
-using Rocket.Surgery.Extensions.CommandLine;
-using Rocket.Surgery.Extensions.Configuration;
-using Rocket.Surgery.Extensions.DependencyInjection;
-using Rocket.Surgery.Extensions.Logging;
-using IHostingEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
+using Rocket.Surgery.Conventions.Reflection;
+using Rocket.Surgery.Conventions.Scanners;
 
-namespace Rocket.Surgery.AspNetCore.Hosting
+// ReSharper disable once CheckNamespace
+namespace Microsoft.AspNetCore.Hosting
 {
     public static class RocketWebHostExtensions
     {
-        public static Task<int> GoAsync(this IWebHostBuilder builder)
+        private static readonly ConditionalWeakTable<IWebHostBuilder, RocketWebHostBuilder> Builders = new ConditionalWeakTable<IWebHostBuilder, RocketWebHostBuilder>();
+        public static IRocketWebHostBuilder UseConventional(this IWebHostBuilder builder)
         {
-            return ((IRocketWebHostBuilder)builder).GoAsync(CancellationToken.None);
+            return GetOrCreateBuilder(builder);
         }
 
-        public static Task<int> GoAsync(this IWebHostBuilder builder, CancellationToken cancellationToken)
+        public static IRocketWebHostBuilder UseConventionalScanner(this IRocketWebHostBuilder builder, IConventionScanner scanner)
         {
-            return ((IRocketWebHostBuilder)builder).GoAsync(cancellationToken);
+            return Swap(builder, GetOrCreateBuilder(builder).With(scanner));
         }
 
-        public static int Go(this IWebHostBuilder builder)
+        public static IRocketWebHostBuilder UseConventionalAssemblyCandidateFinder(this IRocketWebHostBuilder builder, IAssemblyCandidateFinder assemblyCandidateFinder)
         {
-            return ((IRocketWebHostBuilder)builder).GoAsync(CancellationToken.None).GetAwaiter().GetResult();
+            return Swap(builder, GetOrCreateBuilder(builder).With(assemblyCandidateFinder));
         }
 
-        public static Task<int> GoAsync(this IRocketWebHostBuilder builder)
+        public static IRocketWebHostBuilder UseConventionalAssemblyProvider(this IRocketWebHostBuilder builder, IAssemblyProvider assemblyProvider)
         {
-            return builder.GoAsync(CancellationToken.None);
+            return Swap(builder, GetOrCreateBuilder(builder).With(assemblyProvider));
         }
 
-        public static int Go(this IRocketWebHostBuilder builder)
+        public static IRocketWebHostBuilder UseConventionalDiagnosticSource(this IRocketWebHostBuilder builder, DiagnosticSource diagnosticSource)
         {
-            return builder.GoAsync(CancellationToken.None).GetAwaiter().GetResult();
+            return Swap(builder, GetOrCreateBuilder(builder).With(diagnosticSource));
         }
 
-        public static async Task<int> GoAsync(this IRocketWebHostBuilder hostBuilder, CancellationToken cancellationToken)
+        public static IRocketWebHostBuilder UseConventionalProperties(this IRocketWebHostBuilder builder, IDictionary<object, object> properties)
         {
-            await Task.Yield();
+            return Swap(builder, GetOrCreateBuilder(builder).With(properties));
+        }
 
-            IWebHost host = null;
-
-            hostBuilder.ConfigureServices(services =>
-                services.AddSingleton(_ => new WebHostWrapper(host)));
-            hostBuilder.ConfigureServices(services =>
-                services.AddSingleton(_ => host));
-
-            using (host = hostBuilder.Build())
+        public static IRocketWebHostBuilder UseConventionalDependencyContext(
+            this IWebHostBuilder builder,
+            DependencyContext dependencyContext,
+            DiagnosticSource diagnosticSource = null)
+        {
+            var b = GetOrCreateBuilder(builder);
+            if (diagnosticSource != null)
             {
-                var logger = host.Services.GetRequiredService<ILoggerFactory>().CreateLogger<IWebHost>();
-                try
-                {
-                    var executor = host.Services.GetService<ICommandLineExecutor>();
-                    if (executor != null)
-                    {
-                        if (executor.Application.IsShowingInformation)
-                        {
-                            return 0;
-                        }
-
-                        if (!executor.IsDefaultCommand)
-                        {
-                            await host.StartAsync(cancellationToken);
-                            var result = executor.Execute(host.Services);
-                            await host.StopAsync(cancellationToken);
-                            return result;
-                        }
-                    }
-
-                    var r = executor.Execute(host.Services);
-                    if (r == int.MinValue)
-                    {
-                        await host.RunAsync(cancellationToken);
-                    }
-                    else
-                    {
-                        return r;
-                    }
-                    return 0;
-                }
-                catch (Exception e)
-                {
-                    logger.LogCritical(e, "Application Crashed");
-                    return -1;
-                }
+                b = b.With(diagnosticSource);
             }
+
+            var logger = new DiagnosticLogger(b.DiagnosticSource);
+            var assemblyCandidateFinder = new DependencyContextAssemblyCandidateFinder(dependencyContext, logger);
+            var assemblyProvider = new DependencyContextAssemblyProvider(dependencyContext, logger);
+            var scanner = new AggregateConventionScanner(assemblyCandidateFinder);
+            return Swap(
+                builder, b
+                    .With(assemblyCandidateFinder)
+                    .With(assemblyProvider)
+                    .With(scanner)
+                );
         }
 
-        public static T ContributeDelegate<T>(this T builder, params Delegate[] @delegates)
-            where T : IRocketWebHostBuilder
+        public static IRocketWebHostBuilder UseDependencyContext(
+            this IRocketWebHostBuilder builder,
+            DependencyContext dependencyContext,
+            DiagnosticSource diagnosticSource = null)
         {
-            builder.AppendDelegate(@delegates);
-            return builder;
+            return builder.UseConventionalDependencyContext(dependencyContext, diagnosticSource);
         }
 
-        public static T ContributeConvention<T>(this T builder, params IConvention[] conventions)
-            where T : IRocketWebHostBuilder
+        public static IRocketWebHostBuilder UseConventionalAppDomain(
+            this IWebHostBuilder builder,
+            AppDomain appDomain,
+            DiagnosticSource diagnosticSource = null)
         {
-            builder.AppendConvention(conventions);
-            return builder;
+            var b = GetOrCreateBuilder(builder);
+            if (diagnosticSource != null)
+            {
+                b = b.With(diagnosticSource);
+            }
+
+            var logger = new DiagnosticLogger(b.DiagnosticSource);
+            var assemblyCandidateFinder = new AppDomainAssemblyCandidateFinder(appDomain, logger);
+            var assemblyProvider = new AppDomainAssemblyProvider(appDomain, logger);
+            var scanner = new AggregateConventionScanner(assemblyCandidateFinder);
+            return Swap(
+                builder, b
+                    .With(assemblyCandidateFinder)
+                    .With(assemblyProvider)
+                    .With(scanner)
+            );
         }
 
-        public static T ContributeCommandLine<T>(this T builder, CommandLineConventionDelegate commandLineConventionDelegate)
-            where T : IRocketWebHostBuilder
+        public static IRocketWebHostBuilder UseAppDomain(
+            this IRocketWebHostBuilder builder,
+            AppDomain appDomain,
+            DiagnosticSource diagnosticSource = null)
         {
-            builder.AppendDelegate(commandLineConventionDelegate);
-            return builder;
+            return builder.UseConventionalAppDomain(appDomain, diagnosticSource);
         }
 
-        public static T ContributeConfiguration<T>(this T builder, ConfigurationConventionDelegate configurationConventionDelegate)
-            where T : IRocketWebHostBuilder
+
+        public static IRocketWebHostBuilder UseConventionalAssemblies(
+            this IWebHostBuilder builder,
+            IEnumerable<Assembly> assemblies,
+            DiagnosticSource diagnosticSource = null)
         {
-            builder.AppendDelegate(configurationConventionDelegate);
-            return builder;
+            var b = GetOrCreateBuilder(builder);
+            if (diagnosticSource != null)
+            {
+                b = b.With(diagnosticSource);
+            }
+
+            var logger = new DiagnosticLogger(b.DiagnosticSource);
+            var enumerable = assemblies as Assembly[] ?? assemblies.ToArray();
+            var assemblyCandidateFinder = new DefaultAssemblyCandidateFinder(enumerable, logger);
+            var assemblyProvider = new DefaultAssemblyProvider(enumerable, logger);
+            var scanner = new AggregateConventionScanner(assemblyCandidateFinder);
+            return Swap(
+                builder, b
+                    .With(assemblyCandidateFinder)
+                    .With(assemblyProvider)
+                    .With(scanner)
+            );
         }
 
-        public static T ContributeLogging<T>(this T builder, LoggingConventionDelegate loggingConventionDelegate)
-            where T : IRocketWebHostBuilder
+        public static IRocketWebHostBuilder UseAssemblies(
+            this IRocketWebHostBuilder builder,
+            IEnumerable<Assembly> assemblies,
+            DiagnosticSource diagnosticSource = null)
         {
-            builder.AppendDelegate(loggingConventionDelegate);
-            return builder;
+            return builder.UseConventionalAssemblies(assemblies, diagnosticSource);
         }
 
-        public static T ContributeServices<T>(this T builder, ServiceConventionDelegate serviceConventionDelegate)
-            where T : IRocketWebHostBuilder
+        internal static IRocketWebHostBuilder UseServices(this IWebHostBuilder builder)
         {
-            builder.AppendDelegate(serviceConventionDelegate);
-            return builder;
+            builder.ConfigureServices((context, services) =>
+            {
+                var conventionalBuilder = GetOrCreateBuilder(builder);
+                services.RemoveAll<IRocketServiceComposer>();
+                services.AddSingleton(_ => conventionalBuilder.ApplicationServicesComposeDelegate(conventionalBuilder, context.Configuration, context.HostingEnvironment as Extensions.Hosting.IHostingEnvironment));
+            });
+            return GetOrCreateBuilder(builder);
+        }
+
+        public static IRocketWebHostBuilder UseSystemServices(this IWebHostBuilder builder)
+        {
+            builder.ConfigureServices((context, services) =>
+            {
+                var conventionalBuilder = GetOrCreateBuilder(builder);
+                services.RemoveAll<IRocketServiceComposer>();
+                services.AddSingleton(_ => conventionalBuilder.ApplicationAndSystemServicesComposeDelegate(conventionalBuilder, context.Configuration, context.HostingEnvironment as Extensions.Hosting.IHostingEnvironment));
+            });
+            return GetOrCreateBuilder(builder);
+        }
+
+        internal static RocketWebHostBuilder GetConventionalWebHostBuilder(IWebHostBuilder builder)
+        {
+            return GetOrCreateBuilder(builder);
+        }
+
+        private static RocketWebHostBuilder GetOrCreateBuilder(IRocketWebHostBuilder builder)
+        {
+            return GetOrCreateBuilder(builder.Builder);
+        }
+
+        internal static RocketWebHostBuilder GetOrCreateBuilder(IWebHostBuilder builder)
+        {
+            if (!Builders.TryGetValue(builder, out var conventionalBuilder))
+            {
+                var diagnosticSource = new DiagnosticListener("Rocket.Surgery.Hosting");
+                var dependencyContext = DependencyContext.Default;
+                var logger = new DiagnosticLogger(diagnosticSource);
+                var assemblyCandidateFinder = new DependencyContextAssemblyCandidateFinder(dependencyContext, logger);
+                var assemblyProvider = new DependencyContextAssemblyProvider(dependencyContext, logger);
+                var scanner = new AggregateConventionScanner(assemblyCandidateFinder);
+                conventionalBuilder = new RocketWebHostBuilder(builder, scanner, assemblyCandidateFinder, assemblyProvider, diagnosticSource, new Dictionary<object, object>());
+
+                var startupAssemblies = ((builder.GetSetting(WebHostDefaults.HostingStartupAssembliesKey) ?? "") + ";" +
+                                         typeof(RocketHostingStartup).Assembly.GetName().Name).Trim(';');
+                builder.UseSetting(WebHostDefaults.HostingStartupAssembliesKey, startupAssemblies);
+                conventionalBuilder.ApplicationServicesComposeDelegate = (b, configuration, environment) => new RocketServiceComposer(
+                    b.Scanner,
+                    b.AssemblyProvider,
+                    b.AssemblyCandidateFinder,
+                    configuration,
+                    environment,
+                    b.DiagnosticSource);
+                conventionalBuilder.ApplicationAndSystemServicesComposeDelegate = (b, configuration, environment) => new RocketApplicationServiceComposer(
+                    b.Scanner,
+                    b.AssemblyProvider,
+                    b.AssemblyCandidateFinder,
+                    configuration,
+                    environment,
+                    b.DiagnosticSource);
+                Builders.Add(builder, conventionalBuilder);
+                conventionalBuilder.UseServices();
+            }
+
+            return conventionalBuilder;
+        }
+
+        internal static RocketWebHostBuilder Swap(IWebHostBuilder builder, RocketWebHostBuilder newRocketBuilder)
+        {
+            Builders.Remove(builder);
+            Builders.Add(builder, newRocketBuilder);
+            return newRocketBuilder;
         }
     }
 }

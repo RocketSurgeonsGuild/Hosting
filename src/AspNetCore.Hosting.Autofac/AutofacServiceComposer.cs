@@ -5,7 +5,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Rocket.Surgery.Conventions.Reflection;
 using Rocket.Surgery.Conventions.Scanners;
 using Rocket.Surgery.Extensions.Autofac;
-using Rocket.Surgery.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -19,7 +18,7 @@ namespace Rocket.Surgery.AspNetCore.Hosting.Autofac
         private readonly IAssemblyProvider _assemblyProvider;
         private readonly IAssemblyCandidateFinder _assemblyCandidateFinder;
         private readonly IConfiguration _configuration;
-        private readonly IHostingEnvironment _environment;
+        private readonly Microsoft.Extensions.Hosting.IHostingEnvironment _environment;
         private readonly DiagnosticSource _diagnosticSource;
         private readonly ContainerBuilder _containerBuilder;
 
@@ -28,7 +27,7 @@ namespace Rocket.Surgery.AspNetCore.Hosting.Autofac
             IAssemblyProvider assemblyProvider,
             IAssemblyCandidateFinder assemblyCandidateFinder,
             IConfiguration configuration,
-            IHostingEnvironment environment,
+            Microsoft.Extensions.Hosting.IHostingEnvironment environment,
             DiagnosticSource diagnosticSource,
             ContainerBuilder containerBuilder)
         {
@@ -41,7 +40,8 @@ namespace Rocket.Surgery.AspNetCore.Hosting.Autofac
             _containerBuilder = containerBuilder ?? throw new ArgumentNullException(nameof(containerBuilder));
         }
 
-        public IServiceProvider ComposeServices(IServiceCollection services, IDictionary<object, object> properties)
+        public void ComposeServices(IServiceCollection services, IDictionary<object, object> properties, out IServiceProvider systemServiceProvider,
+            out IServiceProvider applicationServiceProvider)
         {
             var builder = new AutofacBuilder(
                 _containerBuilder,
@@ -50,11 +50,14 @@ namespace Rocket.Surgery.AspNetCore.Hosting.Autofac
                 _assemblyCandidateFinder,
                 services,
                 _configuration,
-                (Microsoft.Extensions.Hosting.IHostingEnvironment)_environment,
+                _environment,
                 _diagnosticSource,
                 properties);
 
-            return builder.Build().Resolve<IServiceProvider>();
+            var c = builder.Build();
+
+            systemServiceProvider = null;
+            applicationServiceProvider = c.Resolve<IServiceProvider>();
         }
     }
 }

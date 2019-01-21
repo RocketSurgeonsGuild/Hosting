@@ -5,251 +5,108 @@ using System.IO;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Hosting.Internal;
 using Microsoft.Extensions.Logging;
-using Rocket.Surgery.Builders;
+using Microsoft.Extensions.Logging.Configuration;
 using Rocket.Surgery.Conventions;
 using Rocket.Surgery.Conventions.Reflection;
 using Rocket.Surgery.Conventions.Scanners;
-using Rocket.Surgery.Extensions.CommandLine;
-using Rocket.Surgery.Extensions.Configuration;
-using Rocket.Surgery.Extensions.DependencyInjection;
-using Rocket.Surgery.Extensions.Logging;
-using ConfigurationBuilder = Rocket.Surgery.Extensions.Configuration.ConfigurationBuilder;
-using IMsftConfigurationBuilder = Microsoft.Extensions.Configuration.IConfigurationBuilder;
-using MsftConfigurationBuilder = Microsoft.Extensions.Configuration.ConfigurationBuilder;
 
 namespace Rocket.Surgery.Hosting
 {
-    public class RocketHostBuilder : ConventionHostBuilder, IRocketHostBuilder
+    class RocketHostBuilder : ConventionHostBuilder, IRocketHostBuilder
     {
-        private readonly List<Action<IMsftConfigurationBuilder>> _configureHostConfigActions = new List<Action<IMsftConfigurationBuilder>>();
-        private readonly IHostBuilder _hostBuilder;
-        private readonly string[] _arguments;
-        private ServicesBuilderDelegate _servicesBuilderDelegate;
-
-        public RocketHostBuilder(
-            IHostBuilder hostBuilder,
-            IConventionScanner scanner,
-            IAssemblyCandidateFinder assemblyCandidateFinder,
-            IAssemblyProvider assemblyProvider,
-            DiagnosticSource diagnosticSource,
-            string[] arguments = null)
-            : base(scanner, assemblyCandidateFinder, assemblyProvider, diagnosticSource, hostBuilder.Properties)
+        public RocketHostBuilder(IHostBuilder builder, IConventionScanner scanner, IAssemblyCandidateFinder assemblyCandidateFinder, IAssemblyProvider assemblyProvider, DiagnosticSource diagnosticSource, IDictionary<object, object> properties) : base(scanner, assemblyCandidateFinder, assemblyProvider, diagnosticSource, properties)
         {
-            _hostBuilder = hostBuilder;
-            _arguments = arguments;
-            _servicesBuilderDelegate = (conventionScanner, provider, finder, services, configuration, environment, logger1, properties) =>
-                new ServicesBuilder(Scanner, AssemblyProvider, AssemblyCandidateFinder, services, configuration, environment, diagnosticSource, Properties);
+            Builder = builder;
+        }
+        public RocketHostBuilder(IHostBuilder builder, IConventionScanner scanner, IAssemblyCandidateFinder assemblyCandidateFinder, IAssemblyProvider assemblyProvider, DiagnosticSource diagnosticSource, IDictionary<object, object> properties, string[] args) : base(scanner, assemblyCandidateFinder, assemblyProvider, diagnosticSource, properties)
+        {
+            Builder = builder;
+            Arguments = args;
+        }
 
-            _hostBuilder.ConfigureServices(ConfigureDefaultServices);
-            _hostBuilder.ConfigureAppConfiguration(DefaultApplicationConfiguration);
-            ((IRocketHostBuilder)this).PrependConvention(new StandardConfigurationConvention());
-            UseCli = _arguments != null;
+        public IHostBuilder Builder { get; }
 
-            this.UseEmpoweredLogging(new EmpoweredLoggingOptions()
+        public IHostBuilder ConfigureContainer<TContainerBuilder>(Action<HostBuilderContext, TContainerBuilder> configureDelegate) => Builder.ConfigureContainer(configureDelegate);
+        public IHost Build() => Builder.Build();
+        public IHostBuilder ConfigureHostConfiguration(Action<IConfigurationBuilder> configureDelegate) => Builder.ConfigureHostConfiguration(configureDelegate);
+        public IHostBuilder ConfigureAppConfiguration(Action<HostBuilderContext, IConfigurationBuilder> configureDelegate) => Builder.ConfigureAppConfiguration(configureDelegate);
+        public IHostBuilder ConfigureServices(Action<IServiceCollection> configureServices) => Builder.ConfigureServices(configureServices);
+        public IHostBuilder ConfigureServices(Action<HostBuilderContext, IServiceCollection> configureServices) => Builder.ConfigureServices(configureServices);
+        public IHostBuilder UseServiceProviderFactory<TContainerBuilder>(IServiceProviderFactory<TContainerBuilder> factory) => Builder.UseServiceProviderFactory(factory);
+        public string[] Arguments { get; set; }
+
+        internal RocketHostBuilder With(IConventionScanner scanner)
+        {
+            return new RocketHostBuilder(Builder, scanner, AssemblyCandidateFinder, AssemblyProvider, DiagnosticSource, Properties, Arguments);
+        }
+
+        internal RocketHostBuilder With(IAssemblyCandidateFinder assemblyCandidateFinder)
+        {
+            return new RocketHostBuilder(Builder, Scanner, assemblyCandidateFinder, AssemblyProvider, DiagnosticSource, Properties, Arguments);
+        }
+
+        internal RocketHostBuilder With(IAssemblyProvider assemblyProvider)
+        {
+            return new RocketHostBuilder(Builder, Scanner, AssemblyCandidateFinder, assemblyProvider, DiagnosticSource, Properties, Arguments);
+        }
+
+        internal RocketHostBuilder With(DiagnosticSource diagnosticSource)
+        {
+            return new RocketHostBuilder(Builder, Scanner, AssemblyCandidateFinder, AssemblyProvider, diagnosticSource, Properties, Arguments);
+        }
+    }
+
+    // To be replaced by Host in 3.x
+    public static class RocketHost
+    {
+        public static IHostBuilder CreateDefaultBuilder(string[] args = null)
+        {
+            var builder = new HostBuilder();
+
+            builder.UseContentRoot(Directory.GetCurrentDirectory());
+            builder.ConfigureHostConfiguration(config =>
             {
-                GetLogLevel = context =>
+                config.AddEnvironmentVariables(); // TODO: Prefix?
+                if (args != null)
                 {
-                    var state = context.Get<IApplicationState>();
-                    return state?.GetLogLevel() ?? LogLevel.Information;
+                    config.AddCommandLine(args);
                 }
             });
-        }
 
-        private void DefaultApplicationConfiguration(HostBuilderContext context, IMsftConfigurationBuilder configurationBuilder)
-        {
-            // remove standard configurations
-            configurationBuilder.Sources.Clear();
-            var cb = new ConfigurationBuilder(
-                Scanner,
-                (IHostingEnvironment)context.HostingEnvironment,
-                context.Configuration,
-                configurationBuilder,
-                DiagnosticSource,
-                Properties);
-            cb.Build();
-        }
-
-        private void ConfigureDefaultServices(HostBuilderContext context, IServiceCollection services)
-        {
-            services.AddSingleton(Scanner);
-            services.AddSingleton(AssemblyProvider);
-            services.AddSingleton(AssemblyCandidateFinder);
-        }
-
-        public bool UseCli { get; set; }
-
-        public IHost Build()
-        {
-            if (UseCli)
-            {
-                var clb = new CommandLineBuilder(
-                    Scanner,
-                    AssemblyProvider,
-                    AssemblyCandidateFinder,
-                    DiagnosticSource,
-                    Properties
-                );
-                clb.OnParse(state =>
+            builder.ConfigureAppConfiguration((hostingContext, config) =>
                 {
-                    this.ConfigureServices(services =>
+                    var env = hostingContext.HostingEnvironment;
+
+                    config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                        .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
+
+                    if (env.IsDevelopment() && !string.IsNullOrEmpty(env.ApplicationName))
                     {
-                        services.AddSingleton(state);
-                    });
+                        var appAssembly = Assembly.Load(new AssemblyName(env.ApplicationName));
+                        if (appAssembly != null)
+                        {
+                            config.AddUserSecrets(appAssembly, optional: true);
+                        }
+                    }
 
-                    Properties[typeof(IApplicationState)] = state;
-                    ((IRocketHostBuilder)this).AppendConvention(new CliConfigurationConvention());
-                    ((IRocketHostBuilder)this).AppendConvention(new FinalConfigurationConvention(state.RemainingArguments));
+                    config.AddEnvironmentVariables();
+
+                    if (args != null)
+                    {
+                        config.AddCommandLine(args);
+                    }
+                })
+                .ConfigureLogging((hostingContext, logging) =>
+                {
+                    logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
+                    logging.AddConsole();
+                    logging.AddDebug();
+                    logging.AddEventSourceLogger();
                 });
-                var executor = clb.Build().Parse(_arguments ?? Array.Empty<string>());
-                this.ConfigureServices(services =>
-                {
-                    services.AddSingleton(executor);
-                    services.AddSingleton<IHostLifetime, CliLifetime>();
-                });
-            }
-            else
-            {
-                ((IRocketHostBuilder)this).AppendConvention(new FinalConfigurationConvention());
-            }
 
-            IConfiguration appConfiguration = null;
-            IHostingEnvironment hostingEnvironment = null;
-            _hostBuilder.ConfigureServices((context, services) =>
-            {
-                appConfiguration = context.Configuration;
-                hostingEnvironment = context.HostingEnvironment;
-            });
-
-            _hostBuilder.UseServiceProviderFactory(
-                new ServicesBuilderServiceProviderFactory(collection =>
-                    _servicesBuilderDelegate(
-                        Scanner,
-                        AssemblyProvider,
-                        AssemblyCandidateFinder,
-                        collection,
-                        appConfiguration,
-                        hostingEnvironment,
-                        DiagnosticSource,
-                        Properties
-                    )
-                )
-            );
-
-            _hostBuilder.ConfigureAppConfiguration((context, configurationBuilder) =>
-            {
-                var cb = new ConfigurationBuilder(
-                    Scanner,
-                    context.HostingEnvironment,
-                    context.Configuration,
-                    configurationBuilder,
-                    DiagnosticSource,
-                    Properties);
-                cb.Build();
-            });
-
-            return _hostBuilder.Build();
-        }
-
-        public IRocketHostBuilder ConfigureAppConfiguration(Action<HostBuilderContext, IMsftConfigurationBuilder> configureDelegate)
-        {
-            if (configureDelegate == null)
-            {
-                throw new ArgumentNullException(nameof(configureDelegate));
-            }
-
-            Scanner.AppendDelegate(new ConfigurationConventionDelegate(context =>
-            {
-                configureDelegate(new HostBuilderContext(context.Properties)
-                {
-                    HostingEnvironment = context.Environment,
-                    Configuration = context.Configuration
-                }, context);
-            }));
-            return this;
-        }
-
-        public IRocketHostBuilder ConfigureHostConfiguration(Action<IMsftConfigurationBuilder> configureDelegate)
-        {
-            _hostBuilder.ConfigureHostConfiguration(configureDelegate);
-            return this;
-        }
-
-        public IRocketHostBuilder ConfigureServices(Action<HostBuilderContext, IServiceCollection> configureDelegate)
-        {
-            if (configureDelegate == null)
-            {
-                throw new ArgumentNullException(nameof(configureDelegate));
-            }
-
-            Scanner.AppendDelegate(new ServiceConventionDelegate(context =>
-            {
-                configureDelegate(new HostBuilderContext(context.Properties)
-                {
-                    HostingEnvironment = context.Environment,
-                    Configuration = context.Configuration
-                }, context.Services);
-            }));
-            return this;
-        }
-
-        public IRocketHostBuilder ConfigureContainer<TContainerBuilder>(Action<HostBuilderContext, TContainerBuilder> configureDelegate)
-        {
-            _hostBuilder.ConfigureContainer(configureDelegate);
-            return this;
-        }
-
-        public IRocketHostBuilder UseServicesBuilderFactory(ServicesBuilderDelegate configureDelegate)
-        {
-            _servicesBuilderDelegate = configureDelegate;
-            return this;
-        }
-
-        public IRocketHostBuilder ExceptConvention(Type type)
-        {
-            Scanner.ExceptConvention(type ?? throw new ArgumentNullException(nameof(type)));
-            return this;
-        }
-
-        public IRocketHostBuilder ExceptConvention(Assembly assembly)
-        {
-            Scanner.ExceptConvention(assembly ?? throw new ArgumentNullException(nameof(assembly)));
-            return this;
-        }
-
-        public IHostBuilder AsHostBuilder() => this;
-
-        IHostBuilder IHostBuilder.ConfigureHostConfiguration(Action<IMsftConfigurationBuilder> configureDelegate)
-        {
-            ((IRocketHostBuilder)this).ConfigureHostConfiguration(configureDelegate);
-            return this;
-        }
-
-        IHostBuilder IHostBuilder.ConfigureAppConfiguration(Action<HostBuilderContext, IMsftConfigurationBuilder> configureDelegate)
-        {
-            ((IRocketHostBuilder)this).ConfigureAppConfiguration(configureDelegate);
-            return this;
-        }
-
-        IHostBuilder IHostBuilder.ConfigureServices(Action<HostBuilderContext, IServiceCollection> configureDelegate)
-        {
-            ((IRocketHostBuilder)this).ConfigureServices(configureDelegate);
-            return this;
-        }
-
-        IHostBuilder IHostBuilder.ConfigureContainer<TContainerBuilder>(Action<HostBuilderContext, TContainerBuilder> configureDelegate)
-        {
-            ((IRocketHostBuilder)this).ConfigureContainer(configureDelegate);
-            return this;
-        }
-
-        IHostBuilder IHostBuilder.UseServiceProviderFactory<TContainerBuilder>(IServiceProviderFactory<TContainerBuilder> factory)
-        {
-            // Yes this breaks SOLID :(
-            throw new NotSupportedException("UseServiceProviderFactory cannot be used with RocketHostBuilder");
+            return builder;
         }
     }
 }
