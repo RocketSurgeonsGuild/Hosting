@@ -5,7 +5,7 @@ using Rocket.Surgery.Conventions.Scanners;
 
 namespace Rocket.Surgery.AspNetCore.Hosting
 {
-    public interface IRocketHostingContext
+    public interface IRocketWebHostingContext
     {
         IConventionScanner Scanner { get; }
         DiagnosticSource DiagnosticSource { get; }

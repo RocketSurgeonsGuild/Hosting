@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0</TargetFrameworks>
     </PropertyGroup>
@@ -6,7 +6,6 @@
         <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
         <PackageReference Include="Rocket.Surgery.Builders.Abstractions" />
         <PackageReference Include="Rocket.Surgery.Conventions.Abstractions" />
-        <PackageReference Include="Rocket.Surgery.Extensions.CommandLine.Abstractions" />
         <PackageReference Include="Rocket.Surgery.Extensions.Configuration.Abstractions" />
         <PackageReference Include="Rocket.Surgery.Extensions.DependencyInjection.Abstractions" />
         <PackageReference Include="Rocket.Surgery.Extensions.Logging.Abstractions" />

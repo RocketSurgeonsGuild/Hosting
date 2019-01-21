@@ -25,19 +25,19 @@
     <PackageReference Update="NetEscapades.Configuration.Yaml" Version="1.6.0" />
     <PackageReference Update="Rocket.Surgery.Builders" Version="3.2.1" />
     <PackageReference Update="Rocket.Surgery.Builders.Abstractions" Version="3.2.1" />
-    <PackageReference Update="Rocket.Surgery.Conventions" Version="2.2.0" />
-    <PackageReference Update="Rocket.Surgery.Conventions.Abstractions" Version="2.2.0" />
+    <PackageReference Update="Rocket.Surgery.Conventions" Version="2.2.1" />
+    <PackageReference Update="Rocket.Surgery.Conventions.Abstractions" Version="2.2.1" />
     <PackageReference Update="Rocket.Surgery.Extensions" Version="0.11.1" />
-    <PackageReference Update="Rocket.Surgery.Extensions.CommandLine" Version="1.0.2" />
-    <PackageReference Update="Rocket.Surgery.Extensions.CommandLine.Abstractions" Version="1.0.2" />
-    <PackageReference Update="Rocket.Surgery.Extensions.Configuration" Version="1.0.1" />
-    <PackageReference Update="Rocket.Surgery.Extensions.Configuration.Abstractions" Version="1.0.1" />
-    <PackageReference Update="Rocket.Surgery.Extensions.DependencyInjection" Version="1.0.3" />
-    <PackageReference Update="Rocket.Surgery.Extensions.DependencyInjection.Abstractions" Version="1.0.3" />
-    <PackageReference Update="Rocket.Surgery.Extensions.Autofac" Version="1.0.3" />
-    <PackageReference Update="Rocket.Surgery.Extensions.Autofac.Abstractions" Version="1.0.3" />
-    <PackageReference Update="Rocket.Surgery.Extensions.Logging.Empowered" Version="1.0.1" />
-    <PackageReference Update="Rocket.Surgery.Extensions.Logging.Abstractions" Version="1.0.4" />
+    <PackageReference Update="Rocket.Surgery.Extensions.CommandLine" Version="1.1.0" />
+    <PackageReference Update="Rocket.Surgery.Extensions.CommandLine.Abstractions" Version="1.1.0" />
+    <PackageReference Update="Rocket.Surgery.Extensions.Configuration" Version="1.1.0" />
+    <PackageReference Update="Rocket.Surgery.Extensions.Configuration.Abstractions" Version="1.1.0" />
+    <PackageReference Update="Rocket.Surgery.Extensions.DependencyInjection" Version="1.1.0" />
+    <PackageReference Update="Rocket.Surgery.Extensions.DependencyInjection.Abstractions" Version="1.1.0" />
+    <PackageReference Update="Rocket.Surgery.Extensions.Autofac" Version="1.1.0" />
+    <PackageReference Update="Rocket.Surgery.Extensions.Autofac.Abstractions" Version="1.1.0" />
+    <PackageReference Update="Rocket.Surgery.Extensions.Logging.Empowered" Version="1.1.0" />
+    <PackageReference Update="Rocket.Surgery.Extensions.Logging.Abstractions" Version="1.1.0" />
     <PackageReference Update="System.Diagnostics.DiagnosticSource" Version="4.5.1" />
   </ItemGroup>
   <ItemGroup>

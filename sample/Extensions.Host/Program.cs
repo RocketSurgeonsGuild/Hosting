@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Rocket.Surgery.Conventions;
 using Rocket.Surgery.Conventions.Reflection;
 using Rocket.Surgery.Conventions.Scanners;
 using Rocket.Surgery.Extensions.CommandLine;
@@ -23,15 +24,13 @@ namespace Extensions.Host
     {
         public static Task<int> Main(string[] args)
         {
-            var assemblyCandidateFinder = new DependencyContextAssemblyCandidateFinder(DependencyContext.Default);
-            var assemblyProvider = new DependencyContextAssemblyProvider(DependencyContext.Default);
             var diagnosticSource = new DiagnosticListener("Extensions.Host");
-            var builder = new RocketHostBuilder(new HostBuilder(), new AggregateConventionScanner(assemblyCandidateFinder),
-                assemblyCandidateFinder, assemblyProvider, diagnosticSource, args ?? Array.Empty<string>());
+            var builder = RocketHost.CreateDefaultBuilder()
+                .LaunchWith(RocketBooster.For(DependencyContext.Default, diagnosticSource));
 
             builder.AppendConvention(new Convention());
 
-            return builder.ContributeCommandLine(c => c.OnRun(x =>
+            return builder.AppendDelegate(new CommandLineConventionDelegate(c => c.OnRun(x =>
             {
                 Console.WriteLine($"               Debug: {x.Debug}");
                 Console.WriteLine($"               Trace: {x.Trace}");
@@ -40,9 +39,8 @@ namespace Extensions.Host
                 Console.WriteLine($"    IsDefaultCommand: {x.IsDefaultCommand}");
                 Console.WriteLine($"  RemainingArguments: {string.Join(" ", x.RemainingArguments)}");
                 return 1234;
-            }))
-                .GoAsync();
-            //.RunCliOrStart();
+            })))
+                .RunCli();
         }
     }
 

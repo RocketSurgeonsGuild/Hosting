@@ -1,5 +1,7 @@
 ﻿using System;
 using FluentAssertions;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyModel;
 using Rocket.Surgery.AspNetCore.Hosting;
 using Xunit;
@@ -11,22 +13,22 @@ namespace Rocket.Surgery.Hosting.AspNetCore.Tests
         [Fact]
         public void Creates_RocketHost_ForAppDomain()
         {
-            var host = RocketWebHost.ForAppDomain(AppDomain.CurrentDomain);
-            host.Should().BeOfType<RocketWebHostBuilder>();
+            var host = WebHost.CreateDefaultBuilder().LaunchWith(RocketBooster.For(AppDomain.CurrentDomain));
+            host.Should().BeAssignableTo<IRocketWebHostBuilder>();
         }
 
         [Fact]
         public void Creates_RocketHost_ForAssemblies()
         {
-            var host = RocketWebHost.ForAssemblies(new[] { typeof(RocketWebHostTests).Assembly });
-            host.Should().BeOfType<RocketWebHostBuilder>();
+            var host = WebHost.CreateDefaultBuilder().LaunchWith(RocketBooster.For(new[] { typeof(RocketWebHostTests).Assembly }));
+            host.Should().BeAssignableTo<IRocketWebHostBuilder>();
         }
 
         [Fact]
         public void Creates_RocketHost_ForDependencyContext()
         {
-            var host = RocketWebHost.ForDependencyContext(DependencyContext.Load(typeof(RocketWebHostTests).Assembly));
-            host.Should().BeOfType<RocketWebHostBuilder>();
+            var host = WebHost.CreateDefaultBuilder().LaunchWith(RocketBooster.For(DependencyContext.Load(typeof(RocketWebHostTests).Assembly)));
+            host.Should().BeAssignableTo<IRocketWebHostBuilder>();
         }
     }
 }

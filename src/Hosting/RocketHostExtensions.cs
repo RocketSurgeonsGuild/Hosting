@@ -26,6 +26,17 @@ namespace Microsoft.Extensions.Hosting
     public static class RocketHostExtensions
     {
         private static readonly ConditionalWeakTable<IHostBuilder, RocketHostBuilder> Builders = new ConditionalWeakTable<IHostBuilder, RocketHostBuilder>();
+
+        public static IRocketHostBuilder UseRocketBooster(this IHostBuilder builder, Func<IHostBuilder, IRocketHostBuilder> func)
+        {
+            return func(builder);
+        }
+
+        public static IRocketHostBuilder LaunchWith(this IHostBuilder builder, Func<IHostBuilder, IRocketHostBuilder> func)
+        {
+            return func(builder);
+        }
+
         public static IRocketHostBuilder UseConventional(this IHostBuilder builder)
         {
             return GetOrCreateBuilder(builder);
@@ -51,58 +62,12 @@ namespace Microsoft.Extensions.Hosting
             return Swap(builder, GetOrCreateBuilder(builder).With(diagnosticSource));
         }
 
-        public static IRocketHostBuilder UseConventionalDependencyContext(
-            this IHostBuilder builder,
-            DependencyContext dependencyContext,
-            DiagnosticSource diagnosticSource = null)
-        {
-            var b = GetOrCreateBuilder(builder);
-            if (diagnosticSource != null)
-            {
-                b = b.With(diagnosticSource);
-            }
-
-            var logger = new DiagnosticLogger(b.DiagnosticSource);
-            var assemblyCandidateFinder = new DependencyContextAssemblyCandidateFinder(dependencyContext, logger);
-            var assemblyProvider = new DependencyContextAssemblyProvider(dependencyContext, logger);
-            var scanner = new AggregateConventionScanner(assemblyCandidateFinder);
-            return Swap(
-                builder, b
-                    .With(assemblyCandidateFinder)
-                    .With(assemblyProvider)
-                    .With(scanner)
-            );
-        }
-
         public static IRocketHostBuilder UseDependencyContext(
             this IRocketHostBuilder builder,
             DependencyContext dependencyContext,
             DiagnosticSource diagnosticSource = null)
         {
-            return builder.UseConventionalDependencyContext(dependencyContext, diagnosticSource);
-        }
-
-        public static IRocketHostBuilder UseConventionalAppDomain(
-            this IHostBuilder builder,
-            AppDomain appDomain,
-            DiagnosticSource diagnosticSource = null)
-        {
-            var b = GetOrCreateBuilder(builder);
-            if (diagnosticSource != null)
-            {
-                b = b.With(diagnosticSource);
-            }
-
-            var logger = new DiagnosticLogger(b.DiagnosticSource);
-            var assemblyCandidateFinder = new AppDomainAssemblyCandidateFinder(appDomain, logger);
-            var assemblyProvider = new AppDomainAssemblyProvider(appDomain, logger);
-            var scanner = new AggregateConventionScanner(assemblyCandidateFinder);
-            return Swap(
-                builder, b
-                    .With(assemblyCandidateFinder)
-                    .With(assemblyProvider)
-                    .With(scanner)
-            );
+            return builder.LaunchWith(RocketBooster.ForDependencyContext(dependencyContext, diagnosticSource));
         }
 
         public static IRocketHostBuilder UseAppDomain(
@@ -110,31 +75,7 @@ namespace Microsoft.Extensions.Hosting
             AppDomain appDomain,
             DiagnosticSource diagnosticSource = null)
         {
-            return builder.UseConventionalAppDomain(appDomain, diagnosticSource);
-        }
-
-        public static IRocketHostBuilder UseConventionalAssemblies(
-            this IHostBuilder builder,
-            IEnumerable<Assembly> assemblies,
-            DiagnosticSource diagnosticSource = null)
-        {
-            var b = GetOrCreateBuilder(builder);
-            if (diagnosticSource != null)
-            {
-                b = b.With(diagnosticSource);
-            }
-
-            var logger = new DiagnosticLogger(b.DiagnosticSource);
-            var enumerable = assemblies as Assembly[] ?? assemblies.ToArray();
-            var assemblyCandidateFinder = new DefaultAssemblyCandidateFinder(enumerable, logger);
-            var assemblyProvider = new DefaultAssemblyProvider(enumerable, logger);
-            var scanner = new AggregateConventionScanner(assemblyCandidateFinder);
-            return Swap(
-                builder, b
-                    .With(assemblyCandidateFinder)
-                    .With(assemblyProvider)
-                    .With(scanner)
-            );
+            return builder.LaunchWith(RocketBooster.ForAppDomain(appDomain, diagnosticSource));
         }
 
         public static IRocketHostBuilder UseAssemblies(
@@ -142,30 +83,26 @@ namespace Microsoft.Extensions.Hosting
             IEnumerable<Assembly> assemblies,
             DiagnosticSource diagnosticSource = null)
         {
-            return builder.UseConventionalAssemblies(assemblies, diagnosticSource);
+            return builder.LaunchWith(RocketBooster.ForAssemblies(assemblies, diagnosticSource));
         }
 
-        private static IRocketHostBuilder UseServices(this IHostBuilder builder)
+        private static void DefaultServices(IHostBuilder builder, HostBuilderContext context, IServiceCollection services)
         {
-            builder.ConfigureServices((context, services) =>
-            {
-                var conventionalBuilder = GetOrCreateBuilder(builder);
-                builder.UseServiceProviderFactory(
-                    new ServicesBuilderServiceProviderFactory(collection =>
-                        new ServicesBuilder(
-                            conventionalBuilder.Scanner,
-                            conventionalBuilder.AssemblyProvider,
-                            conventionalBuilder.AssemblyCandidateFinder,
-                            collection,
-                            context.Configuration,
-                            context.HostingEnvironment,
-                            conventionalBuilder.DiagnosticSource,
-                            conventionalBuilder.Properties
-                        )
+            var conventionalBuilder = GetOrCreateBuilder(builder);
+            builder.UseServiceProviderFactory(
+                new ServicesBuilderServiceProviderFactory(collection =>
+                    new ServicesBuilder(
+                        conventionalBuilder.Scanner,
+                        conventionalBuilder.AssemblyProvider,
+                        conventionalBuilder.AssemblyCandidateFinder,
+                        collection,
+                        context.Configuration,
+                        context.HostingEnvironment,
+                        conventionalBuilder.DiagnosticSource,
+                        conventionalBuilder.Properties
                     )
-                );
-            });
-            return GetOrCreateBuilder(builder);
+                )
+            );
         }
 
         internal static RocketHostBuilder GetConventionalHostBuilder(IHostBuilder builder)
@@ -180,6 +117,7 @@ namespace Microsoft.Extensions.Hosting
 
         internal static RocketHostBuilder GetOrCreateBuilder(IHostBuilder builder)
         {
+            if (builder is IRocketHostBuilder rb) builder = rb.Builder;
             if (!Builders.TryGetValue(builder, out var conventionalBuilder))
             {
                 var diagnosticSource = new DiagnosticListener("Rocket.Surgery.Hosting");
@@ -195,9 +133,10 @@ namespace Microsoft.Extensions.Hosting
                     .ConfigureHostConfiguration(host.CaptureArguments)
                     .ConfigureAppConfiguration(host.CaptureArguments)
                     .ConfigureAppConfiguration(host.ConfigureAppConfiguration)
-                    .ConfigureServices(host.ConfigureServices);
+                    .ConfigureServices(host.ConfigureServices)
+                    .ConfigureServices((context, services) => DefaultServices(builder, context, services));
                 Builders.Add(builder, conventionalBuilder);
-                UseServices(builder);
+
             }
 
             return conventionalBuilder;

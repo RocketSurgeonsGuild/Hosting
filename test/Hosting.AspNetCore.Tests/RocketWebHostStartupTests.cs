@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.TestHost;
 using Rocket.Surgery.AspNetCore.Hosting;
 using Rocket.Surgery.Conventions.Reflection;
 using Rocket.Surgery.Conventions.Scanners;
-using Rocket.Surgery.Extensions.CommandLine;
 using Rocket.Surgery.Extensions.Testing;
 using Rocket.Surgery.Hosting.AspNetCore.Tests.Startups;
 using Xunit;
@@ -16,50 +15,21 @@ namespace Rocket.Surgery.Hosting.AspNetCore.Tests
 {
     public class RocketWebHostStartupTests : AutoTestBase
     {
+        private readonly IRocketWebHostBuilder _baseBuilder;
         public RocketWebHostStartupTests(ITestOutputHelper outputHelper) : base(outputHelper)
         {
-            AutoFake.Provide(WebHost.CreateDefaultBuilder());
-            AutoFake.Provide<IConventionScanner>(new BasicConventionScanner());
-            AutoFake.Provide<IAssemblyCandidateFinder>(
-                new DefaultAssemblyCandidateFinder(new[] { typeof(RocketWebHostBuilderTests).Assembly }));
-            AutoFake.Provide<IAssemblyProvider>(
-                new DefaultAssemblyProvider(new[] { typeof(RocketWebHostBuilderTests).Assembly }));
-        }
-
-
-        [Fact]
-        public async Task Should_Start_Simple_Application()
-        {
-            AutoFake.Provide(new string[0]);
-            IRocketWebHostBuilder builder = AutoFake.Resolve<RocketWebHostBuilder>();
-            var result = await builder
-                .ContributeCommandLine(c => c.OnRun(state => 1337))
-                .UseStartup<SimpleStartup>()
-                .GoAsync();
-
-            result.Should().Be(1337);
-        }
-
-        [Fact]
-        public async Task Should_Run_Command_Given_Arguments1()
-        {
-            AutoFake.Provide(new string[] { "dosomething" });
-            IRocketWebHostBuilder builder = AutoFake.Resolve<RocketWebHostBuilder>();
-            var result = builder
-                .ContributeCommandLine(c => c.OnRun(state => 1337))
-                .ContributeConvention(new CommandLineConvention());
-            builder.UseStartup<SimpleStartup>();
-
-            (await result.GoAsync()).Should().Be(1001);
+            _baseBuilder = WebHost.CreateDefaultBuilder()
+                .UseConventional()
+                .UseScanner(new BasicConventionScanner())
+                .UseAssemblyCandidateFinder(new DefaultAssemblyCandidateFinder(new[] { typeof(RocketWebHostBuilderTests).Assembly }))
+                .UseAssemblyProvider(new DefaultAssemblyProvider(new[] { typeof(RocketWebHostBuilderTests).Assembly }));
         }
 
         [Fact]
         public async Task Should_Start_Application()
         {
-            AutoFake.Provide(new string[] { });
-            IRocketWebHostBuilder builder = AutoFake.Resolve<RocketWebHostBuilder>();
-            var result = builder
-                .ContributeCommandLine(c => c.OnRun(state => 1337));
+            var builder = _baseBuilder;
+            var result = builder;
             builder.UseStartup<SimpleStartup>();
 
             using (var server = new TestServer(builder))
@@ -70,19 +40,6 @@ namespace Rocket.Surgery.Hosting.AspNetCore.Tests
                 var content = await response.Content.ReadAsStringAsync();
                 content.Should().Be("SimpleStartup -> Configure");
             }
-        }
-
-        [Fact]
-        public async Task Should_Inject_WebHost_Into_Command()
-        {
-            AutoFake.Provide(new string[] { "myself" });
-            IRocketWebHostBuilder builder = AutoFake.Resolve<RocketWebHostBuilder>();
-            var result = builder
-                .ContributeCommandLine(c => c.OnRun(state => 1337))
-                .ContributeDelegate(new CommandLineConventionDelegate(context => context.AddCommand<MyCommand>("myself")))
-                .UseStartup<SimpleStartup>();
-
-            (await builder.GoAsync()).Should().Be(1234);
         }
     }
 }

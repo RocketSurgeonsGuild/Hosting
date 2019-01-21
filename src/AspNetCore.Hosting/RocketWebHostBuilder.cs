@@ -38,12 +38,6 @@ namespace Rocket.Surgery.AspNetCore.Hosting
         }
 
         public IWebHostBuilder Builder { get; }
-        public IWebHost Build() => Builder.Build();
-        public IWebHostBuilder ConfigureAppConfiguration(Action<WebHostBuilderContext, IConfigurationBuilder> configureDelegate) => Builder.ConfigureAppConfiguration(configureDelegate);
-        public IWebHostBuilder ConfigureServices(Action<IServiceCollection> configureServices) => Builder.ConfigureServices(configureServices);
-        public IWebHostBuilder ConfigureServices(Action<WebHostBuilderContext, IServiceCollection> configureServices) => Builder.ConfigureServices(configureServices);
-        public string GetSetting(string key) => Builder.GetSetting(key);
-        public IWebHostBuilder UseSetting(string key, string value) => Builder.UseSetting(key, value);
 
         internal RocketWebHostBuilder With(IConventionScanner scanner)
         {
@@ -72,5 +66,16 @@ namespace Rocket.Surgery.AspNetCore.Hosting
 
         internal Func<RocketWebHostBuilder, IConfiguration, Microsoft.Extensions.Hosting.IHostingEnvironment, IRocketServiceComposer> ApplicationServicesComposeDelegate { get; set; }
         internal Func<RocketWebHostBuilder, IConfiguration, Microsoft.Extensions.Hosting.IHostingEnvironment, IRocketServiceComposer> ApplicationAndSystemServicesComposeDelegate { get; set; }
+        IWebHost IWebHostBuilder.Build() => Builder.Build();
+
+        IWebHostBuilder IWebHostBuilder.ConfigureAppConfiguration(Action<WebHostBuilderContext, IConfigurationBuilder> configureDelegate) => Builder.ConfigureAppConfiguration(configureDelegate);
+
+        IWebHostBuilder IWebHostBuilder.ConfigureServices(Action<IServiceCollection> configureServices) => Builder.ConfigureServices(configureServices);
+
+        IWebHostBuilder IWebHostBuilder.ConfigureServices(Action<WebHostBuilderContext, IServiceCollection> configureServices) => Builder.ConfigureServices(configureServices);
+
+        string IWebHostBuilder.GetSetting(string key) => Builder.GetSetting(key);
+
+        IWebHostBuilder IWebHostBuilder.UseSetting(string key, string value) => Builder.UseSetting(key, value);
     }
 }

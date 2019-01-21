@@ -15,16 +15,14 @@ namespace Rocket.Surgery.Hosting.AspNetCore.Tests.Startups
     class TestStartup : RocketStartup
     {
         public TestStartup(
-            IConventionScanner scanner, 
+            IRocketWebHostingContext context,
             IRocketServiceComposer serviceComposer,
             IConfiguration configuration,
-            IHostingEnvironment environment,
-            DiagnosticSource diagnosticSource,
-            IDictionary<object, object> properties) : base(scanner, serviceComposer, configuration, environment, diagnosticSource, properties)
+            IHostingEnvironment environment) : base(context, serviceComposer, configuration, environment)
         {
         }
 
-        public void Compose(RocketApplicationBuilder app)
+        public void Compose(IApplicationBuilder app)
         {
             app.Use((context, func) => context.Response.WriteAsync("TestStartup -> Compose"));
         }

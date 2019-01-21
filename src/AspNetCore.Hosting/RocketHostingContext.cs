@@ -5,10 +5,10 @@ using Rocket.Surgery.Conventions.Scanners;
 
 namespace Rocket.Surgery.AspNetCore.Hosting
 {
-    class RocketHostingContext : IRocketHostingContext
+    class RocketWebHostingContext : IRocketWebHostingContext
     {
 
-        public RocketHostingContext(RocketWebHostBuilder builder)
+        public RocketWebHostingContext(RocketWebHostBuilder builder)
         {
             Scanner = builder.Scanner;
             DiagnosticSource = builder.DiagnosticSource;

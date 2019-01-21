@@ -12,24 +12,22 @@ using Rocket.Surgery.Extensions.DependencyInjection;
 
 namespace Rocket.Surgery.Hosting.AspNetCore.Tests.Startups
 {
-    class TestApplicationStartup : RocketApplicationStartup
+    class TestApplicationStartup : RocketStartup
     {
         public TestApplicationStartup(
-            IConventionScanner scanner,
-            IRocketApplicationServiceComposer serviceComposer,
-            IConfiguration configuration, 
-            IHostingEnvironment environment, 
-            DiagnosticSource diagnosticSource,
-            IDictionary<object, object> properties) : base(scanner, serviceComposer, configuration, environment, diagnosticSource, properties)
+            IRocketWebHostingContext context,
+            IRocketServiceComposer serviceComposer,
+            IConfiguration configuration,
+            IHostingEnvironment environment) : base(context, serviceComposer, configuration, environment)
         {
         }
 
-        public void ComposeSystem(RocketSystemBuilder app)
+        public void ComposeSystem(IApplicationBuilder app)
         {
             app.Use((context, func) => context.Response.WriteAsync("TestApplicationStartup -> ComposeSystem"));
         }
 
-        public void Compose(RocketApplicationBuilder app)
+        public void Compose(IApplicationBuilder app)
         {
             app.Use((context, func) => context.Response.WriteAsync("TestApplicationStartup -> Compose"));
         }

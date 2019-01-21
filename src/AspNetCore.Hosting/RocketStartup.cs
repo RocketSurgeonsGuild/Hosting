@@ -24,12 +24,12 @@ namespace Rocket.Surgery.AspNetCore.Hosting
 {
     public abstract class RocketStartup : IStartup
     {
-        private readonly IRocketHostingContext _context;
+        private readonly IRocketWebHostingContext _context;
         private readonly IRocketServiceComposer _serviceComposer;
         protected string SystemPath = "/system";
 
         protected RocketStartup(
-            IRocketHostingContext context,
+            IRocketWebHostingContext context,
             IRocketServiceComposer serviceComposer,
             IConfiguration configuration,
             IHostingEnvironment environment)
@@ -77,7 +77,11 @@ namespace Rocket.Surgery.AspNetCore.Hosting
             {
                 using (Logger.TimeTrace("{Step}", nameof(Configure)))
                 {
-                    application.Map(SystemPath, a => ConfigureSystem(new ApplicationBuilder(SystemServices)));
+                    application.Map(SystemPath, a =>
+                    {
+                        a.ApplicationServices = SystemServices;
+                        ConfigureSystem(a);
+                    });
                 }
             }
 

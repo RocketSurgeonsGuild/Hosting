@@ -19,7 +19,7 @@ namespace Rocket.Surgery.AspNetCore.Hosting
         private RocketWebHostBuilder _rocketWebHostBuilder;
         public void Configure(IWebHostBuilder builder)
         {
-            var conventionalBuilder = _rocketWebHostBuilder = RocketWebHostExtensions.GetConventionalWebHostBuilder(builder);
+            IRocketWebHostBuilder conventionalBuilder = _rocketWebHostBuilder = RocketWebHostExtensions.GetConventionalWebHostBuilder(builder);
 
             conventionalBuilder.ConfigureServices(ConfigureDefaultServices);
             conventionalBuilder.ConfigureAppConfiguration(DefaultApplicationConfiguration);
@@ -98,13 +98,7 @@ namespace Rocket.Surgery.AspNetCore.Hosting
 
         private void ConfigureDefaultServices(WebHostBuilderContext context, IServiceCollection services)
         {
-            services.AddSingleton<IRocketHostingContext>(_ => new RocketHostingContext(_rocketWebHostBuilder));
-            services.AddSingleton<IRocketServiceComposer>(_ => new RocketApplicationServiceComposer(_rocketWebHostBuilder.Scanner,
-                _rocketWebHostBuilder.AssemblyProvider,
-                _rocketWebHostBuilder.AssemblyCandidateFinder, 
-                context.Configuration,
-                context.HostingEnvironment as Microsoft.Extensions.Hosting.IHostingEnvironment,
-                _rocketWebHostBuilder.DiagnosticSource));
+            services.AddSingleton<IRocketWebHostingContext>(_ => new RocketWebHostingContext(_rocketWebHostBuilder));
         }
     }
 }
