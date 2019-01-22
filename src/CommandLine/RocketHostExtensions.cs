@@ -48,27 +48,32 @@ namespace Microsoft.Extensions.Hosting
         public static async Task<int> RunCli(this IHostBuilder builder)
         {
             builder.UseCommandLine();
-            var host = builder.Build();
-            try
+            using (var host = builder.Build())
             {
-                await host.StartAsync();
-                var context = host.Services.GetRequiredService<IRocketHostingContext>();
-                var clb = new CommandLineBuilder(
-                    context.Scanner,
-                    context.AssemblyProvider,
-                    context.AssemblyCandidateFinder,
-                    context.DiagnosticSource,
-                    context.Properties
-                );
-                return clb.Build().Execute(host.Services, context.Arguments);
-            }
-            catch (Exception e)
-            {
-                host.Services.GetService<ILoggerFactory>()
-                    .CreateLogger("Cli")
-                    .LogError(e, "Application exception");
-                return -1;
+                try
+                {
+                    await host.StartAsync();
+                    var context = host.Services.GetRequiredService<IRocketHostingContext>();
+                    var clb = new CommandLineBuilder(
+                        context.Scanner,
+                        context.AssemblyProvider,
+                        context.AssemblyCandidateFinder,
+                        context.DiagnosticSource,
+                        context.Properties
+                    );
+                    var result = clb.Build().Execute(host.Services, context.Arguments);
+                    await host.StopAsync();
+                    return result;
+                }
+                catch (Exception e)
+                {
+                    host.Services.GetService<ILoggerFactory>()
+                        .CreateLogger("Cli")
+                        .LogError(e, "Application exception");
+                    return -1;
+                }
             }
         }
     }
 }
+
