@@ -17,6 +17,7 @@
     <PackageReference Include="Rocket.Surgery.Builders" />
     <PackageReference Include="Rocket.Surgery.Conventions" />
     <PackageReference Include="Rocket.Surgery.Extensions" />
+    <PackageReference Include="Rocket.Surgery.Extensions.CommandLine" />
     <PackageReference Include="Rocket.Surgery.Extensions.Configuration" />
     <PackageReference Include="Rocket.Surgery.Extensions.DependencyInjection" />
   </ItemGroup>
@@ -36,9 +37,6 @@
     </AssemblyAttribute>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
       <_Parameter1>Rocket.Surgery.CommandLine</_Parameter1>
-    </AssemblyAttribute>
-    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-      <_Parameter1>Rocket.Surgery.CommandLine.Autofac</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
 </Project>

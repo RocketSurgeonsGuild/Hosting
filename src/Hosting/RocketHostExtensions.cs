@@ -1,24 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.CommandLine;
-using Microsoft.Extensions.Configuration.EnvironmentVariables;
-using Microsoft.Extensions.Configuration.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyModel;
-using NetEscapades.Configuration.Yaml;
 using Rocket.Surgery.Conventions;
 using Rocket.Surgery.Conventions.Reflection;
 using Rocket.Surgery.Conventions.Scanners;
 using Rocket.Surgery.Extensions.Configuration;
 using Rocket.Surgery.Extensions.DependencyInjection;
 using Rocket.Surgery.Hosting;
-using ConfigurationBuilder = Rocket.Surgery.Extensions.Configuration.ConfigurationBuilder;
-using IConfigurationBuilder = Microsoft.Extensions.Configuration.IConfigurationBuilder;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.Hosting
@@ -128,15 +120,15 @@ namespace Microsoft.Extensions.Hosting
                 var scanner = new AggregateConventionScanner(assemblyCandidateFinder);
                 conventionalBuilder = new RocketHostBuilder(builder, scanner, assemblyCandidateFinder, assemblyProvider, diagnosticSource, builder.Properties);
 
-                var host = new RocketHost(builder);
+                var host = new RocketContext(builder);
                 builder
                     .ConfigureHostConfiguration(host.CaptureArguments)
-                    .ConfigureAppConfiguration(host.CaptureArguments)
+                    .ConfigureHostConfiguration(host.ConfigureCli)
+                    .ConfigureAppConfiguration(host.ReplaceArguments)
                     .ConfigureAppConfiguration(host.ConfigureAppConfiguration)
                     .ConfigureServices(host.ConfigureServices)
                     .ConfigureServices((context, services) => DefaultServices(builder, context, services));
                 Builders.Add(builder, conventionalBuilder);
-
             }
 
             return conventionalBuilder;
@@ -147,105 +139,6 @@ namespace Microsoft.Extensions.Hosting
             Builders.Remove(builder);
             Builders.Add(builder, newRocketBuilder);
             return newRocketBuilder;
-        }
-    }
-
-    class RocketHost
-    {
-        private readonly IHostBuilder _hostBuilder;
-        private string[] _args;
-
-        public RocketHost(IHostBuilder hostBuilder)
-        {
-            _hostBuilder = hostBuilder;
-        }
-
-        public void CaptureArguments(IConfigurationBuilder configurationBuilder)
-        {
-            var commandLineSource = configurationBuilder.Sources.OfType<CommandLineConfigurationSource>()
-                .FirstOrDefault();
-            if (commandLineSource != null)
-            {
-                _args = commandLineSource.Args.ToArray();
-            }
-        }
-
-        public void ConfigureAppConfiguration(HostBuilderContext context, IConfigurationBuilder configurationBuilder)
-        {
-            var rocketHostBuilder = RocketHostExtensions.GetConventionalHostBuilder(_hostBuilder);
-            InsertConfigurationSourceAfter(
-                configurationBuilder.Sources,
-                sources => sources.OfType<JsonConfigurationSource>().FirstOrDefault(x => x.Path == "appsettings.json"),
-                (source) => new YamlConfigurationSource()
-                {
-                    Path = "appsettings.yml",
-                    FileProvider = source.FileProvider,
-                    Optional = true,
-                    ReloadOnChange = true,
-                });
-            InsertConfigurationSourceAfter(
-                configurationBuilder.Sources,
-                sources => sources.OfType<JsonConfigurationSource>().FirstOrDefault(x =>
-                    string.Equals(x.Path, $"appsettings.{context.HostingEnvironment.EnvironmentName}.json",
-                        StringComparison.OrdinalIgnoreCase)),
-                (source) => new YamlConfigurationSource()
-                {
-                    Path = $"appsettings.{context.HostingEnvironment.EnvironmentName}.yml",
-                    FileProvider = source.FileProvider,
-                    Optional = true,
-                    ReloadOnChange = true,
-                });
-
-            var cb = new ConfigurationBuilder(
-                rocketHostBuilder.Scanner,
-                context.HostingEnvironment,
-                context.Configuration,
-                configurationBuilder,
-                rocketHostBuilder.DiagnosticSource,
-                rocketHostBuilder.Properties);
-            cb.Build();
-
-            MoveConfigurationSourceToEnd(configurationBuilder.Sources,
-                sources => sources.OfType<JsonConfigurationSource>().Where(x =>
-                    string.Equals(x.Path, "secrets.json", StringComparison.OrdinalIgnoreCase)));
-            MoveConfigurationSourceToEnd(configurationBuilder.Sources,
-                sources => sources.OfType<EnvironmentVariablesConfigurationSource>());
-            MoveConfigurationSourceToEnd(configurationBuilder.Sources,
-                sources => sources.OfType<CommandLineConfigurationSource>());
-        }
-
-        private static void InsertConfigurationSourceAfter<T>(IList<IConfigurationSource> sources, Func<IList<IConfigurationSource>, T> getSource, Func<T, IConfigurationSource> createSourceFrom)
-            where T : IConfigurationSource
-        {
-            var source = getSource(sources);
-            if (source != null)
-            {
-                var index = sources.IndexOf(source);
-                sources.Insert(index + 1, createSourceFrom(source));
-            }
-        }
-
-        private static void MoveConfigurationSourceToEnd<T>(IList<IConfigurationSource> sources, Func<IList<IConfigurationSource>, IEnumerable<T>> getSource)
-            where T : IConfigurationSource
-        {
-            var otherSources = getSource(sources).ToArray();
-            if (otherSources.Any())
-            {
-                foreach (var other in otherSources)
-                {
-                    sources.Remove(other);
-                }
-                foreach (var other in otherSources)
-                {
-                    sources.Add(other);
-                }
-            }
-        }
-
-        public void ConfigureServices(HostBuilderContext context, IServiceCollection services)
-        {
-            var rocketHostBuilder = RocketHostExtensions.GetConventionalHostBuilder(_hostBuilder);
-            services.AddSingleton<IRocketHostingContext>(_ => new RocketHostingContext(rocketHostBuilder, _args ?? Array.Empty<string>()));
         }
     }
 }

@@ -13,7 +13,6 @@ using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.Hosting.Internal;
 using Microsoft.Extensions.Logging;
 using NetEscapades.Configuration.Yaml;
-using Rocket.Surgery.CommandLine;
 using Rocket.Surgery.Conventions;
 using Rocket.Surgery.Conventions.Reflection;
 using Rocket.Surgery.Conventions.Scanners;
@@ -31,17 +30,10 @@ namespace Microsoft.Extensions.Hosting
     {
         public static IRocketHostBuilder UseCommandLine(this IHostBuilder builder)
         {
-            if (!builder.Properties.TryGetValue(typeof(CommandLineHost), out var value))
-            {
-                value = new CommandLineHost(builder);
-                builder.Properties.Add(typeof(CommandLineHost), value);
-
-                var host = (CommandLineHost)value;
-                builder.UseConsoleLifetime()
-                    .ConfigureHostConfiguration(host.CaptureAndRemoveArguments)
-                    .ConfigureAppConfiguration(host.CaptureAndRemoveArguments)
-                    .ConfigureServices(host.ConfigureServices);
-            }
+            builder.Properties.Add(nameof(UseCommandLine), true);
+            builder
+                .UseConsoleLifetime()
+                .ConfigureServices(services => services.Configure<ConsoleLifetimeOptions>(c => c.SuppressStatusMessages = true));
             return RocketHostExtensions.GetOrCreateBuilder(builder);
         }
 
@@ -53,15 +45,8 @@ namespace Microsoft.Extensions.Hosting
                 try
                 {
                     await host.StartAsync();
-                    var context = host.Services.GetRequiredService<IRocketHostingContext>();
-                    var clb = new CommandLineBuilder(
-                        context.Scanner,
-                        context.AssemblyProvider,
-                        context.AssemblyCandidateFinder,
-                        context.DiagnosticSource,
-                        context.Properties
-                    );
-                    var result = clb.Build().Execute(host.Services, context.Arguments);
+                    var context = host.Services.GetRequiredService<ICommandLineExecutor>();
+                    var result = context.Execute(host.Services);
                     await host.StopAsync();
                     return result;
                 }

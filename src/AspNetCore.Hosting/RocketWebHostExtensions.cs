@@ -3,14 +3,18 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.DependencyModel;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Rocket.Surgery.AspNetCore.Hosting;
 using Rocket.Surgery.Conventions;
 using Rocket.Surgery.Conventions.Reflection;
 using Rocket.Surgery.Conventions.Scanners;
+using Rocket.Surgery.Extensions.CommandLine;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.AspNetCore.Hosting
@@ -99,6 +103,36 @@ namespace Microsoft.AspNetCore.Hosting
                 services.AddSingleton(_ => conventionalBuilder.ApplicationAndSystemServicesComposeDelegate(conventionalBuilder, context.Configuration, context.HostingEnvironment as Extensions.Hosting.IHostingEnvironment));
             });
             return GetOrCreateBuilder(builder);
+        }
+
+        public static async Task<int> RunCli(this IWebHostBuilder builder)
+        {
+            using (var host = builder.Build())
+            {
+                try
+                {
+                    await host.StartAsync();
+                    var context = host.Services.GetRequiredService<ICommandLineExecutor>();
+                    if (context.IsDefaultCommand)
+                    {
+                        await host.WaitForShutdownAsync();
+                        return 0;
+                    }
+                    else
+                    {
+                        var result = context.Execute(host.Services);
+                        await host.StopAsync();
+                        return result;
+                    }
+                }
+                catch (Exception e)
+                {
+                    host.Services.GetService<ILoggerFactory>()
+                        .CreateLogger("Cli")
+                        .LogError(e, "Application exception");
+                    return -1;
+                }
+            }
         }
 
         internal static RocketWebHostBuilder GetConventionalWebHostBuilder(IWebHostBuilder builder)

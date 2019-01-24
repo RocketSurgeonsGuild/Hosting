@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -12,6 +14,7 @@ using Rocket.Surgery.AspNetCore.Hosting;
 using Rocket.Surgery.Conventions;
 using Rocket.Surgery.Conventions.Reflection;
 using Rocket.Surgery.Conventions.Scanners;
+using Rocket.Surgery.Extensions.CommandLine;
 using Rocket.Surgery.Extensions.Configuration;
 using Rocket.Surgery.Extensions.DependencyInjection;
 using Rocket.Surgery.Extensions.Testing;
@@ -66,7 +69,31 @@ namespace Rocket.Surgery.Hosting.AspNetCore.Tests
                 .UseAssemblyProvider(new DefaultAssemblyProvider(new[] { typeof(RocketWebHostBuilderTests).Assembly }));
             builder.UseStartup<TestStartup>();
 
-            var host = builder.Build();
+            using (var server = new TestServer(builder))
+            {
+                server.CreateClient();
+            }
+        }
+
+        [Fact]
+        public async Task Should_Run_The_Cli()
+        {
+            var serviceConventionFake = A.Fake<IServiceConvention>();
+            var configurationConventionFake = A.Fake<IConfigurationConvention>();
+
+            var builder = WebHost.CreateDefaultBuilder(new[] { "myself" })
+                .UseConventional()
+                .UseScanner(new BasicConventionScanner(
+                    serviceConventionFake, configurationConventionFake
+                ))
+                .UseAssemblyCandidateFinder(new DefaultAssemblyCandidateFinder(new[] { typeof(RocketWebHostBuilderTests).Assembly }))
+                .UseAssemblyProvider(new DefaultAssemblyProvider(new[] { typeof(RocketWebHostBuilderTests).Assembly }))
+                .AppendDelegate(new CommandLineConventionDelegate(c => c.OnRun(state => 1337)))
+                .AppendDelegate(new CommandLineConventionDelegate(context => context.AddCommand<MyCommand>("myself", x => { }))); ;
+            builder.UseStartup<MyStartup>();
+
+            var result = await builder.RunCli();
+            result.Should().Be(1234);
         }
     }
 }
