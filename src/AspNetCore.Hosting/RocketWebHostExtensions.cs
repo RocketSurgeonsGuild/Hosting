@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.DependencyModel;
@@ -111,17 +113,19 @@ namespace Microsoft.AspNetCore.Hosting
             {
                 try
                 {
-                    await host.StartAsync();
                     var context = host.Services.GetRequiredService<ICommandLineExecutor>();
                     if (context.IsDefaultCommand)
                     {
+                        await host.StartAsync();
                         await host.WaitForShutdownAsync();
                         return 0;
                     }
                     else
                     {
+                        var exec = host.Services.GetRequiredService<HostedServiceExecutor >();
+                        await exec.StartAsync(CancellationToken.None);
                         var result = context.Execute(host.Services);
-                        await host.StopAsync();
+                        await exec.StopAsync(CancellationToken.None);
                         return result;
                     }
                 }
