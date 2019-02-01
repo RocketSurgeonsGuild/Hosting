@@ -26,8 +26,11 @@ namespace Microsoft.Extensions.Hosting
             builder.ConfigureAppConfiguration((hostingContext, config) =>
                 {
                     var env = hostingContext.HostingEnvironment;
+                    // Configure the base path (fix coming in 3.0.0)
+                    config.SetBasePath(env.ContentRootPath);
 
-                    config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                    config
+                        .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                         .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
 
                     if (env.IsDevelopment() && !string.IsNullOrEmpty(env.ApplicationName))
