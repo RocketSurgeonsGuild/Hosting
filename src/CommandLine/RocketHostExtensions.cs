@@ -28,10 +28,10 @@ namespace Microsoft.Extensions.Hosting
 {
     public static class RocketCommandLineHostExtensions
     {
-        public static IRocketHostBuilder UseCommandLine(this IHostBuilder builder)
+        public static IRocketHostBuilder UseCommandLine(this IRocketHostBuilder builder)
         {
             builder.Properties.Add(nameof(UseCommandLine), true);
-            builder
+            builder.Builder
                 .UseConsoleLifetime()
                 .ConfigureServices(services => services.Configure<ConsoleLifetimeOptions>(c => c.SuppressStatusMessages = true));
             return RocketHostExtensions.GetOrCreateBuilder(builder);
@@ -39,7 +39,7 @@ namespace Microsoft.Extensions.Hosting
 
         public static async Task<int> RunCli(this IHostBuilder builder)
         {
-            builder.UseCommandLine();
+            builder.ConfigureRocketSurgey(x => x.UseCommandLine());
             using (var host = builder.Build())
             {
                 try

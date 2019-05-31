@@ -7,7 +7,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Rocket.Surgery.Conventions.Reflection;
 using Rocket.Surgery.Conventions.Scanners;
 using Rocket.Surgery.Extensions.DependencyInjection;
-using IHostingEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
 
 namespace Rocket.Surgery.AspNetCore.Hosting
 {
@@ -17,7 +16,7 @@ namespace Rocket.Surgery.AspNetCore.Hosting
         private readonly IAssemblyProvider _assemblyProvider;
         private readonly IAssemblyCandidateFinder _assemblyCandidateFinder;
         private readonly IConfiguration _configuration;
-        private readonly IHostingEnvironment _environment;
+        private readonly IWebHostEnvironment _environment;
         private readonly DiagnosticSource _diagnosticSource;
 
         public RocketServiceComposer(
@@ -25,7 +24,7 @@ namespace Rocket.Surgery.AspNetCore.Hosting
             IAssemblyProvider assemblyProvider,
             IAssemblyCandidateFinder assemblyCandidateFinder,
             IConfiguration configuration,
-            IHostingEnvironment environment,
+            IWebHostEnvironment environment,
             DiagnosticSource diagnosticSource)
         {
             _scanner = scanner ?? throw new ArgumentNullException(nameof(scanner));

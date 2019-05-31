@@ -18,7 +18,7 @@ namespace Rocket.Surgery.AspNetCore.Hosting.Autofac
         private readonly IAssemblyProvider _assemblyProvider;
         private readonly IAssemblyCandidateFinder _assemblyCandidateFinder;
         private readonly IConfiguration _configuration;
-        private readonly Microsoft.Extensions.Hosting.IHostingEnvironment _environment;
+        private readonly Microsoft.Extensions.Hosting.IHostEnvironment _environment;
         private readonly DiagnosticSource _diagnosticSource;
         private readonly ContainerBuilder _containerBuilder;
 
@@ -27,7 +27,7 @@ namespace Rocket.Surgery.AspNetCore.Hosting.Autofac
             IAssemblyProvider assemblyProvider,
             IAssemblyCandidateFinder assemblyCandidateFinder,
             IConfiguration configuration,
-            Microsoft.Extensions.Hosting.IHostingEnvironment environment,
+            Microsoft.Extensions.Hosting.IHostEnvironment environment,
             DiagnosticSource diagnosticSource,
             ContainerBuilder containerBuilder)
         {

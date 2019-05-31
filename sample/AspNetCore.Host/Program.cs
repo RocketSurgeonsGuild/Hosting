@@ -17,7 +17,6 @@ using Rocket.Surgery.Conventions.Reflection;
 using Rocket.Surgery.Conventions.Scanners;
 using Rocket.Surgery.Extensions.Configuration;
 using Rocket.Surgery.Extensions.DependencyInjection;
-using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace Extensions.Host
 {
@@ -39,7 +38,7 @@ namespace Extensions.Host
 
     public class Startup : RocketStartup
     {
-        public Startup(IRocketWebHostingContext context, IRocketServiceComposer serviceComposer, IConfiguration configuration, IHostingEnvironment environment) : base(context, serviceComposer, configuration, environment)
+        public Startup(IRocketWebHostingContext context, IRocketServiceComposer serviceComposer, IConfiguration configuration, IHostEnvironment environment) : base(context, serviceComposer, configuration, environment)
         {
         }
 

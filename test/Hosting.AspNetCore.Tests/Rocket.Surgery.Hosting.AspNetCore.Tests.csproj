@@ -1,9 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFrameworks>netcoreapp2.2</TargetFrameworks>
+        <TargetFrameworks>netcoreapp3.0</TargetFrameworks>
     </PropertyGroup>
     <ItemGroup>
-        <ProjectReference Include="..\..\src\AspNetCore.Hosting\Rocket.Surgery.AspNetCore.Hosting.csproj" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
         <PackageReference Include="Microsoft.AspNetCore.TestHost" />
+        <ProjectReference Include="..\..\src\AspNetCore.Hosting\Rocket.Surgery.AspNetCore.Hosting.csproj" />
     </ItemGroup>
 </Project>

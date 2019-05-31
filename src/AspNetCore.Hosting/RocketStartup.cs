@@ -18,11 +18,10 @@ using Microsoft.Extensions.Logging;
 using Rocket.Surgery.Conventions;
 using Rocket.Surgery.Conventions.Scanners;
 using Rocket.Surgery.Reflection.Extensions;
-using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace Rocket.Surgery.AspNetCore.Hosting
 {
-    public abstract class RocketStartup : IStartup
+    public abstract class RocketStartup
     {
         private readonly IRocketWebHostingContext _context;
         private readonly IRocketServiceComposer _serviceComposer;
@@ -32,103 +31,19 @@ namespace Rocket.Surgery.AspNetCore.Hosting
             IRocketWebHostingContext context,
             IRocketServiceComposer serviceComposer,
             IConfiguration configuration,
-            IHostingEnvironment environment)
+            IHostEnvironment environment)
         {
             _context = context;
             _serviceComposer = serviceComposer;
             Environment = environment;
             Configuration = configuration;
-            Logger = new DiagnosticLogger(context.DiagnosticSource);
             if (this is IConvention convention)
             {
                 context.Scanner.AppendConvention(convention);
             }
         }
 
-        public IHostingEnvironment Environment { get; }
+        public IHostEnvironment Environment { get; }
         public IConfiguration Configuration { get; }
-        public ILogger Logger { get; }
-        public IServiceProvider ApplicationServices { get; private set; }
-        public IServiceProvider SystemServices { get; private set; }
-
-        public virtual IServiceProvider ConfigureServices(IServiceCollection services)
-        {
-            services.RemoveAll(typeof(IDictionary<object, object>));
-            using (Logger.TimeTrace("{Step}", nameof(ConfigureServices)))
-            {
-                services.RemoveAll(typeof(AutoRequestServicesStartupFilter));
-
-                _serviceComposer.ComposeServices(
-                    services,
-                    _context.Properties,
-                    out var systemServiceProvider,
-                    out var applicationServiceProvider);
-
-                ApplicationServices = applicationServiceProvider;
-                SystemServices = systemServiceProvider;
-
-                return applicationServiceProvider;
-            }
-        }
-
-        public virtual void Configure(IApplicationBuilder application)
-        {
-            if (SystemServices != null)
-            {
-                using (Logger.TimeTrace("{Step}", nameof(Configure)))
-                {
-                    application.Map(SystemPath, a =>
-                    {
-                        a.ApplicationServices = SystemServices;
-                        ConfigureSystem(a);
-                    });
-                }
-            }
-
-            if (GetType().GetMethod("Compose", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic) != null)
-            {
-                using (Logger.TimeTrace("Configuring Compose Method"))
-                {
-                    var action = InjectableMethodBuilder.Create(GetType(), "Compose")
-                        .WithParameter<IApplicationBuilder>()
-                        .Compile();
-
-                    using (Logger.TimeDebug("Invoking Compose Method"))
-                    {
-                        application.UseMiddleware<RequestServicesContainerMiddleware>(
-                            ApplicationServices.GetRequiredService<IServiceScopeFactory>());
-                        action(this, ApplicationServices, application);
-                    }
-                }
-            }
-            else
-            {
-                Logger.LogTrace("Missing Compose method, you probably didn't meant to get here!");
-            }
-        }
-
-        public virtual void ConfigureSystem(IApplicationBuilder applicationBuilder)
-        {
-            if (GetType().GetMethod("ComposeSystem", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic) != null)
-            {
-                using (Logger.TimeTrace("Configuring ComposeSystem Method"))
-                {
-                    var systemAction = InjectableMethodBuilder.Create(GetType(), "ComposeSystem")
-                        .WithParameter<IApplicationBuilder>()
-                        .Compile();
-
-                    using (Logger.TimeTrace("Invoking ComposeSystem Method"))
-                    {
-                        applicationBuilder.UseMiddleware<RequestServicesContainerMiddleware>(
-                        SystemServices.GetRequiredService<IServiceScopeFactory>());
-                        systemAction(this, SystemServices, applicationBuilder);
-                    }
-                }
-            }
-            else
-            {
-                Logger.LogTrace("Missing ComposeSystem method, you might have meant to get here!");
-            }
-        }
     }
 }

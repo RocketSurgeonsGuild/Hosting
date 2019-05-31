@@ -19,19 +19,20 @@ namespace Microsoft.Extensions.Hosting
     {
         private static readonly ConditionalWeakTable<IHostBuilder, RocketHostBuilder> Builders = new ConditionalWeakTable<IHostBuilder, RocketHostBuilder>();
 
-        public static IRocketHostBuilder UseRocketBooster(this IHostBuilder builder, Func<IHostBuilder, IRocketHostBuilder> func)
+        public static IHostBuilder ConfigureRocketSurgey(this IHostBuilder builder, Action<IRocketHostBuilder> action)
+        {
+            action(GetOrCreateBuilder(builder));
+            return builder;
+        }
+
+        public static IRocketHostBuilder UseRocketBooster(this IRocketHostBuilder builder, Func<IRocketHostBuilder, IRocketHostBuilder> func)
         {
             return func(builder);
         }
 
-        public static IRocketHostBuilder LaunchWith(this IHostBuilder builder, Func<IHostBuilder, IRocketHostBuilder> func)
+        public static IRocketHostBuilder LaunchWith(this IRocketHostBuilder builder, Func<IRocketHostBuilder, IRocketHostBuilder> func)
         {
             return func(builder);
-        }
-
-        public static IRocketHostBuilder UseConventional(this IHostBuilder builder)
-        {
-            return GetOrCreateBuilder(builder);
         }
 
         public static IRocketHostBuilder UseScanner(this IRocketHostBuilder builder, IConventionScanner scanner)
@@ -59,7 +60,7 @@ namespace Microsoft.Extensions.Hosting
             DependencyContext dependencyContext,
             DiagnosticSource diagnosticSource = null)
         {
-            return builder.LaunchWith(RocketBooster.ForDependencyContext(dependencyContext, diagnosticSource));
+            return RocketBooster.ForDependencyContext(dependencyContext, diagnosticSource)(builder);
         }
 
         public static IRocketHostBuilder UseAppDomain(
@@ -67,7 +68,7 @@ namespace Microsoft.Extensions.Hosting
             AppDomain appDomain,
             DiagnosticSource diagnosticSource = null)
         {
-            return builder.LaunchWith(RocketBooster.ForAppDomain(appDomain, diagnosticSource));
+            return RocketBooster.ForAppDomain(appDomain, diagnosticSource)(builder);
         }
 
         public static IRocketHostBuilder UseAssemblies(
@@ -75,7 +76,7 @@ namespace Microsoft.Extensions.Hosting
             IEnumerable<Assembly> assemblies,
             DiagnosticSource diagnosticSource = null)
         {
-            return builder.LaunchWith(RocketBooster.ForAssemblies(assemblies, diagnosticSource));
+            return RocketBooster.ForAssemblies(assemblies, diagnosticSource)(builder);
         }
 
         private static void DefaultServices(IHostBuilder builder, HostBuilderContext context, IServiceCollection services)
@@ -102,14 +103,13 @@ namespace Microsoft.Extensions.Hosting
             return GetOrCreateBuilder(builder);
         }
 
-        private static RocketHostBuilder GetOrCreateBuilder(IRocketHostBuilder builder)
+        internal static RocketHostBuilder GetOrCreateBuilder(IRocketHostBuilder builder)
         {
             return GetOrCreateBuilder(builder.Builder);
         }
 
         internal static RocketHostBuilder GetOrCreateBuilder(IHostBuilder builder)
         {
-            if (builder is IRocketHostBuilder rb) builder = rb.Builder;
             if (!Builders.TryGetValue(builder, out var conventionalBuilder))
             {
                 var diagnosticSource = new DiagnosticListener("Rocket.Surgery.Hosting");
@@ -134,10 +134,10 @@ namespace Microsoft.Extensions.Hosting
             return conventionalBuilder;
         }
 
-        internal static RocketHostBuilder Swap(IHostBuilder builder, RocketHostBuilder newRocketBuilder)
+        internal static RocketHostBuilder Swap(IRocketHostBuilder builder, RocketHostBuilder newRocketBuilder)
         {
-            Builders.Remove(builder);
-            Builders.Add(builder, newRocketBuilder);
+            Builders.Remove(builder.Builder);
+            Builders.Add(builder.Builder, newRocketBuilder);
             return newRocketBuilder;
         }
     }

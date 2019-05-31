@@ -18,7 +18,7 @@ namespace Rocket.Surgery.Hosting.AspNetCore.Tests.Startups
             IRocketWebHostingContext context,
             IRocketServiceComposer serviceComposer,
             IConfiguration configuration,
-            IHostingEnvironment environment) : base(context, serviceComposer, configuration, environment)
+            IHostEnvironment environment) : base(context, serviceComposer, configuration, environment)
         {
         }
 

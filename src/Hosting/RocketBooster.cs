@@ -14,7 +14,7 @@ namespace Microsoft.Extensions.Hosting
 {
     public static class RocketBooster
     {
-        public static Func<IHostBuilder, IRocketHostBuilder> ForDependencyContext(
+        public static Func<IRocketHostBuilder, IRocketHostBuilder> ForDependencyContext(
             DependencyContext dependencyContext,
             DiagnosticSource diagnosticSource = null)
         {
@@ -30,8 +30,7 @@ namespace Microsoft.Extensions.Hosting
                 var assemblyCandidateFinder = new DependencyContextAssemblyCandidateFinder(dependencyContext, logger);
                 var assemblyProvider = new DependencyContextAssemblyProvider(dependencyContext, logger);
                 var scanner = new AggregateConventionScanner(assemblyCandidateFinder);
-                return RocketHostExtensions.Swap(
-                    builder, b
+                return RocketHostExtensions.Swap(b, b
                         .With(assemblyCandidateFinder)
                         .With(assemblyProvider)
                         .With(scanner)
@@ -39,12 +38,12 @@ namespace Microsoft.Extensions.Hosting
             };
         }
 
-        public static Func<IHostBuilder, IRocketHostBuilder> For(DependencyContext dependencyContext, DiagnosticSource diagnosticSource = null)
+        public static Func<IRocketHostBuilder, IRocketHostBuilder> For(DependencyContext dependencyContext, DiagnosticSource diagnosticSource = null)
         {
             return ForDependencyContext(dependencyContext, diagnosticSource);
         }
 
-        public static Func<IHostBuilder, IRocketHostBuilder> ForAppDomain(
+        public static Func<IRocketHostBuilder, IRocketHostBuilder> ForAppDomain(
             AppDomain appDomain,
             DiagnosticSource diagnosticSource = null)
         {
@@ -60,8 +59,7 @@ namespace Microsoft.Extensions.Hosting
                 var assemblyCandidateFinder = new AppDomainAssemblyCandidateFinder(appDomain, logger);
                 var assemblyProvider = new AppDomainAssemblyProvider(appDomain, logger);
                 var scanner = new AggregateConventionScanner(assemblyCandidateFinder);
-                return RocketHostExtensions.Swap(
-                    builder, b
+                return RocketHostExtensions.Swap(b, b
                         .With(assemblyCandidateFinder)
                         .With(assemblyProvider)
                         .With(scanner)
@@ -69,12 +67,12 @@ namespace Microsoft.Extensions.Hosting
             };
         }
 
-        public static Func<IHostBuilder, IRocketHostBuilder> For(AppDomain appDomain, DiagnosticSource diagnosticSource = null)
+        public static Func<IRocketHostBuilder, IRocketHostBuilder> For(AppDomain appDomain, DiagnosticSource diagnosticSource = null)
         {
             return ForAppDomain(appDomain, diagnosticSource);
         }
 
-        public static Func<IHostBuilder, IRocketHostBuilder> ForAssemblies(
+        public static Func<IRocketHostBuilder, IRocketHostBuilder> ForAssemblies(
             IEnumerable<Assembly> assemblies,
             DiagnosticSource diagnosticSource = null)
         {
@@ -91,8 +89,7 @@ namespace Microsoft.Extensions.Hosting
                 var assemblyCandidateFinder = new DefaultAssemblyCandidateFinder(enumerable, logger);
                 var assemblyProvider = new DefaultAssemblyProvider(enumerable, logger);
                 var scanner = new AggregateConventionScanner(assemblyCandidateFinder);
-                return RocketHostExtensions.Swap(
-                    builder, b
+                return RocketHostExtensions.Swap(b, b
                         .With(assemblyCandidateFinder)
                         .With(assemblyProvider)
                         .With(scanner)
@@ -100,7 +97,7 @@ namespace Microsoft.Extensions.Hosting
             };
         }
 
-        public static Func<IHostBuilder, IRocketHostBuilder> For(IEnumerable<Assembly> assemblies, DiagnosticSource diagnosticSource = null)
+        public static Func<IRocketHostBuilder, IRocketHostBuilder> For(IEnumerable<Assembly> assemblies, DiagnosticSource diagnosticSource = null)
         {
             return ForAssemblies(assemblies, diagnosticSource);
         }

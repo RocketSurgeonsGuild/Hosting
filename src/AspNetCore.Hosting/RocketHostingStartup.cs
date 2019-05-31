@@ -74,7 +74,7 @@ namespace Rocket.Surgery.AspNetCore.Hosting
 
             var cb = new ConfigurationBuilder(
                 _rocketWebHostBuilder.Scanner,
-                context.HostingEnvironment as Microsoft.Extensions.Hosting.IHostingEnvironment,
+                context.HostingEnvironment as Microsoft.Extensions.Hosting.IHostEnvironment,
                 context.Configuration,
                 configurationBuilder,
                 _rocketWebHostBuilder.DiagnosticSource,

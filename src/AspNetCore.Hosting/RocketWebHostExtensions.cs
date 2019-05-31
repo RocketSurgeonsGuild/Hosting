@@ -93,18 +93,7 @@ namespace Microsoft.AspNetCore.Hosting
         {
             var conventionalBuilder = GetOrCreateBuilder(builder);
             services.RemoveAll<IRocketServiceComposer>();
-            services.AddSingleton(_ => conventionalBuilder.ApplicationServicesComposeDelegate(conventionalBuilder, context.Configuration, context.HostingEnvironment as Extensions.Hosting.IHostingEnvironment));
-        }
-
-        public static IRocketWebHostBuilder UseSystemServices(this IWebHostBuilder builder)
-        {
-            builder.ConfigureServices((context, services) =>
-            {
-                var conventionalBuilder = GetOrCreateBuilder(builder);
-                services.RemoveAll<IRocketServiceComposer>();
-                services.AddSingleton(_ => conventionalBuilder.ApplicationAndSystemServicesComposeDelegate(conventionalBuilder, context.Configuration, context.HostingEnvironment as Extensions.Hosting.IHostingEnvironment));
-            });
-            return GetOrCreateBuilder(builder);
+            services.AddSingleton(_ => conventionalBuilder.ApplicationServicesComposeDelegate(conventionalBuilder, context.Configuration, context.HostingEnvironment as Extensions.Hosting.IHostEnvironment));
         }
 
         public static async Task<int> RunCli(this IWebHostBuilder builder)
@@ -164,6 +153,7 @@ namespace Microsoft.AspNetCore.Hosting
                 var startupAssemblies = ((builder.GetSetting(WebHostDefaults.HostingStartupAssembliesKey) ?? "") + ";" +
                                          typeof(RocketHostingStartup).Assembly.GetName().Name).Trim(';');
                 builder.UseSetting(WebHostDefaults.HostingStartupAssembliesKey, startupAssemblies);
+                builder.UseServiceProviderFactory()
                 conventionalBuilder.ApplicationServicesComposeDelegate = (b, configuration, environment) => new RocketServiceComposer(
                     b.Scanner,
                     b.AssemblyProvider,

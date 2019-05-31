@@ -16,7 +16,7 @@ namespace Rocket.Surgery.AspNetCore.Hosting
         private readonly IAssemblyProvider _assemblyProvider;
         private readonly IAssemblyCandidateFinder _assemblyCandidateFinder;
         private readonly IConfiguration _configuration;
-        private readonly IHostingEnvironment _environment;
+        private readonly IHostEnvironment _environment;
         private readonly DiagnosticSource _diagnosticSource;
 
         public RocketApplicationServiceComposer(
@@ -24,7 +24,7 @@ namespace Rocket.Surgery.AspNetCore.Hosting
             IAssemblyProvider assemblyProvider,
             IAssemblyCandidateFinder assemblyCandidateFinder,
             IConfiguration configuration,
-            IHostingEnvironment environment,
+            IHostEnvironment environment,
             DiagnosticSource diagnosticSource)
         {
             _scanner = scanner ?? throw new ArgumentNullException(nameof(scanner));
@@ -36,8 +36,8 @@ namespace Rocket.Surgery.AspNetCore.Hosting
         }
 
         public void ComposeServices(
-            IServiceCollection services, 
-            IDictionary<object, object> properties, 
+            IServiceCollection services,
+            IDictionary<object, object> properties,
             out IServiceProvider systemServiceProvider,
             out IServiceProvider applicationServiceProvider)
         {

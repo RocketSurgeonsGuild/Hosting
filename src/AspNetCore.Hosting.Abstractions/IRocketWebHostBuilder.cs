@@ -12,7 +12,7 @@ using Rocket.Surgery.Conventions.Scanners;
 
 namespace Rocket.Surgery.AspNetCore.Hosting
 {
-    public interface IRocketWebHostBuilder : IConventionHostBuilder, IWebHostBuilder
+    public interface IRocketWebHostBuilder : IConventionHostBuilder
     {
         IWebHostBuilder Builder { get; }
     }

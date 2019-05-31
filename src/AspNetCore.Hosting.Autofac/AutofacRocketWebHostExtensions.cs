@@ -5,7 +5,6 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Rocket.Surgery.AspNetCore.Hosting;
 using Rocket.Surgery.AspNetCore.Hosting.Autofac;
 using Rocket.Surgery.Extensions.Autofac;
-using IHostingEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.AspNetCore.Hosting

@@ -11,12 +11,12 @@ namespace Microsoft.Extensions.Hosting
 {
     public static class AutofacRocketHostExtensions
     {
-        public static IRocketHostBuilder UseAutofac(this IHostBuilder builder, ContainerBuilder containerBuilder = null)
+        public static IRocketHostBuilder UseAutofac(this IRocketHostBuilder builder, ContainerBuilder containerBuilder = null)
         {
-            builder.ConfigureServices((context, services) =>
+            builder.Builder.ConfigureServices((context, services) =>
             {
                 var conventionalBuilder = RocketHostExtensions.GetOrCreateBuilder(builder);
-                builder.UseServiceProviderFactory(
+                builder.Builder.UseServiceProviderFactory(
                     new ServicesBuilderServiceProviderFactory(collection =>
                         new AutofacBuilder(
                             containerBuilder ?? new ContainerBuilder(),
