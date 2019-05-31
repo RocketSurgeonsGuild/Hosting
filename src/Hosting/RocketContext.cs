@@ -144,6 +144,14 @@ namespace Microsoft.Extensions.Hosting
             if (_exec != null)
             {
                 services.AddSingleton(_exec);
+                if (!_exec.IsDefaultCommand)
+                {
+                    // Remove the hosted service that bootstraps kestrel, we are executing a command here.
+                    foreach (var service in services.Where(x => x.ImplementationType?.FullName.Contains("Microsoft.AspNetCore.Hosting.Internal") == true).ToArray())
+                    {
+                        services.Remove(service);
+                    }
+                }
             }
         }
     }

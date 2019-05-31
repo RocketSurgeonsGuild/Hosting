@@ -18,19 +18,17 @@ using Rocket.Surgery.Extensions.Configuration;
 using Rocket.Surgery.Extensions.DependencyInjection;
 using Rocket.Surgery.Hosting;
 
-namespace Extensions.Host
+namespace Extensions
 {
     public class Program
     {
         public static Task<int> Main(string[] args)
         {
             var diagnosticSource = new DiagnosticListener("Extensions.Host");
-            var builder = RocketHost.CreateDefaultBuilder()
-                .LaunchWith(RocketBooster.For(DependencyContext.Default, diagnosticSource));
-
-            builder.AppendConvention(new Convention());
-
-            return builder.AppendDelegate(new CommandLineConventionDelegate(c => c.OnRun(x =>
+            return Host.CreateDefaultBuilder()
+                .LaunchWith(RocketBooster.For(DependencyContext.Default, diagnosticSource))
+                .ConfigureRocketSurgey(b => b.AppendConvention(new Convention())
+                .AppendDelegate(new CommandLineConventionDelegate(c => c.OnRun(x =>
             {
                 Console.WriteLine($"               Debug: {x.Debug}");
                 Console.WriteLine($"               Trace: {x.Trace}");
@@ -39,12 +37,12 @@ namespace Extensions.Host
                 Console.WriteLine($"    IsDefaultCommand: {x.IsDefaultCommand}");
                 Console.WriteLine($"  RemainingArguments: {string.Join(" ", x.RemainingArguments)}");
                 return 1234;
-            })))
+            }))))
                 .RunCli();
         }
     }
 
-    [Command(ThrowOnUnexpectedArgument =  false)]
+    [Command(ThrowOnUnexpectedArgument = false)]
     class MyCommand
     {
         private readonly IConfiguration _configuration;

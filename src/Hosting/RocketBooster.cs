@@ -14,7 +14,7 @@ namespace Microsoft.Extensions.Hosting
 {
     public static class RocketBooster
     {
-        public static Func<IRocketHostBuilder, IRocketHostBuilder> ForDependencyContext(
+        public static Func<IHostBuilder, IRocketHostBuilder> ForDependencyContext(
             DependencyContext dependencyContext,
             DiagnosticSource diagnosticSource = null)
         {
@@ -38,12 +38,12 @@ namespace Microsoft.Extensions.Hosting
             };
         }
 
-        public static Func<IRocketHostBuilder, IRocketHostBuilder> For(DependencyContext dependencyContext, DiagnosticSource diagnosticSource = null)
+        public static Func<IHostBuilder, IRocketHostBuilder> For(DependencyContext dependencyContext, DiagnosticSource diagnosticSource = null)
         {
             return ForDependencyContext(dependencyContext, diagnosticSource);
         }
 
-        public static Func<IRocketHostBuilder, IRocketHostBuilder> ForAppDomain(
+        public static Func<IHostBuilder, IRocketHostBuilder> ForAppDomain(
             AppDomain appDomain,
             DiagnosticSource diagnosticSource = null)
         {
@@ -67,12 +67,12 @@ namespace Microsoft.Extensions.Hosting
             };
         }
 
-        public static Func<IRocketHostBuilder, IRocketHostBuilder> For(AppDomain appDomain, DiagnosticSource diagnosticSource = null)
+        public static Func<IHostBuilder, IRocketHostBuilder> For(AppDomain appDomain, DiagnosticSource diagnosticSource = null)
         {
             return ForAppDomain(appDomain, diagnosticSource);
         }
 
-        public static Func<IRocketHostBuilder, IRocketHostBuilder> ForAssemblies(
+        public static Func<IHostBuilder, IRocketHostBuilder> ForAssemblies(
             IEnumerable<Assembly> assemblies,
             DiagnosticSource diagnosticSource = null)
         {
@@ -97,7 +97,7 @@ namespace Microsoft.Extensions.Hosting
             };
         }
 
-        public static Func<IRocketHostBuilder, IRocketHostBuilder> For(IEnumerable<Assembly> assemblies, DiagnosticSource diagnosticSource = null)
+        public static Func<IHostBuilder, IRocketHostBuilder> For(IEnumerable<Assembly> assemblies, DiagnosticSource diagnosticSource = null)
         {
             return ForAssemblies(assemblies, diagnosticSource);
         }

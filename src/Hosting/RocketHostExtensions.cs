@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyModel;
+using Microsoft.Extensions.Logging;
 using Rocket.Surgery.Conventions;
 using Rocket.Surgery.Conventions.Reflection;
 using Rocket.Surgery.Conventions.Scanners;
+using Rocket.Surgery.Extensions.CommandLine;
 using Rocket.Surgery.Extensions.Configuration;
 using Rocket.Surgery.Extensions.DependencyInjection;
 using Rocket.Surgery.Hosting;
@@ -25,14 +28,18 @@ namespace Microsoft.Extensions.Hosting
             return builder;
         }
 
-        public static IRocketHostBuilder UseRocketBooster(this IRocketHostBuilder builder, Func<IRocketHostBuilder, IRocketHostBuilder> func)
+        public static IHostBuilder UseRocketBooster(this IHostBuilder builder, Func<IHostBuilder, IRocketHostBuilder> func, Action<IRocketHostBuilder> action = null)
         {
-            return func(builder);
+            var b = func(builder);
+            action?.Invoke(func(builder));
+            return builder;
         }
 
-        public static IRocketHostBuilder LaunchWith(this IRocketHostBuilder builder, Func<IRocketHostBuilder, IRocketHostBuilder> func)
+        public static IHostBuilder LaunchWith(this IHostBuilder builder, Func<IHostBuilder, IRocketHostBuilder> func, Action<IRocketHostBuilder> action = null)
         {
-            return func(builder);
+            var b = func(builder);
+            action?.Invoke(func(builder));
+            return builder;
         }
 
         public static IRocketHostBuilder UseScanner(this IRocketHostBuilder builder, IConventionScanner scanner)
@@ -60,7 +67,7 @@ namespace Microsoft.Extensions.Hosting
             DependencyContext dependencyContext,
             DiagnosticSource diagnosticSource = null)
         {
-            return RocketBooster.ForDependencyContext(dependencyContext, diagnosticSource)(builder);
+            return RocketBooster.ForDependencyContext(dependencyContext, diagnosticSource)(builder.Builder);
         }
 
         public static IRocketHostBuilder UseAppDomain(
@@ -68,7 +75,7 @@ namespace Microsoft.Extensions.Hosting
             AppDomain appDomain,
             DiagnosticSource diagnosticSource = null)
         {
-            return RocketBooster.ForAppDomain(appDomain, diagnosticSource)(builder);
+            return RocketBooster.ForAppDomain(appDomain, diagnosticSource)(builder.Builder);
         }
 
         public static IRocketHostBuilder UseAssemblies(
@@ -76,7 +83,7 @@ namespace Microsoft.Extensions.Hosting
             IEnumerable<Assembly> assemblies,
             DiagnosticSource diagnosticSource = null)
         {
-            return RocketBooster.ForAssemblies(assemblies, diagnosticSource)(builder);
+            return RocketBooster.ForAssemblies(assemblies, diagnosticSource)(builder.Builder);
         }
 
         private static void DefaultServices(IHostBuilder builder, HostBuilderContext context, IServiceCollection services)
@@ -139,6 +146,37 @@ namespace Microsoft.Extensions.Hosting
             Builders.Remove(builder.Builder);
             Builders.Add(builder.Builder, newRocketBuilder);
             return newRocketBuilder;
+        }
+        public static IRocketHostBuilder UseCommandLine(this IRocketHostBuilder builder)
+        {
+            builder.Properties.Add(nameof(UseCommandLine), true);
+            builder.Builder
+                .UseConsoleLifetime()
+                .ConfigureServices(services => services.Configure<ConsoleLifetimeOptions>(c => c.SuppressStatusMessages = true));
+            return RocketHostExtensions.GetOrCreateBuilder(builder);
+        }
+
+        public static async Task<int> RunCli(this IHostBuilder builder)
+        {
+            builder.ConfigureRocketSurgey(x => x.UseCommandLine());
+            using (var host = builder.Build())
+            {
+                try
+                {
+                    await host.StartAsync();
+                    var context = host.Services.GetRequiredService<ICommandLineExecutor>();
+                    var result = context.Execute(host.Services);
+                    await host.StopAsync();
+                    return result;
+                }
+                catch (Exception e)
+                {
+                    host.Services.GetService<ILoggerFactory>()
+                        .CreateLogger("Cli")
+                        .LogError(e, "Application exception");
+                    return -1;
+                }
+            }
         }
     }
 }

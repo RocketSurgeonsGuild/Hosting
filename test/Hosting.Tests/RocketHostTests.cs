@@ -12,22 +12,22 @@ namespace Rocket.Surgery.Hosting.Tests
         [Fact]
         public void Creates_RocketHost_ForAppDomain()
         {
-            var host = RocketHost.CreateDefaultBuilder().LaunchWith(RocketBooster.For(AppDomain.CurrentDomain));
-            host.Should().BeAssignableTo<IRocketHostBuilder>();
+            var host = Host.CreateDefaultBuilder().LaunchWith(RocketBooster.For(AppDomain.CurrentDomain));
+            host.Should().BeAssignableTo<IHostBuilder>();
         }
 
         [Fact]
         public void Creates_RocketHost_ForAssemblies()
         {
-            var host = RocketHost.CreateDefaultBuilder().LaunchWith(RocketBooster.For(new[] { typeof(RocketHostTests).Assembly }));
-            host.Should().BeAssignableTo<IRocketHostBuilder>();
+            var host = Host.CreateDefaultBuilder().LaunchWith(RocketBooster.For(new[] { typeof(RocketHostTests).Assembly }));
+            host.Should().BeAssignableTo<IHostBuilder>();
         }
 
         [Fact]
         public void Creates_RocketHost_ForDependencyContext()
         {
-            var host = RocketHost.CreateDefaultBuilder().LaunchWith(RocketBooster.For(DependencyContext.Load(typeof(RocketHostTests).Assembly)));
-            host.Should().BeAssignableTo<IRocketHostBuilder>();
+            var host = Host.CreateDefaultBuilder().LaunchWith(RocketBooster.For(DependencyContext.Load(typeof(RocketHostTests).Assembly)));
+            host.Should().BeAssignableTo<IHostBuilder>();
         }
     }
 }

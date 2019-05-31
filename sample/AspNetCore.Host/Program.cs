@@ -12,13 +12,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.Hosting;
-using Rocket.Surgery.AspNetCore.Hosting;
 using Rocket.Surgery.Conventions.Reflection;
 using Rocket.Surgery.Conventions.Scanners;
 using Rocket.Surgery.Extensions.Configuration;
 using Rocket.Surgery.Extensions.DependencyInjection;
 
-namespace Extensions.Host
+namespace Extensions
 {
     public class Program
     {
@@ -26,19 +25,21 @@ namespace Extensions.Host
         {
             var diagnosticSource = new DiagnosticListener("Extensions.Host");
 
-            var builder = WebHost.CreateDefaultBuilder()
+            var builder = Host.CreateDefaultBuilder()
                 .LaunchWith(RocketBooster.For(DependencyContext.Default, diagnosticSource))
-                .UseKestrel()
-                .UseStartup<Startup>();
+                .ConfigureWebHostDefaults(x => x
+                    .UseKestrel()
+                    .UseStartup<Startup>()
+                );
             return builder
                 .Build()
                 .RunAsync();
         }
     }
 
-    public class Startup : RocketStartup
+    public class Startup
     {
-        public Startup(IRocketWebHostingContext context, IRocketServiceComposer serviceComposer, IConfiguration configuration, IHostEnvironment environment) : base(context, serviceComposer, configuration, environment)
+        public Startup(IConfiguration configuration, IHostEnvironment environment)
         {
         }
 
