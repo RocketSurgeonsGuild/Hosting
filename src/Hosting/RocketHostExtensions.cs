@@ -31,14 +31,14 @@ namespace Microsoft.Extensions.Hosting
         public static IHostBuilder UseRocketBooster(this IHostBuilder builder, Func<IHostBuilder, IRocketHostBuilder> func, Action<IRocketHostBuilder> action = null)
         {
             var b = func(builder);
-            action?.Invoke(func(builder));
+            action?.Invoke(b);
             return builder;
         }
 
         public static IHostBuilder LaunchWith(this IHostBuilder builder, Func<IHostBuilder, IRocketHostBuilder> func, Action<IRocketHostBuilder> action = null)
         {
             var b = func(builder);
-            action?.Invoke(func(builder));
+            action?.Invoke(b);
             return builder;
         }
 
