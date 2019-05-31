@@ -25,7 +25,7 @@ namespace Extensions
         public static Task<int> Main(string[] args)
         {
             var diagnosticSource = new DiagnosticListener("Extensions.Host");
-            return Host.CreateDefaultBuilder()
+            return Host.CreateDefaultBuilder(args)
                 .LaunchWith(RocketBooster.For(DependencyContext.Default, diagnosticSource))
                 .ConfigureRocketSurgey(b => b.AppendConvention(new Convention())
                 .AppendDelegate(new CommandLineConventionDelegate(c => c.OnRun(x =>

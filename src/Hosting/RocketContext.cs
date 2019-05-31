@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.CommandLine;
 using Microsoft.Extensions.Configuration.EnvironmentVariables;
@@ -8,6 +9,7 @@ using Microsoft.Extensions.Configuration.Json;
 using Microsoft.Extensions.DependencyInjection;
 using NetEscapades.Configuration.Yaml;
 using Rocket.Surgery.Extensions.CommandLine;
+using Rocket.Surgery.Extensions.DependencyInjection;
 using Rocket.Surgery.Hosting;
 using ConfigurationBuilder = Rocket.Surgery.Extensions.Configuration.ConfigurationBuilder;
 using IConfigurationBuilder = Microsoft.Extensions.Configuration.IConfigurationBuilder;
@@ -36,6 +38,7 @@ namespace Microsoft.Extensions.Hosting
                 rocketHostBuilder.DiagnosticSource,
                 rocketHostBuilder.Properties
             );
+
             _exec = clb.Build().Parse(_args ?? Array.Empty<string>());
             _args = _exec.ApplicationState.RemainingArguments ?? Array.Empty<string>();
             configurationBuilder.AddApplicationState(_exec.ApplicationState);
@@ -141,18 +144,25 @@ namespace Microsoft.Extensions.Hosting
         {
             var rocketHostBuilder = RocketHostExtensions.GetConventionalHostBuilder(_hostBuilder);
             services.AddSingleton<IRocketHostingContext>(_ => new RocketHostingContext(rocketHostBuilder, _args ?? Array.Empty<string>()));
-            if (_exec != null)
-            {
-                services.AddSingleton(_exec);
-                if (!_exec.IsDefaultCommand)
-                {
-                    // Remove the hosted service that bootstraps kestrel, we are executing a command here.
-                    foreach (var service in services.Where(x => x.ImplementationType?.FullName.Contains("Microsoft.AspNetCore.Hosting.Internal") == true).ToArray())
-                    {
-                        services.Remove(service);
-                    }
-                }
-            }
+        }
+
+        public void DefaultServices(IHostBuilder builder, HostBuilderContext context, IServiceCollection services)
+        {
+            var conventionalBuilder = RocketHostExtensions.GetConventionalHostBuilder(_hostBuilder);
+            builder.UseServiceProviderFactory(
+                new ServicesBuilderServiceProviderFactory(collection =>
+                    new ServicesBuilder(
+                        conventionalBuilder.Scanner,
+                        conventionalBuilder.AssemblyProvider,
+                        conventionalBuilder.AssemblyCandidateFinder,
+                        collection,
+                        context.Configuration,
+                        context.HostingEnvironment,
+                        conventionalBuilder.DiagnosticSource,
+                        conventionalBuilder.Properties
+                    )
+                )
+            );
         }
     }
 }

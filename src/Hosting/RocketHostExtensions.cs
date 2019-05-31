@@ -86,25 +86,6 @@ namespace Microsoft.Extensions.Hosting
             return RocketBooster.ForAssemblies(assemblies, diagnosticSource)(builder.Builder);
         }
 
-        private static void DefaultServices(IHostBuilder builder, HostBuilderContext context, IServiceCollection services)
-        {
-            var conventionalBuilder = GetOrCreateBuilder(builder);
-            builder.UseServiceProviderFactory(
-                new ServicesBuilderServiceProviderFactory(collection =>
-                    new ServicesBuilder(
-                        conventionalBuilder.Scanner,
-                        conventionalBuilder.AssemblyProvider,
-                        conventionalBuilder.AssemblyCandidateFinder,
-                        collection,
-                        context.Configuration,
-                        context.HostingEnvironment,
-                        conventionalBuilder.DiagnosticSource,
-                        conventionalBuilder.Properties
-                    )
-                )
-            );
-        }
-
         internal static RocketHostBuilder GetConventionalHostBuilder(IHostBuilder builder)
         {
             return GetOrCreateBuilder(builder);
@@ -134,7 +115,7 @@ namespace Microsoft.Extensions.Hosting
                     .ConfigureAppConfiguration(host.ReplaceArguments)
                     .ConfigureAppConfiguration(host.ConfigureAppConfiguration)
                     .ConfigureServices(host.ConfigureServices)
-                    .ConfigureServices((context, services) => DefaultServices(builder, context, services));
+                    .ConfigureServices((context, services) => host.DefaultServices(builder, context, services));
                 Builders.Add(builder, conventionalBuilder);
             }
 
@@ -149,10 +130,14 @@ namespace Microsoft.Extensions.Hosting
         }
         public static IRocketHostBuilder UseCommandLine(this IRocketHostBuilder builder)
         {
+            return builder.UseCommandLine(x => x.SuppressStatusMessages = true);
+        }
+        public static IRocketHostBuilder UseCommandLine(this IRocketHostBuilder builder, Action<ConsoleLifetimeOptions> configureOptions)
+        {
             builder.Properties.Add(nameof(UseCommandLine), true);
             builder.Builder
                 .UseConsoleLifetime()
-                .ConfigureServices(services => services.Configure<ConsoleLifetimeOptions>(c => c.SuppressStatusMessages = true));
+                .ConfigureServices(services => services.Configure<ConsoleLifetimeOptions>(configureOptions));
             return RocketHostExtensions.GetOrCreateBuilder(builder);
         }
 
@@ -161,13 +146,11 @@ namespace Microsoft.Extensions.Hosting
             builder.ConfigureRocketSurgey(x => x.UseCommandLine());
             using (var host = builder.Build())
             {
+                var result = host.Services.GetRequiredService<CommandLineResult>();
                 try
                 {
-                    await host.StartAsync();
-                    var context = host.Services.GetRequiredService<ICommandLineExecutor>();
-                    var result = context.Execute(host.Services);
-                    await host.StopAsync();
-                    return result;
+                    await host.RunAsync();
+                    return result.Value;
                 }
                 catch (Exception e)
                 {
