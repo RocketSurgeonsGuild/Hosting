@@ -134,7 +134,6 @@ namespace Microsoft.Extensions.Hosting
         }
         public static IRocketHostBuilder UseCommandLine(this IRocketHostBuilder builder, Action<ConsoleLifetimeOptions> configureOptions)
         {
-            builder.Properties.Add(nameof(UseCommandLine), true);
             builder.Builder
                 .UseConsoleLifetime()
                 .ConfigureServices(services => services.Configure<ConsoleLifetimeOptions>(configureOptions));

@@ -10,7 +10,7 @@ using Rocket.Surgery.Conventions;
 
 namespace Rocket.Surgery.Hosting
 {
-    public interface IRocketHostBuilder : IConventionHostBuilder
+    public interface IRocketHostBuilder : IConventionHostBuilder<IRocketHostBuilder>
     {
         IHostBuilder Builder { get; }
     }

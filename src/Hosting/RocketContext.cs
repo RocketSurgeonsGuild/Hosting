@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration.EnvironmentVariables;
 using Microsoft.Extensions.Configuration.Json;
 using Microsoft.Extensions.DependencyInjection;
 using NetEscapades.Configuration.Yaml;
+using Rocket.Surgery.Conventions;
 using Rocket.Surgery.Extensions.CommandLine;
 using Rocket.Surgery.Extensions.DependencyInjection;
 using Rocket.Surgery.Hosting;
@@ -94,7 +95,7 @@ namespace Microsoft.Extensions.Hosting
 
             var cb = new ConfigurationBuilder(
                 rocketHostBuilder.Scanner,
-                context.HostingEnvironment,
+                context.HostingEnvironment.Convert(),
                 context.Configuration,
                 configurationBuilder,
                 rocketHostBuilder.DiagnosticSource,
@@ -157,7 +158,7 @@ namespace Microsoft.Extensions.Hosting
                         conventionalBuilder.AssemblyCandidateFinder,
                         collection,
                         context.Configuration,
-                        context.HostingEnvironment,
+                        context.HostingEnvironment.Convert(),
                         conventionalBuilder.DiagnosticSource,
                         conventionalBuilder.Properties
                     )

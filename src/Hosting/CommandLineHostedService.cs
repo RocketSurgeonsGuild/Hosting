@@ -12,7 +12,11 @@ namespace Microsoft.Extensions.Hosting
     {
         private readonly ICommandLineExecutor _executor;
         private readonly IServiceProvider _serviceProvider;
+#if NETCOREAPP3_0
         private readonly IHostApplicationLifetime _lifetime;
+#else
+        private readonly IApplicationLifetime _lifetime;
+#endif
         private readonly CommandLineResult _result;
         private readonly bool _isWebApp;
         private readonly ILogger<CommandLineHostedService> _logger;
@@ -20,8 +24,12 @@ namespace Microsoft.Extensions.Hosting
         public CommandLineHostedService(
             IServiceProvider serviceProvider,
             ICommandLineExecutor executor,
+#if NETCOREAPP3_0
             IHostApplicationLifetime lifetime,
-            CommandLineResult commandLineResult,
+#else
+            IApplicationLifetime lifetime,
+#endif
+        CommandLineResult commandLineResult,
             bool isWebApp)
         {
             this._executor = executor ?? throw new ArgumentNullException(nameof(executor));

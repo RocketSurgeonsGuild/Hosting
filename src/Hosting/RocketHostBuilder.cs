@@ -10,7 +10,7 @@ using Rocket.Surgery.Conventions.Scanners;
 
 namespace Rocket.Surgery.Hosting
 {
-    class RocketHostBuilder : ConventionHostBuilder, IRocketHostBuilder
+    class RocketHostBuilder : ConventionHostBuilder<IRocketHostBuilder>, IRocketHostBuilder
     {
         public RocketHostBuilder(IHostBuilder builder, IConventionScanner scanner, IAssemblyCandidateFinder assemblyCandidateFinder, IAssemblyProvider assemblyProvider, DiagnosticSource diagnosticSource, IDictionary<object, object> properties) : base(scanner, assemblyCandidateFinder, assemblyProvider, diagnosticSource, properties)
         {
