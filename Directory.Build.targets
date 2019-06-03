@@ -16,6 +16,7 @@
     <PackageReference Update="Microsoft.Extensions.Hosting.Abstractions" Version="2.1.1" />
     <PackageReference Update="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.1.1" />
     <PackageReference Update="Microsoft.Extensions.DiagnosticAdapter" Version="2.1.0" />
+    <PackageReference Update="System.Diagnostics.DiagnosticSource" Version="4.5.1" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.0'">
     <PackageReference Update="Microsoft.Extensions.Configuration.Binder" Version="3.0.0-preview5.19227.9" />
@@ -34,6 +35,7 @@
     <PackageReference Update="Microsoft.Extensions.Hosting.Abstractions" Version="3.0.0-preview5.19227.9" />
     <PackageReference Update="Microsoft.Extensions.Options.ConfigurationExtensions" Version="3.0.0-preview5.19227.9" />
     <PackageReference Update="Microsoft.Extensions.DiagnosticAdapter" Version="3.0.0-preview5.19227.9" />
+    <PackageReference Update="System.Diagnostics.DiagnosticSource" Version="4.6.0-preview5.19224.8" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Update="Microsoft.NET.Sdk.Functions" Version="1.0.28" />
@@ -43,20 +45,21 @@
     <PackageReference Update="Microsoft.Azure.WebJobs.Extensions.Http" Version="3.0.2" />
     <PackageReference Update="NetEscapades.Configuration.Yaml" Version="1.6.0" />
     <PackageReference Update="Newtonsoft.Json" Version="12.0.2" />
-    <PackageReference Update="Rocket.Surgery.Conventions" Version="5.0.0-PullRequest0003.*" />
-    <PackageReference Update="Rocket.Surgery.Conventions.Abstractions" Version="5.0.0-PullRequest0003.*" />
+    <PackageReference Update="Rocket.Surgery.Conventions" Version="5.0.1" />
+    <PackageReference Update="Rocket.Surgery.Conventions.Abstractions" Version="5.0.1" />
     <PackageReference Update="Rocket.Surgery.Extensions" Version="1.0.0" />
-    <PackageReference Update="Rocket.Surgery.Extensions.CommandLine" Version="4.0.0-PullRequest0002.*" />
-    <PackageReference Update="Rocket.Surgery.Extensions.CommandLine.Abstractions" Version="4.0.0-PullRequest0002.*" />
-    <PackageReference Update="Rocket.Surgery.Extensions.Configuration" Version="5.0.0-PullRequest0001.*" />
-    <PackageReference Update="Rocket.Surgery.Extensions.Configuration.Abstractions" Version="5.0.0-PullRequest0001.*" />
-    <PackageReference Update="Rocket.Surgery.Extensions.DependencyInjection" Version="5.0.0-PullRequest0001.*" />
-    <PackageReference Update="Rocket.Surgery.Extensions.DependencyInjection.Abstractions" Version="5.0.0-PullRequest0001.*" />
-    <PackageReference Update="Rocket.Surgery.Extensions.Autofac" Version="4.0.0-PullRequest0001.*" />
-    <PackageReference Update="Rocket.Surgery.Extensions.Autofac.Abstractions" Version="4.0.0-PullRequest0001.*" />
-    <PackageReference Update="Rocket.Surgery.Extensions.Logging.Empowered" Version="5.0.0-PullRequest0001.*" />
-    <PackageReference Update="Rocket.Surgery.Extensions.Logging.Abstractions" Version="5.0.0-PullRequest0001.*" />
-    <PackageReference Update="System.Diagnostics.DiagnosticSource" Version="4.5.1" />
+    <PackageReference Update="Rocket.Surgery.Extensions.CommandLine" Version="4.0.0" />
+    <PackageReference Update="Rocket.Surgery.Extensions.CommandLine.Abstractions" Version="4.0.0" />
+    <PackageReference Update="Rocket.Surgery.Extensions.Configuration" Version="5.0.0" />
+    <PackageReference Update="Rocket.Surgery.Extensions.Configuration.Abstractions" Version="5.0.0" />
+    <PackageReference Update="Rocket.Surgery.Extensions.DependencyInjection" Version="5.0.0" />
+    <PackageReference Update="Rocket.Surgery.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
+    <PackageReference Update="Rocket.Surgery.Extensions.Autofac" Version="4.0.0" />
+    <PackageReference Update="Rocket.Surgery.Extensions.Autofac.Abstractions" Version="4.0.0" />
+    <PackageReference Update="Rocket.Surgery.Extensions.Logging.Empowered" Version="5.0.0" />
+    <PackageReference Update="Rocket.Surgery.Extensions.Logging.Abstractions" Version="5.0.0" />
+    <PackageReference Update="Rocket.Surgery.Extensions.WebJobs" Version="5.0.0" />
+    <PackageReference Update="Rocket.Surgery.Extensions.WebJobs.Abstractions" Version="5.0.0" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Rocket.Surgery.Build.Metadata" Version="3.3.0" PrivateAssets="All" />

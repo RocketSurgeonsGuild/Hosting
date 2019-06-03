@@ -14,6 +14,7 @@ using Rocket.Surgery.Conventions.Reflection;
 using Rocket.Surgery.Conventions.Scanners;
 using Rocket.Surgery.Extensions.Configuration;
 using Rocket.Surgery.Extensions.DependencyInjection;
+using Rocket.Surgery.Extensions.WebJobs;
 using ConfigurationBuilder = Rocket.Surgery.Extensions.Configuration.ConfigurationBuilder;
 using MsftConfigurationBinder = Microsoft.Extensions.Configuration.ConfigurationBuilder;
 
@@ -155,6 +156,21 @@ namespace Rocket.Surgery.Hosting.Functions
             Composer.Register<IServiceConventionContext, IServiceConvention, ServiceConventionDelegate>(Scanner, builder);
         }
 
+        private void SetupWebJobs(IConfiguration existingConfiguration)
+        {
+            var builder = new WebJobsConventionBuilder( 
+                Scanner,
+                AssemblyProvider,
+                AssemblyCandidateFinder,
+                Builder,
+                existingConfiguration,
+                _environment,
+                DiagnosticSource,
+                Properties);
+
+            Composer.Register<IWebJobsConventionContext, IWebJobsConvention, WebJobsConventionDelegate>(Scanner, builder);
+        }
+
         public void Compose()
         {
             if (_startupInstance is IConvention convention)
@@ -162,7 +178,9 @@ namespace Rocket.Surgery.Hosting.Functions
                 Scanner.AppendConvention(convention);
             }
 
-            SetupServices(SetupConfiguration());
+            var configuration = SetupConfiguration();
+            SetupServices(configuration);
+            SetupWebJobs(configuration);
         }
     }
 }

@@ -16,5 +16,6 @@
         <PackageReference Include="Rocket.Surgery.Extensions" />
         <PackageReference Include="Rocket.Surgery.Extensions.Configuration" />
         <PackageReference Include="Rocket.Surgery.Extensions.DependencyInjection" />
+        <PackageReference Include="Rocket.Surgery.Extensions.WebJobs" />
     </ItemGroup>
 </Project>
