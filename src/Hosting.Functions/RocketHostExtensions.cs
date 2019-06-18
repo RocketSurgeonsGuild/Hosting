@@ -38,7 +38,9 @@ namespace Rocket.Surgery.Hosting.Functions
         {
             var b = func(builder, startupInstance);
             action(b);
-            GetOrCreateBuilder(builder, startupInstance, null).Compose();
+            if (!Builders.TryGetValue(builder, out var conventionalBuilder))
+                throw new Exception("Something bad happened...");
+            conventionalBuilder.Compose();
             return builder;
         }
 
@@ -47,7 +49,9 @@ namespace Rocket.Surgery.Hosting.Functions
             var b = func(builder, startupInstance);
             b.UseEnvironment(environment);
             action(b);
-            GetOrCreateBuilder(builder, startupInstance, environment).Compose();
+            if (!Builders.TryGetValue(builder, out var conventionalBuilder))
+                throw new Exception("Something bad happened...");
+            conventionalBuilder.Compose();
             return builder;
         }
 
@@ -55,7 +59,9 @@ namespace Rocket.Surgery.Hosting.Functions
         {
             var b = func(builder, startupInstance);
             action(b);
-            GetOrCreateBuilder(builder, startupInstance, null).Compose();
+            if (!Builders.TryGetValue(builder, out var conventionalBuilder))
+                throw new Exception("Something bad happened...");
+            conventionalBuilder.Compose();
             return builder;
         }
 
@@ -64,7 +70,9 @@ namespace Rocket.Surgery.Hosting.Functions
             var b = func(builder, startupInstance);
             b.UseEnvironment(environment);
             action(b);
-            GetOrCreateBuilder(builder, startupInstance, environment).Compose();
+            if (!Builders.TryGetValue(builder, out var conventionalBuilder))
+                throw new Exception("Something bad happened...");
+            conventionalBuilder.Compose();
             return builder;
         }
 
