@@ -48,8 +48,8 @@
     <PackageReference Update="Rocket.Surgery.Conventions" Version="5.0.2" />
     <PackageReference Update="Rocket.Surgery.Conventions.Abstractions" Version="5.0.2" />
     <PackageReference Update="Rocket.Surgery.Extensions" Version="1.0.0" />
-    <PackageReference Update="Rocket.Surgery.Extensions.CommandLine" Version="4.0.1" />
-    <PackageReference Update="Rocket.Surgery.Extensions.CommandLine.Abstractions" Version="4.0.1" />
+    <PackageReference Update="Rocket.Surgery.Extensions.CommandLine" Version="4.1.0" />
+    <PackageReference Update="Rocket.Surgery.Extensions.CommandLine.Abstractions" Version="4.1.0" />
     <PackageReference Update="Rocket.Surgery.Extensions.Configuration" Version="5.1.1" />
     <PackageReference Update="Rocket.Surgery.Extensions.Configuration.Abstractions" Version="5.1.1" />
     <PackageReference Update="Rocket.Surgery.Extensions.DependencyInjection" Version="5.1.1" />
