@@ -30,8 +30,7 @@ namespace Microsoft.Extensions.Hosting
                 var assemblyCandidateFinder = new DependencyContextAssemblyCandidateFinder(dependencyContext, logger);
                 var assemblyProvider = new DependencyContextAssemblyProvider(dependencyContext, logger);
                 var scanner = new AggregateConventionScanner(assemblyCandidateFinder);
-                return RocketHostExtensions.Swap(
-                    builder, b
+                return RocketHostExtensions.Swap(b, b
                         .With(assemblyCandidateFinder)
                         .With(assemblyProvider)
                         .With(scanner)
@@ -60,8 +59,7 @@ namespace Microsoft.Extensions.Hosting
                 var assemblyCandidateFinder = new AppDomainAssemblyCandidateFinder(appDomain, logger);
                 var assemblyProvider = new AppDomainAssemblyProvider(appDomain, logger);
                 var scanner = new AggregateConventionScanner(assemblyCandidateFinder);
-                return RocketHostExtensions.Swap(
-                    builder, b
+                return RocketHostExtensions.Swap(b, b
                         .With(assemblyCandidateFinder)
                         .With(assemblyProvider)
                         .With(scanner)
@@ -91,8 +89,7 @@ namespace Microsoft.Extensions.Hosting
                 var assemblyCandidateFinder = new DefaultAssemblyCandidateFinder(enumerable, logger);
                 var assemblyProvider = new DefaultAssemblyProvider(enumerable, logger);
                 var scanner = new AggregateConventionScanner(assemblyCandidateFinder);
-                return RocketHostExtensions.Swap(
-                    builder, b
+                return RocketHostExtensions.Swap(b, b
                         .With(assemblyCandidateFinder)
                         .With(assemblyProvider)
                         .With(scanner)

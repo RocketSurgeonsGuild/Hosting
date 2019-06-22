@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "AspNetCore.Host": {
+      "commandName": "Project",
+      "commandLineArgs": "my"
+    }
+  }
+}

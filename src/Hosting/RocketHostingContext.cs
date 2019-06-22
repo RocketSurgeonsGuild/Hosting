@@ -19,11 +19,8 @@ namespace Rocket.Surgery.Hosting
         }
 
         public IConventionScanner Scanner { get; }
-
         public DiagnosticSource DiagnosticSource { get; }
-
         public IDictionary<object, object> Properties { get; }
-
         public IAssemblyProvider AssemblyProvider { get; }
         public IAssemblyCandidateFinder AssemblyCandidateFinder { get; }
         public string[] Arguments { get; }

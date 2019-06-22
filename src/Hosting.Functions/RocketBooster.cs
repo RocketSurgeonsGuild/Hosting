@@ -3,24 +3,24 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.DependencyModel;
-using Rocket.Surgery.AspNetCore.Hosting;
 using Rocket.Surgery.Conventions;
 using Rocket.Surgery.Conventions.Reflection;
 using Rocket.Surgery.Conventions.Scanners;
+//using Microsoft.Azure.WebJobs.Hosting;
 
-// ReSharper disable once CheckNamespace
-namespace Microsoft.AspNetCore.Hosting
+namespace Rocket.Surgery.Hosting.Functions
 {
     public static class RocketBooster
     {
-        public static Func<IWebHostBuilder, IRocketWebHostBuilder> ForDependencyContext(
+        public static Func<IWebJobsBuilder, object, IRocketFunctionHostBuilder> ForDependencyContext(
             DependencyContext dependencyContext,
             DiagnosticSource diagnosticSource = null)
         {
-            return builder =>
+            return (builder , startupInstance) =>
             {
-                var b = RocketWebHostExtensions.GetOrCreateBuilder(builder);
+                var b = RocketHostExtensions.GetOrCreateBuilder(builder, startupInstance, null);
                 if (diagnosticSource != null)
                 {
                     b = b.With(diagnosticSource);
@@ -30,8 +30,7 @@ namespace Microsoft.AspNetCore.Hosting
                 var assemblyCandidateFinder = new DependencyContextAssemblyCandidateFinder(dependencyContext, logger);
                 var assemblyProvider = new DependencyContextAssemblyProvider(dependencyContext, logger);
                 var scanner = new AggregateConventionScanner(assemblyCandidateFinder);
-                return RocketWebHostExtensions.Swap(
-                    builder, b
+                return RocketHostExtensions.Swap(b, b
                         .With(assemblyCandidateFinder)
                         .With(assemblyProvider)
                         .With(scanner)
@@ -39,18 +38,18 @@ namespace Microsoft.AspNetCore.Hosting
             };
         }
 
-        public static Func<IWebHostBuilder, IRocketWebHostBuilder> For(DependencyContext dependencyContext, DiagnosticSource diagnosticSource = null)
+        public static Func<IWebJobsBuilder, object, IRocketFunctionHostBuilder> For(DependencyContext dependencyContext, DiagnosticSource diagnosticSource = null)
         {
             return ForDependencyContext(dependencyContext, diagnosticSource);
         }
 
-        public static Func<IWebHostBuilder, IRocketWebHostBuilder> ForAppDomain(
+        public static Func<IWebJobsBuilder, object, IRocketFunctionHostBuilder> ForAppDomain(
             AppDomain appDomain,
             DiagnosticSource diagnosticSource = null)
         {
-            return builder =>
+            return (builder, startupInstance) =>
             {
-                var b = RocketWebHostExtensions.GetOrCreateBuilder(builder);
+                var b = RocketHostExtensions.GetOrCreateBuilder(builder, startupInstance, null);
                 if (diagnosticSource != null)
                 {
                     b = b.With(diagnosticSource);
@@ -60,8 +59,7 @@ namespace Microsoft.AspNetCore.Hosting
                 var assemblyCandidateFinder = new AppDomainAssemblyCandidateFinder(appDomain, logger);
                 var assemblyProvider = new AppDomainAssemblyProvider(appDomain, logger);
                 var scanner = new AggregateConventionScanner(assemblyCandidateFinder);
-                return RocketWebHostExtensions.Swap(
-                    builder, b
+                return RocketHostExtensions.Swap(b, b
                         .With(assemblyCandidateFinder)
                         .With(assemblyProvider)
                         .With(scanner)
@@ -69,19 +67,18 @@ namespace Microsoft.AspNetCore.Hosting
             };
         }
 
-        public static Func<IWebHostBuilder, IRocketWebHostBuilder> For(AppDomain appDomain, DiagnosticSource diagnosticSource = null)
+        public static Func<IWebJobsBuilder, object, IRocketFunctionHostBuilder> For(AppDomain appDomain, DiagnosticSource diagnosticSource = null)
         {
             return ForAppDomain(appDomain, diagnosticSource);
         }
 
-
-        public static Func<IWebHostBuilder, IRocketWebHostBuilder> ForAssemblies(
+        public static Func<IWebJobsBuilder, object, IRocketFunctionHostBuilder> ForAssemblies(
             IEnumerable<Assembly> assemblies,
             DiagnosticSource diagnosticSource = null)
         {
-            return builder =>
+            return (builder, startupInstance) =>
             {
-                var b = RocketWebHostExtensions.GetOrCreateBuilder(builder);
+                var b = RocketHostExtensions.GetOrCreateBuilder(builder, startupInstance, null);
                 if (diagnosticSource != null)
                 {
                     b = b.With(diagnosticSource);
@@ -92,8 +89,7 @@ namespace Microsoft.AspNetCore.Hosting
                 var assemblyCandidateFinder = new DefaultAssemblyCandidateFinder(enumerable, logger);
                 var assemblyProvider = new DefaultAssemblyProvider(enumerable, logger);
                 var scanner = new AggregateConventionScanner(assemblyCandidateFinder);
-                return RocketWebHostExtensions.Swap(
-                    builder, b
+                return RocketHostExtensions.Swap(b, b
                         .With(assemblyCandidateFinder)
                         .With(assemblyProvider)
                         .With(scanner)
@@ -101,7 +97,7 @@ namespace Microsoft.AspNetCore.Hosting
             };
         }
 
-        public static Func<IWebHostBuilder, IRocketWebHostBuilder> For(IEnumerable<Assembly> assemblies, DiagnosticSource diagnosticSource = null)
+        public static Func<IWebJobsBuilder, object, IRocketFunctionHostBuilder> For(IEnumerable<Assembly> assemblies, DiagnosticSource diagnosticSource = null)
         {
             return ForAssemblies(assemblies, diagnosticSource);
         }

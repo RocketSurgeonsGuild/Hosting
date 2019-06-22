@@ -3,7 +3,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
-using Rocket.Surgery.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 using Rocket.Surgery.Conventions.Reflection;
 using Rocket.Surgery.Conventions.Scanners;
 using Rocket.Surgery.Extensions.Testing;
@@ -15,14 +15,15 @@ namespace Rocket.Surgery.Hosting.AspNetCore.Tests
 {
     public class RocketWebHostStartupTests : AutoTestBase
     {
-        private readonly IRocketWebHostBuilder _baseBuilder;
+        private readonly IHostBuilder _baseBuilder;
         public RocketWebHostStartupTests(ITestOutputHelper outputHelper) : base(outputHelper)
         {
-            _baseBuilder = WebHost.CreateDefaultBuilder()
-                .UseConventional()
+            _baseBuilder = Host.CreateDefaultBuilder()
+                .ConfigureWebHostDefaults(x => { })
+                .ConfigureRocketSurgey(x => x
                 .UseScanner(new BasicConventionScanner())
                 .UseAssemblyCandidateFinder(new DefaultAssemblyCandidateFinder(new[] { typeof(RocketWebHostBuilderTests).Assembly }))
-                .UseAssemblyProvider(new DefaultAssemblyProvider(new[] { typeof(RocketWebHostBuilderTests).Assembly }));
+                .UseAssemblyProvider(new DefaultAssemblyProvider(new[] { typeof(RocketWebHostBuilderTests).Assembly })));
         }
 
         [Fact]
@@ -30,15 +31,18 @@ namespace Rocket.Surgery.Hosting.AspNetCore.Tests
         {
             var builder = _baseBuilder;
             var result = builder;
-            builder.UseStartup<SimpleStartup>();
+            builder.ConfigureWebHost(x => x.UseStartup<SimpleStartup>().UseTestServer());
 
-            using (var server = new TestServer(builder))
+            using (var host = builder.Build())
             {
+                await host.StartAsync();
+                var server = host.GetTestServer();
                 var response = await server.CreateRequest("/")
                     .GetAsync();
 
                 var content = await response.Content.ReadAsStringAsync();
                 content.Should().Be("SimpleStartup -> Configure");
+                await host.StopAsync();
             }
         }
     }

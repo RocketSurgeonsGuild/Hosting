@@ -1,10 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
     <OutputType>Exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\AspNetCore.Hosting\Rocket.Surgery.AspNetCore.Hosting.csproj" />
+    <ProjectReference Include="..\..\src\Hosting\Rocket.Surgery.Hosting.csproj" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" />
   </ItemGroup>
