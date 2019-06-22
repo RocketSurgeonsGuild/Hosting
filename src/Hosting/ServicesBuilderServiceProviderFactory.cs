@@ -34,25 +34,29 @@ namespace Rocket.Surgery.Hosting
                 var webHostedServices = containerBuilder.Services
                     .Where(x => x.ImplementationType?.FullName.Contains("Microsoft.AspNetCore.Hosting.Internal") == true)
                     .ToArray();
-                containerBuilder.Services.AddSingleton<IHostedService>(_ =>
-                    new CommandLineHostedService(
-                        _,
-                        exec,
-#if NETCOREAPP3_0
-                        _.GetRequiredService<IHostApplicationLifetime>(),
-#else
-                        _.GetRequiredService<IApplicationLifetime>(),
-#endif
-                        result,
-                        webHostedServices.Any()
-                    )
-                );
                 if (!exec.IsDefaultCommand)
                 {
                     foreach (var descriptor in webHostedServices)
                     {
                         containerBuilder.Services.Remove(descriptor);
                     }
+                }
+                var hasWebHostedService = webHostedServices.Any();
+                if (containerBuilder.Properties.TryGetValue(typeof(CommandLineHostedService), out var _) || !exec.IsDefaultCommand)
+                {
+                    containerBuilder.Services.AddSingleton<IHostedService>(_ =>
+                        new CommandLineHostedService(
+                            _,
+                            exec,
+#if NETSTANDARD2_0 || NETCOREAPP2_1
+                            _.GetRequiredService<IApplicationLifetime>(),
+#else
+                            _.GetRequiredService<IHostApplicationLifetime>(),
+#endif
+                            result,
+                            hasWebHostedService
+                        )
+                    );
                 }
             }
             return containerBuilder.Build();
