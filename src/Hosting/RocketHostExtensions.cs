@@ -86,6 +86,21 @@ namespace Microsoft.Extensions.Hosting
             return RocketBooster.ForAssemblies(assemblies, diagnosticSource)(builder.Builder);
         }
 
+        public static IRocketHostBuilder UseDiagnosticLogging(this IRocketHostBuilder builder, Action<ILoggingBuilder> action)
+        {
+            DiagnosticListenerExtensions.SubscribeWithAdapter(
+                builder.DiagnosticSource is DiagnosticListener listener ? listener : new DiagnosticListener("DiagnosticLogger"),
+                new DiagnosticListenerLoggingAdapter(
+                    new ServiceCollection()
+                        .AddLogging(action)
+                        .BuildServiceProvider()
+                        .GetRequiredService<ILoggerFactory>()
+                        .CreateLogger("DiagnosticLogger")
+                    )
+                );
+            return builder;
+        }
+
         internal static RocketHostBuilder GetConventionalHostBuilder(IHostBuilder builder)
         {
             return GetOrCreateBuilder(builder);
