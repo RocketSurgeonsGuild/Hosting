@@ -130,6 +130,7 @@ namespace Microsoft.Extensions.Hosting
                     .ConfigureAppConfiguration(host.ReplaceArguments)
                     .ConfigureAppConfiguration(host.ConfigureAppConfiguration)
                     .ConfigureServices(host.ConfigureServices)
+                    .ConfigureServices(host.ConfigureLogging)
                     .ConfigureServices((context, services) => host.DefaultServices(builder, context, services));
                 Builders.Add(builder, conventionalBuilder);
             }

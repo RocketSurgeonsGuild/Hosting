@@ -18,6 +18,7 @@
     <PackageReference Include="Rocket.Surgery.Extensions.CommandLine" />
     <PackageReference Include="Rocket.Surgery.Extensions.Configuration" />
     <PackageReference Include="Rocket.Surgery.Extensions.DependencyInjection" />
+    <PackageReference Include="Rocket.Surgery.Extensions.Logging" />
   </ItemGroup>
   <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">

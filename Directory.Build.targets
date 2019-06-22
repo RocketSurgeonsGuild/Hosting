@@ -50,16 +50,16 @@
     <PackageReference Update="Rocket.Surgery.Extensions" Version="1.0.0" />
     <PackageReference Update="Rocket.Surgery.Extensions.CommandLine" Version="4.0.1" />
     <PackageReference Update="Rocket.Surgery.Extensions.CommandLine.Abstractions" Version="4.0.1" />
-    <PackageReference Update="Rocket.Surgery.Extensions.Configuration" Version="5.0.2" />
-    <PackageReference Update="Rocket.Surgery.Extensions.Configuration.Abstractions" Version="5.0.2" />
-    <PackageReference Update="Rocket.Surgery.Extensions.DependencyInjection" Version="5.0.2" />
-    <PackageReference Update="Rocket.Surgery.Extensions.DependencyInjection.Abstractions" Version="5.0.2" />
+    <PackageReference Update="Rocket.Surgery.Extensions.Configuration" Version="5.1.1" />
+    <PackageReference Update="Rocket.Surgery.Extensions.Configuration.Abstractions" Version="5.1.1" />
+    <PackageReference Update="Rocket.Surgery.Extensions.DependencyInjection" Version="5.1.1" />
+    <PackageReference Update="Rocket.Surgery.Extensions.DependencyInjection.Abstractions" Version="5.1.1" />
     <PackageReference Update="Rocket.Surgery.Extensions.Autofac" Version="4.0.1" />
     <PackageReference Update="Rocket.Surgery.Extensions.Autofac.Abstractions" Version="4.0.1" />
-    <PackageReference Update="Rocket.Surgery.Extensions.Logging.Empowered" Version="5.0.2" />
-    <PackageReference Update="Rocket.Surgery.Extensions.Logging.Abstractions" Version="5.0.2" />
-    <PackageReference Update="Rocket.Surgery.Extensions.WebJobs" Version="5.0.2" />
-    <PackageReference Update="Rocket.Surgery.Extensions.WebJobs.Abstractions" Version="5.0.2" />
+    <PackageReference Update="Rocket.Surgery.Extensions.Logging" Version="5.1.1" />
+    <PackageReference Update="Rocket.Surgery.Extensions.Logging.Abstractions" Version="5.1.1" />
+    <PackageReference Update="Rocket.Surgery.Extensions.WebJobs" Version="5.1.1" />
+    <PackageReference Update="Rocket.Surgery.Extensions.WebJobs.Abstractions" Version="5.1.1" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Rocket.Surgery.Build.Metadata" Version="3.3.0" PrivateAssets="All" />

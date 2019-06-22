@@ -11,6 +11,7 @@ using NetEscapades.Configuration.Yaml;
 using Rocket.Surgery.Conventions;
 using Rocket.Surgery.Extensions.CommandLine;
 using Rocket.Surgery.Extensions.DependencyInjection;
+using Rocket.Surgery.Extensions.Logging;
 using Rocket.Surgery.Hosting;
 using ConfigurationBuilder = Rocket.Surgery.Extensions.Configuration.ConfigurationBuilder;
 using IConfigurationBuilder = Microsoft.Extensions.Configuration.IConfigurationBuilder;
@@ -145,6 +146,12 @@ namespace Microsoft.Extensions.Hosting
         {
             var rocketHostBuilder = RocketHostExtensions.GetConventionalHostBuilder(_hostBuilder);
             services.AddSingleton<IRocketHostingContext>(_ => new RocketHostingContext(rocketHostBuilder, _args ?? Array.Empty<string>()));
+        }
+
+        public void ConfigureLogging(HostBuilderContext context, IServiceCollection services)
+        {
+            var rocketHostBuilder = RocketHostExtensions.GetConventionalHostBuilder(_hostBuilder);
+            rocketHostBuilder.UseLogging(new RocketLoggingOptions());
         }
 
         public void DefaultServices(IHostBuilder builder, HostBuilderContext context, IServiceCollection services)
