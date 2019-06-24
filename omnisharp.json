@@ -1,5 +1,5 @@
 {
-    "cake": {
-        "enabled": false
+    "RoslynExtensionsOptions": {
+        "enableAnalyzersSupport": true
     }
 }
