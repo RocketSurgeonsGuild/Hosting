@@ -20,6 +20,9 @@
     <PackageReference Include="Rocket.Surgery.Extensions.DependencyInjection" />
     <PackageReference Include="Rocket.Surgery.Extensions.Logging" />
   </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)'!='netstandard2.0' and '$(TargetFramework)'!='netcoreapp2.1'">
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" />
+  </ItemGroup>
   <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
       <_Parameter1>Rocket.Surgery.Hosting.Autofac</_Parameter1>

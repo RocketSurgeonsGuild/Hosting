@@ -146,6 +146,9 @@ namespace Microsoft.Extensions.Hosting
         {
             var rocketHostBuilder = RocketHostExtensions.GetConventionalHostBuilder(_hostBuilder);
             services.AddSingleton<IRocketHostingContext>(_ => new RocketHostingContext(rocketHostBuilder, _args ?? Array.Empty<string>()));
+#if !(NETSTANDARD2_0 || NETCOREAPP2_1)
+            services.AddHealthChecks();
+#endif
         }
 
         public void ConfigureLogging(HostBuilderContext context, IServiceCollection services)
