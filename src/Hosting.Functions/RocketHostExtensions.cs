@@ -161,7 +161,7 @@ namespace Rocket.Surgery.Hosting.Functions
                 var assemblyCandidateFinder = new DependencyContextAssemblyCandidateFinder(dependencyContext, logger);
                 var assemblyProvider = new DependencyContextAssemblyProvider(dependencyContext, logger);
                 var scanner = new AggregateConventionScanner(assemblyCandidateFinder);
-                conventionalBuilder = new RocketFunctionHostBuilder(builder, functionsAssembly, startupInstance, environment, scanner, assemblyCandidateFinder, assemblyProvider, diagnosticSource, new Dictionary<object, object>());
+                conventionalBuilder = new RocketFunctionHostBuilder(builder, functionsAssembly, startupInstance, environment, scanner, assemblyCandidateFinder, assemblyProvider, diagnosticSource);
                 Builders.Add(builder, conventionalBuilder);
             }
 

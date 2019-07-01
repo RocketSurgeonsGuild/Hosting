@@ -33,8 +33,7 @@ namespace Rocket.Surgery.Hosting.Functions
             IConventionScanner scanner,
             IAssemblyCandidateFinder assemblyCandidateFinder,
             IAssemblyProvider assemblyProvider,
-            DiagnosticSource diagnosticSource,
-            IDictionary<object, object> properties) : base(scanner, assemblyCandidateFinder, assemblyProvider, diagnosticSource, properties)
+            DiagnosticSource diagnosticSource) : base(scanner, assemblyCandidateFinder, assemblyProvider, diagnosticSource, new ServiceProviderDictionary())
         {
             _startupInstance = startupInstance;
             _environment = environment ?? CreateEnvironment();
@@ -47,32 +46,32 @@ namespace Rocket.Surgery.Hosting.Functions
 
         internal RocketFunctionHostBuilder With(IConventionScanner scanner)
         {
-            return new RocketFunctionHostBuilder(Builder, FunctionsAssembly, _startupInstance, _environment, scanner, AssemblyCandidateFinder, AssemblyProvider, DiagnosticSource, Properties);
+            return new RocketFunctionHostBuilder(Builder, FunctionsAssembly, _startupInstance, _environment, scanner, AssemblyCandidateFinder, AssemblyProvider, DiagnosticSource);
         }
 
         internal RocketFunctionHostBuilder With(Assembly assemby)
         {
-            return new RocketFunctionHostBuilder(Builder, assemby, _startupInstance, _environment, Scanner, AssemblyCandidateFinder, AssemblyProvider, DiagnosticSource, Properties);
+            return new RocketFunctionHostBuilder(Builder, assemby, _startupInstance, _environment, Scanner, AssemblyCandidateFinder, AssemblyProvider, DiagnosticSource);
         }
 
         internal RocketFunctionHostBuilder With(IAssemblyCandidateFinder assemblyCandidateFinder)
         {
-            return new RocketFunctionHostBuilder(Builder, FunctionsAssembly, _startupInstance, _environment, Scanner, assemblyCandidateFinder, AssemblyProvider, DiagnosticSource, Properties);
+            return new RocketFunctionHostBuilder(Builder, FunctionsAssembly, _startupInstance, _environment, Scanner, assemblyCandidateFinder, AssemblyProvider, DiagnosticSource);
         }
 
         internal RocketFunctionHostBuilder With(IAssemblyProvider assemblyProvider)
         {
-            return new RocketFunctionHostBuilder(Builder, FunctionsAssembly, _startupInstance, _environment, Scanner, AssemblyCandidateFinder, assemblyProvider, DiagnosticSource, Properties);
+            return new RocketFunctionHostBuilder(Builder, FunctionsAssembly, _startupInstance, _environment, Scanner, AssemblyCandidateFinder, assemblyProvider, DiagnosticSource);
         }
 
         internal RocketFunctionHostBuilder With(DiagnosticSource diagnosticSource)
         {
-            return new RocketFunctionHostBuilder(Builder, FunctionsAssembly, _startupInstance, _environment, Scanner, AssemblyCandidateFinder, AssemblyProvider, diagnosticSource, Properties);
+            return new RocketFunctionHostBuilder(Builder, FunctionsAssembly, _startupInstance, _environment, Scanner, AssemblyCandidateFinder, AssemblyProvider, diagnosticSource);
         }
 
         internal RocketFunctionHostBuilder With(IRocketEnvironment environment)
         {
-            return new RocketFunctionHostBuilder(Builder, FunctionsAssembly, _startupInstance, environment, Scanner, AssemblyCandidateFinder, AssemblyProvider, DiagnosticSource, Properties);
+            return new RocketFunctionHostBuilder(Builder, FunctionsAssembly, _startupInstance, environment, Scanner, AssemblyCandidateFinder, AssemblyProvider, DiagnosticSource);
         }
 
         private static IRocketEnvironment CreateEnvironment()
@@ -158,7 +157,7 @@ namespace Rocket.Surgery.Hosting.Functions
 
         private void SetupWebJobs(IConfiguration existingConfiguration)
         {
-            var builder = new WebJobsConventionBuilder( 
+            var builder = new WebJobsConventionBuilder(
                 Scanner,
                 AssemblyProvider,
                 AssemblyCandidateFinder,
