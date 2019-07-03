@@ -23,12 +23,5 @@ namespace Rocket.Surgery.Hosting.Functions.Tests
                 rb => { });
             host.Should().BeAssignableTo<IWebJobsBuilder>();
         }
-
-        [Fact]
-        public void Creates_RocketHost_ForDependencyContext()
-        {
-            var host = new WebJobsBuilder().UseRocketBooster(new Startup(), RocketBooster.For(DependencyContext.Load(typeof(RocketHostTests).Assembly)), rb=>{});
-            host.Should().BeAssignableTo<IWebJobsBuilder>();
-        }
     }
 }
