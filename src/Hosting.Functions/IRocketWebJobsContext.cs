@@ -6,12 +6,17 @@ using Rocket.Surgery.Conventions.Scanners;
 
 namespace Rocket.Surgery.Hosting.Functions
 {
+    /// <summary>
+    /// Interface IRocketWebJobsContext
+    /// Implements the <see cref="IConventionHostBuilder{IRocketWebJobsContext}" />
+    /// </summary>
+    /// <seealso cref="IConventionHostBuilder{IRocketWebJobsContext}" />
     public interface IRocketWebJobsContext : IConventionHostBuilder<IRocketWebJobsContext>
     {
-        IConventionScanner Scanner { get; } 
-        DiagnosticSource DiagnosticSource { get; }
+        /// <summary>
+        /// Gets the properties.
+        /// </summary>
+        /// <value>The properties.</value>
         IDictionary<object, object> Properties { get; }
-        IAssemblyProvider AssemblyProvider { get; }
-        IAssemblyCandidateFinder AssemblyCandidateFinder { get; }
     }
 }

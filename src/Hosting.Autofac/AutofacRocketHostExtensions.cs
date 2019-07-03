@@ -10,8 +10,17 @@ using Rocket.Surgery.Hosting;
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.Hosting
 {
+    /// <summary>
+    /// Class AutofacRocketHostExtensions.
+    /// </summary>
     public static class AutofacRocketHostExtensions
     {
+        /// <summary>
+        /// Uses the autofac.
+        /// </summary>
+        /// <param name="builder">The builder.</param>
+        /// <param name="containerBuilder">The container builder.</param>
+        /// <returns>IRocketHostBuilder.</returns>
         public static IRocketHostBuilder UseAutofac(this IRocketHostBuilder builder, ContainerBuilder containerBuilder = null)
         {
             builder.Builder.ConfigureServices((context, services) =>

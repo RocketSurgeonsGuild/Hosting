@@ -27,7 +27,7 @@ namespace Extensions
             var diagnosticSource = new DiagnosticListener("Extensions.Host");
             return Host.CreateDefaultBuilder(args)
                 .LaunchWith(RocketBooster.For(DependencyContext.Default, diagnosticSource))
-                .ConfigureRocketSurgey(b => b.AppendConvention(new Convention())
+                .ConfigureRocketSurgery(b => b.AppendConvention(new Convention())
                 .AppendDelegate(new CommandLineConventionDelegate(c => c.OnRun(x =>
             {
                 Console.WriteLine($"               Debug: {x.Debug}");
@@ -53,6 +53,7 @@ namespace Extensions
             _configuration = configuration;
             this.x = x;
         }
+
         [Option(CommandOptionType.SingleValue)]
         public string Name { get; set; }
 

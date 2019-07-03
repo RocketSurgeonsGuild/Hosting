@@ -32,7 +32,7 @@ namespace Rocket.Surgery.Hosting.AspNetCore.Tests
         {
             var builder = Host.CreateDefaultBuilder()
                 .ConfigureWebHostDefaults(x => { })
-                .ConfigureRocketSurgey(x => x
+                .ConfigureRocketSurgery(x => x
                 .UseScanner(AutoFake.Resolve<IConventionScanner>())
             .PrependDelegate(new Action(() => { }))
             .AppendDelegate(new Action(() => { })))
@@ -47,7 +47,7 @@ namespace Rocket.Surgery.Hosting.AspNetCore.Tests
             var convention = AutoFake.Resolve<IConvention>();
             var builder = Host.CreateDefaultBuilder()
                 .ConfigureWebHostDefaults(x => { })
-                .ConfigureRocketSurgey(x => x
+                .ConfigureRocketSurgery(x => x
                 .UseScanner(AutoFake.Resolve<IConventionScanner>())
                                 .PrependConvention(convention)
             .AppendConvention(convention));
@@ -63,7 +63,7 @@ namespace Rocket.Surgery.Hosting.AspNetCore.Tests
 
             var builder = Host.CreateDefaultBuilder(Array.Empty<string>())
                 .ConfigureWebHostDefaults(x => x.UseStartup<TestStartup>().UseTestServer())
-                .ConfigureRocketSurgey(x => x
+                .ConfigureRocketSurgery(x => x
                 .UseScanner(new BasicConventionScanner(
                     serviceConventionFake, configurationConventionFake
                 ))
@@ -87,7 +87,7 @@ namespace Rocket.Surgery.Hosting.AspNetCore.Tests
 
             var builder = Host.CreateDefaultBuilder(new[] { "myself" })
                 .ConfigureWebHostDefaults(x => x.UseStartup<MyStartup>().UseTestServer())
-                .ConfigureRocketSurgey(x => x
+                .ConfigureRocketSurgery(x => x
                 .UseScanner(new BasicConventionScanner(
                     serviceConventionFake, configurationConventionFake
                 ))

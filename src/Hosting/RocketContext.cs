@@ -1,35 +1,43 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.CommandLine;
 using Microsoft.Extensions.Configuration.EnvironmentVariables;
 using Microsoft.Extensions.Configuration.Json;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using NetEscapades.Configuration.Yaml;
 using Rocket.Surgery.Conventions;
 using Rocket.Surgery.Extensions.CommandLine;
 using Rocket.Surgery.Extensions.DependencyInjection;
-using Rocket.Surgery.Extensions.Logging;
-using Rocket.Surgery.Hosting;
 using ConfigurationBuilder = Rocket.Surgery.Extensions.Configuration.ConfigurationBuilder;
 using IConfigurationBuilder = Microsoft.Extensions.Configuration.IConfigurationBuilder;
 
-// ReSharper disable once CheckNamespace
-namespace Microsoft.Extensions.Hosting
+namespace Rocket.Surgery.Hosting
 {
+    /// <summary>
+    /// Class RocketContext.
+    /// </summary>
     class RocketContext
     {
         private readonly IHostBuilder _hostBuilder;
         private string[] _args;
         private ICommandLineExecutor _exec;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RocketContext"/> class.
+        /// </summary>
+        /// <param name="hostBuilder">The host builder.</param>
         public RocketContext(IHostBuilder hostBuilder)
         {
             _hostBuilder = hostBuilder;
         }
 
+        /// <summary>
+        /// Configures the cli.
+        /// </summary>
+        /// <param name="configurationBuilder">The configuration builder.</param>
         public void ConfigureCli(IConfigurationBuilder configurationBuilder)
         {
             var rocketHostBuilder = RocketHostExtensions.GetConventionalHostBuilder(_hostBuilder);
@@ -37,7 +45,7 @@ namespace Microsoft.Extensions.Hosting
                 rocketHostBuilder.Scanner,
                 rocketHostBuilder.AssemblyProvider,
                 rocketHostBuilder.AssemblyCandidateFinder,
-                rocketHostBuilder.DiagnosticSource,
+                rocketHostBuilder.Logger,
                 rocketHostBuilder.Properties
             );
 
@@ -47,6 +55,10 @@ namespace Microsoft.Extensions.Hosting
             rocketHostBuilder.Properties.Add(typeof(ICommandLineExecutor), _exec);
         }
 
+        /// <summary>
+        /// Captures the arguments.
+        /// </summary>
+        /// <param name="configurationBuilder">The configuration builder.</param>
         public void CaptureArguments(IConfigurationBuilder configurationBuilder)
         {
             var commandLineSource = configurationBuilder.Sources.OfType<CommandLineConfigurationSource>()
@@ -57,6 +69,10 @@ namespace Microsoft.Extensions.Hosting
             }
         }
 
+        /// <summary>
+        /// Replaces the arguments.
+        /// </summary>
+        /// <param name="configurationBuilder">The configuration builder.</param>
         public void ReplaceArguments(IConfigurationBuilder configurationBuilder)
         {
             var commandLineSource = configurationBuilder.Sources.OfType<CommandLineConfigurationSource>()
@@ -67,6 +83,11 @@ namespace Microsoft.Extensions.Hosting
             }
         }
 
+        /// <summary>
+        /// Configures the application configuration.
+        /// </summary>
+        /// <param name="context">The context.</param>
+        /// <param name="configurationBuilder">The configuration builder.</param>
         public void ConfigureAppConfiguration(HostBuilderContext context, IConfigurationBuilder configurationBuilder)
         {
             var rocketHostBuilder = RocketHostExtensions.GetConventionalHostBuilder(_hostBuilder);
@@ -99,7 +120,7 @@ namespace Microsoft.Extensions.Hosting
                 context.HostingEnvironment.Convert(),
                 context.Configuration,
                 configurationBuilder,
-                rocketHostBuilder.DiagnosticSource,
+                rocketHostBuilder.Logger,
                 rocketHostBuilder.Properties);
             cb.Build();
 
@@ -142,25 +163,32 @@ namespace Microsoft.Extensions.Hosting
             }
         }
 
+        /// <summary>
+        /// Configures the services.
+        /// </summary>
+        /// <param name="context">The context.</param>
+        /// <param name="services">The services.</param>
         public void ConfigureServices(HostBuilderContext context, IServiceCollection services)
         {
             var rocketHostBuilder = RocketHostExtensions.GetConventionalHostBuilder(_hostBuilder);
-            services.AddSingleton<IRocketHostingContext>(_ => new RocketHostingContext(rocketHostBuilder, _args ?? Array.Empty<string>()));
+            services.AddSingleton(rocketHostBuilder.AssemblyCandidateFinder);
+            services.AddSingleton(rocketHostBuilder.AssemblyProvider);
+            services.AddSingleton(rocketHostBuilder.Scanner);
 #if !(NETSTANDARD2_0 || NETCOREAPP2_1)
             services.AddHealthChecks();
 #endif
         }
 
-        public void ConfigureLogging(HostBuilderContext context, IServiceCollection services)
-        {
-            var rocketHostBuilder = RocketHostExtensions.GetConventionalHostBuilder(_hostBuilder);
-            rocketHostBuilder.UseLogging(new RocketLoggingOptions());
-        }
-
-        public void DefaultServices(IHostBuilder builder, HostBuilderContext context, IServiceCollection services)
+        /// <summary>
+        /// Defaults the services.
+        /// </summary>
+        /// <param name="builder">The builder.</param>
+        /// <param name="context">The context.</param>
+        /// <param name="services">The services.</param>
+        public void DefaultServices(HostBuilderContext context, IServiceCollection services)
         {
             var conventionalBuilder = RocketHostExtensions.GetConventionalHostBuilder(_hostBuilder);
-            builder.UseServiceProviderFactory(
+            _hostBuilder.UseServiceProviderFactory(
                 new ServicesBuilderServiceProviderFactory(collection =>
                     new ServicesBuilder(
                         conventionalBuilder.Scanner,
@@ -169,7 +197,7 @@ namespace Microsoft.Extensions.Hosting
                         collection,
                         context.Configuration,
                         context.HostingEnvironment.Convert(),
-                        conventionalBuilder.DiagnosticSource,
+                        conventionalBuilder.Logger,
                         conventionalBuilder.Properties
                     )
                 )

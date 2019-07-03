@@ -10,8 +10,17 @@ using Rocket.Surgery.Conventions;
 
 namespace Rocket.Surgery.Hosting
 {
+    /// <summary>
+    /// Interface IRocketHostBuilder
+    /// Implements the <see cref="IConventionHostBuilder{IRocketHostBuilder}" />
+    /// </summary>
+    /// <seealso cref="IConventionHostBuilder{IRocketHostBuilder}" />
     public interface IRocketHostBuilder : IConventionHostBuilder<IRocketHostBuilder>
     {
+        /// <summary>
+        /// Gets the builder.
+        /// </summary>
+        /// <value>The builder.</value>
         IHostBuilder Builder { get; }
     }
 }

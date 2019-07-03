@@ -16,11 +16,12 @@ namespace Rocket.Surgery.Hosting.AspNetCore.Tests
     public class RocketWebHostStartupTests : AutoTestBase
     {
         private readonly IHostBuilder _baseBuilder;
+
         public RocketWebHostStartupTests(ITestOutputHelper outputHelper) : base(outputHelper)
         {
             _baseBuilder = Host.CreateDefaultBuilder()
                 .ConfigureWebHostDefaults(x => { })
-                .ConfigureRocketSurgey(x => x
+                .ConfigureRocketSurgery(x => x
                 .UseScanner(new BasicConventionScanner())
                 .UseAssemblyCandidateFinder(new DefaultAssemblyCandidateFinder(new[] { typeof(RocketWebHostBuilderTests).Assembly }))
                 .UseAssemblyProvider(new DefaultAssemblyProvider(new[] { typeof(RocketWebHostBuilderTests).Assembly })));

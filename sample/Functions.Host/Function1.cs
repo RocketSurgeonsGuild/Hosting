@@ -20,7 +20,7 @@ namespace Functions.Host
 
         public void Configure(IWebJobsBuilder builder)
         {
-            builder.UseRocketSurgey(
+            builder.UseRocketSurgery(
                 this,
                 hostBuilder =>
                 {
@@ -42,6 +42,7 @@ namespace Functions.Host
         {
             _service = service;
         }
+
         [FunctionName("Function1")]
         public void Run([TimerTrigger("0 */5 * * * *")]TimerInfo myTimer, ILogger log)
         {

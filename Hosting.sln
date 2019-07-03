@@ -66,6 +66,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rocket.Surgery.Hosting.AspN
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rocket.Surgery.Hosting.Tests", "test\Hosting.Tests\Rocket.Surgery.Hosting.Tests.csproj", "{FE8350F4-85E8-4432-BF9D-5E363611BAF4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rocket.Surgery.Hosting.Functions.Tests", "test\Hosting.Functions.Tests\Rocket.Surgery.Hosting.Functions.Tests.csproj", "{FE224E1D-06EC-4FA2-9EDC-818793AE34ED}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -184,6 +186,18 @@ Global
 		{FE8350F4-85E8-4432-BF9D-5E363611BAF4}.Release|x64.Build.0 = Release|Any CPU
 		{FE8350F4-85E8-4432-BF9D-5E363611BAF4}.Release|x86.ActiveCfg = Release|Any CPU
 		{FE8350F4-85E8-4432-BF9D-5E363611BAF4}.Release|x86.Build.0 = Release|Any CPU
+		{FE224E1D-06EC-4FA2-9EDC-818793AE34ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE224E1D-06EC-4FA2-9EDC-818793AE34ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE224E1D-06EC-4FA2-9EDC-818793AE34ED}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{FE224E1D-06EC-4FA2-9EDC-818793AE34ED}.Debug|x64.Build.0 = Debug|Any CPU
+		{FE224E1D-06EC-4FA2-9EDC-818793AE34ED}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FE224E1D-06EC-4FA2-9EDC-818793AE34ED}.Debug|x86.Build.0 = Debug|Any CPU
+		{FE224E1D-06EC-4FA2-9EDC-818793AE34ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE224E1D-06EC-4FA2-9EDC-818793AE34ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE224E1D-06EC-4FA2-9EDC-818793AE34ED}.Release|x64.ActiveCfg = Release|Any CPU
+		{FE224E1D-06EC-4FA2-9EDC-818793AE34ED}.Release|x64.Build.0 = Release|Any CPU
+		{FE224E1D-06EC-4FA2-9EDC-818793AE34ED}.Release|x86.ActiveCfg = Release|Any CPU
+		{FE224E1D-06EC-4FA2-9EDC-818793AE34ED}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -201,5 +215,6 @@ Global
 		{735B9472-48E8-4DB8-B890-792C41FFAD66} = {8FFDF555-DB50-45F9-9A2D-6410F39151C3}
 		{2341ECEE-AAA1-44C5-8B4E-1F829120EE89} = {DF33E0FB-9790-4654-B60F-8AB22E0CC3D1}
 		{FE8350F4-85E8-4432-BF9D-5E363611BAF4} = {DF33E0FB-9790-4654-B60F-8AB22E0CC3D1}
+		{FE224E1D-06EC-4FA2-9EDC-818793AE34ED} = {DF33E0FB-9790-4654-B60F-8AB22E0CC3D1}
 	EndGlobalSection
 EndGlobal

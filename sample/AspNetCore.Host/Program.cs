@@ -19,6 +19,7 @@ using Rocket.Surgery.Conventions.Scanners;
 using Rocket.Surgery.Extensions.CommandLine;
 using Rocket.Surgery.Extensions.Configuration;
 using Rocket.Surgery.Extensions.DependencyInjection;
+using Rocket.Surgery.Hosting;
 
 namespace Extensions
 {
@@ -30,7 +31,7 @@ namespace Extensions
 
             var builder = Host.CreateDefaultBuilder(args)
                 .LaunchWith(RocketBooster.For(DependencyContext.Default, diagnosticSource))
-                .ConfigureRocketSurgey(b => b.AppendConvention(new Convention()))
+                .ConfigureRocketSurgery(b => b.AppendConvention(new Convention()))
                 .ConfigureWebHostDefaults(x => x
                     .UseKestrel()
                     .UseStartup<Startup>()
@@ -51,6 +52,7 @@ namespace Extensions
             _configuration = configuration;
             this.x = x;
         }
+
         [Option(CommandOptionType.SingleValue)]
         public string Name { get; set; }
 
