@@ -41,6 +41,7 @@ namespace Rocket.Surgery.Hosting.AspNetCore.Tests
                 var response = await server.CreateRequest("/")
                     .GetAsync();
 
+                response.Content.Headers.Allow.Count.ToString();
                 var content = await response.Content.ReadAsStringAsync();
                 content.Should().Be("SimpleStartup -> Configure");
                 await host.StopAsync();
