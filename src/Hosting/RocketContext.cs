@@ -182,7 +182,6 @@ namespace Rocket.Surgery.Hosting
         /// <summary>
         /// Defaults the services.
         /// </summary>
-        /// <param name="builder">The builder.</param>
         /// <param name="context">The context.</param>
         /// <param name="services">The services.</param>
         public void DefaultServices(HostBuilderContext context, IServiceCollection services)
