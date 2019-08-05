@@ -9,7 +9,7 @@ namespace Rocket.Surgery.Hosting.Functions
     /// Implements the <see cref="IConventionHostBuilder{IRocketFunctionHostBuilder}" />
     /// </summary>
     /// <seealso cref="IConventionHostBuilder{IRocketFunctionHostBuilder}" />
-    public interface IRocketFunctionHostBuilder : IConventionHostBuilder<IRocketFunctionHostBuilder>
+    public interface IRocketFunctionHostBuilder : IConventionHostBuilder
     {
         /// <summary>
         /// Gets the builder.

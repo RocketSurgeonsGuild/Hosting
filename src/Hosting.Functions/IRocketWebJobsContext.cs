@@ -11,7 +11,7 @@ namespace Rocket.Surgery.Hosting.Functions
     /// Implements the <see cref="IConventionHostBuilder{IRocketWebJobsContext}" />
     /// </summary>
     /// <seealso cref="IConventionHostBuilder{IRocketWebJobsContext}" />
-    public interface IRocketWebJobsContext : IConventionHostBuilder<IRocketWebJobsContext>
+    public interface IRocketWebJobsContext : IConventionHostBuilder
     {
         /// <summary>
         /// Gets the properties.
