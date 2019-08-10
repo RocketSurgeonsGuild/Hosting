@@ -12,9 +12,9 @@ namespace Rocket.Surgery.Hosting
 {
     /// <summary>
     /// Interface IRocketHostBuilder
-    /// Implements the <see cref="IConventionHostBuilder{IRocketHostBuilder}" />
+    /// Implements the <see cref="IConventionHostBuilder" />
     /// </summary>
-    /// <seealso cref="IConventionHostBuilder{IRocketHostBuilder}" />
+    /// <seealso cref="IConventionHostBuilder" />
     public interface IRocketHostBuilder : IConventionHostBuilder
     {
         /// <summary>

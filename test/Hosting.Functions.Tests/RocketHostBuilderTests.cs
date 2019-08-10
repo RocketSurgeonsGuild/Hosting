@@ -52,8 +52,8 @@ namespace Rocket.Surgery.Hosting.Functions.Tests
             var startup = new Startup();
             var builder = new WebJobsBuilder()
                 .UseRocketBooster(
-                    startup, 
-                    RocketBooster.For(DependencyContext.Load(typeof(RocketHostTests).Assembly)), 
+                    startup,
+                    RocketBooster.For(DependencyContext.Load(typeof(RocketHostTests).Assembly)),
                     rb => rb
                         .UseScanner(AutoFake.Resolve<IConventionScanner>())
                         .PrependDelegate(new Action(() => { }))
@@ -138,7 +138,7 @@ namespace Rocket.Surgery.Hosting.Functions.Tests
             var startup = new Startup();
             var builder = new WebJobsBuilder()
                 .UseRocketSurgery(startup, rb => rb
-                    .UseScanner(new BasicConventionScanner(
+                    .UseScanner(new BasicConventionScanner(A.Fake<IServiceProviderDictionary>(),
                         serviceConventionFake, configurationConventionFake))
                     .UseAssemblyCandidateFinder(new DefaultAssemblyCandidateFinder(new[] { typeof(RocketHostBuilderTests).Assembly }))
                     .UseAssemblyProvider(new DefaultAssemblyProvider(new[] { typeof(RocketHostBuilderTests).Assembly })));

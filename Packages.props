@@ -63,21 +63,21 @@
     <PackageReference Update="Microsoft.Azure.WebJobs.Extensions.Http" Version="3.0.2" />
     <PackageReference Update="NetEscapades.Configuration.Yaml" Version="1.6.0" />
     <PackageReference Update="Newtonsoft.Json" Version="12.0.2" />
-    <PackageReference Update="Rocket.Surgery.Conventions" Version="6.3.0" />
-    <PackageReference Update="Rocket.Surgery.Conventions.Abstractions" Version="6.3.0" />
+    <PackageReference Update="Rocket.Surgery.Conventions" Version="6.3.1" />
+    <PackageReference Update="Rocket.Surgery.Conventions.Abstractions" Version="6.3.1" />
     <PackageReference Update="Rocket.Surgery.Extensions" Version="1.0.3" />
-    <PackageReference Update="Rocket.Surgery.Extensions.CommandLine" Version="5.0.5" />
-    <PackageReference Update="Rocket.Surgery.Extensions.CommandLine.Abstractions" Version="5.0.5" />
-    <PackageReference Update="Rocket.Surgery.Extensions.Configuration" Version="6.0.4" />
-    <PackageReference Update="Rocket.Surgery.Extensions.Configuration.Abstractions" Version="6.0.4" />
-    <PackageReference Update="Rocket.Surgery.Extensions.DependencyInjection" Version="6.0.4" />
-    <PackageReference Update="Rocket.Surgery.Extensions.DependencyInjection.Abstractions" Version="6.0.4" />
-    <PackageReference Update="Rocket.Surgery.Extensions.Autofac" Version="5.0.2" />
-    <PackageReference Update="Rocket.Surgery.Extensions.Autofac.Abstractions" Version="5.0.2" />
-    <PackageReference Update="Rocket.Surgery.Extensions.Logging" Version="6.0.4" />
-    <PackageReference Update="Rocket.Surgery.Extensions.Logging.Abstractions" Version="6.0.4" />
-    <PackageReference Update="Rocket.Surgery.Extensions.WebJobs" Version="6.0.4" />
-    <PackageReference Update="Rocket.Surgery.Extensions.WebJobs.Abstractions" Version="6.0.4" />
+    <PackageReference Update="Rocket.Surgery.Extensions.CommandLine" Version="5.0.6" />
+    <PackageReference Update="Rocket.Surgery.Extensions.CommandLine.Abstractions" Version="5.0.6" />
+    <PackageReference Update="Rocket.Surgery.Extensions.Configuration" Version="6.0.5" />
+    <PackageReference Update="Rocket.Surgery.Extensions.Configuration.Abstractions" Version="6.0.5" />
+    <PackageReference Update="Rocket.Surgery.Extensions.DependencyInjection" Version="6.0.5" />
+    <PackageReference Update="Rocket.Surgery.Extensions.DependencyInjection.Abstractions" Version="6.0.5" />
+    <PackageReference Update="Rocket.Surgery.Extensions.Autofac" Version="5.0.3" />
+    <PackageReference Update="Rocket.Surgery.Extensions.Autofac.Abstractions" Version="5.0.3" />
+    <PackageReference Update="Rocket.Surgery.Extensions.Logging" Version="6.0.5" />
+    <PackageReference Update="Rocket.Surgery.Extensions.Logging.Abstractions" Version="6.0.5" />
+    <PackageReference Update="Rocket.Surgery.Extensions.WebJobs" Version="6.0.5" />
+    <PackageReference Update="Rocket.Surgery.Extensions.WebJobs.Abstractions" Version="6.0.5" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Update="Rocket.Surgery.Extensions.Testing" Version="1.1.13" />

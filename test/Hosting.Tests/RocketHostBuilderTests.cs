@@ -130,7 +130,7 @@ namespace Rocket.Surgery.Hosting.Tests
 
             var builder = Host.CreateDefaultBuilder()
                 .ConfigureRocketSurgery(rb => rb
-                    .UseScanner(new BasicConventionScanner(
+                    .UseScanner(new BasicConventionScanner(A.Fake<IServiceProviderDictionary>(),
                         serviceConventionFake, configurationConventionFake, commandLineConventionFake))
                     .UseAssemblyCandidateFinder(new DefaultAssemblyCandidateFinder(new[] { typeof(RocketHostBuilderTests).Assembly }))
                     .UseAssemblyProvider(new DefaultAssemblyProvider(new[] { typeof(RocketHostBuilderTests).Assembly })));
@@ -144,7 +144,7 @@ namespace Rocket.Surgery.Hosting.Tests
         {
             var builder = Host.CreateDefaultBuilder(Array.Empty<string>())
                 .ConfigureRocketSurgery(rb => rb
-                .UseScanner(new BasicConventionScanner())
+                .UseScanner(new BasicConventionScanner(A.Fake<IServiceProviderDictionary>()))
                 .UseAssemblyCandidateFinder(new DefaultAssemblyCandidateFinder(new[] { typeof(RocketHostBuilderTests).Assembly }))
                 .UseAssemblyProvider(new DefaultAssemblyProvider(new[] { typeof(RocketHostBuilderTests).Assembly }))
                 .AppendDelegate(new CommandLineConventionDelegate(c => c.OnRun(state => 1337)), new CommandLineConventionDelegate(c => c.OnRun(state => 1337))));
@@ -158,7 +158,7 @@ namespace Rocket.Surgery.Hosting.Tests
             var builder = Host.CreateDefaultBuilder(Array.Empty<string>())
                 .ConfigureRocketSurgery(rb => rb
                 .UseAutofac()
-                .UseScanner(new BasicConventionScanner())
+                .UseScanner(new BasicConventionScanner(A.Fake<IServiceProviderDictionary>()))
                 .UseAssemblyCandidateFinder(new DefaultAssemblyCandidateFinder(new[] { typeof(RocketHostBuilderTests).Assembly }))
                 .UseAssemblyProvider(new DefaultAssemblyProvider(new[] { typeof(RocketHostBuilderTests).Assembly }))
                 .AppendDelegate(new CommandLineConventionDelegate(c => c.OnRun(state => 1337)), new CommandLineConventionDelegate(c => c.OnRun(state => 1337))));
@@ -177,7 +177,7 @@ namespace Rocket.Surgery.Hosting.Tests
         {
             var builder = Host.CreateDefaultBuilder(new[] { "myself" })
                 .ConfigureRocketSurgery(rb => rb
-                .UseScanner(new BasicConventionScanner())
+                .UseScanner(new BasicConventionScanner(A.Fake<IServiceProviderDictionary>()))
                 .UseAssemblyCandidateFinder(new DefaultAssemblyCandidateFinder(new[] { typeof(RocketHostBuilderTests).Assembly }))
                 .UseAssemblyProvider(new DefaultAssemblyProvider(new[] { typeof(RocketHostBuilderTests).Assembly }))
                 .AppendDelegate(new CommandLineConventionDelegate(c => c.OnRun(state => 1337)))

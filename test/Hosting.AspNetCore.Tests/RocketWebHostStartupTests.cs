@@ -1,9 +1,11 @@
 ﻿using System.Threading.Tasks;
+using FakeItEasy;
 using FluentAssertions;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Hosting;
+using Rocket.Surgery.Conventions;
 using Rocket.Surgery.Conventions.Reflection;
 using Rocket.Surgery.Conventions.Scanners;
 using Rocket.Surgery.Extensions.Testing;
@@ -22,7 +24,7 @@ namespace Rocket.Surgery.Hosting.AspNetCore.Tests
             _baseBuilder = Host.CreateDefaultBuilder()
                 .ConfigureWebHostDefaults(x => { })
                 .ConfigureRocketSurgery(x => x
-                .UseScanner(new BasicConventionScanner())
+                .UseScanner(new BasicConventionScanner(A.Fake<IServiceProviderDictionary>()))
                 .UseAssemblyCandidateFinder(new DefaultAssemblyCandidateFinder(new[] { typeof(RocketWebHostBuilderTests).Assembly }))
                 .UseAssemblyProvider(new DefaultAssemblyProvider(new[] { typeof(RocketWebHostBuilderTests).Assembly })));
         }

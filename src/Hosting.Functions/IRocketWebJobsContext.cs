@@ -8,9 +8,9 @@ namespace Rocket.Surgery.Hosting.Functions
 {
     /// <summary>
     /// Interface IRocketWebJobsContext
-    /// Implements the <see cref="IConventionHostBuilder{IRocketWebJobsContext}" />
+    /// Implements the <see cref="IConventionHostBuilder" />
     /// </summary>
-    /// <seealso cref="IConventionHostBuilder{IRocketWebJobsContext}" />
+    /// <seealso cref="IConventionHostBuilder" />
     public interface IRocketWebJobsContext : IConventionHostBuilder
     {
         /// <summary>

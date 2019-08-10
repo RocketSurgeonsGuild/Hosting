@@ -64,7 +64,7 @@ namespace Rocket.Surgery.Hosting.AspNetCore.Tests
             var builder = Host.CreateDefaultBuilder(Array.Empty<string>())
                 .ConfigureWebHostDefaults(x => x.UseStartup<TestStartup>().UseTestServer())
                 .ConfigureRocketSurgery(x => x
-                .UseScanner(new BasicConventionScanner(
+                .UseScanner(new BasicConventionScanner(A.Fake<IServiceProviderDictionary>(),
                     serviceConventionFake, configurationConventionFake
                 ))
                 .UseAssemblyCandidateFinder(new DefaultAssemblyCandidateFinder(new[] { typeof(RocketWebHostBuilderTests).Assembly }))
@@ -88,7 +88,7 @@ namespace Rocket.Surgery.Hosting.AspNetCore.Tests
             var builder = Host.CreateDefaultBuilder(new[] { "myself" })
                 .ConfigureWebHostDefaults(x => x.UseStartup<MyStartup>().UseTestServer())
                 .ConfigureRocketSurgery(x => x
-                .UseScanner(new BasicConventionScanner(
+                .UseScanner(new BasicConventionScanner(A.Fake<IServiceProviderDictionary>(),
                     serviceConventionFake, configurationConventionFake
                 ))
                 .UseAssemblyCandidateFinder(new DefaultAssemblyCandidateFinder(new[] { typeof(RocketWebHostBuilderTests).Assembly }))
